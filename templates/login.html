@@ -31,7 +31,7 @@
       </div>
 
       <div
-        class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm shadow-lg inset-shadow-2xs p-8 rounded-lg"
+        class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm shadow-lg shadow-violet-800/30 inset-shadow-2xs p-8 rounded-lg"
       >
         <form class="space-y-6" action="#" method="POST">
           <div>
@@ -83,22 +83,24 @@
           <div>
             <button
               type="submit"
-              class="flex w-full justify-center rounded-md bg-violet-800 px-3 py-2.5 text-md/6 font-semibold font-switzer tracking-widest text-white shadow-xs hover:bg-violet-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
+              class="flex w-full justify-center rounded-md bg-violet-800 px-3 py-2.5 text-md/6 font-semibold font-switzer tracking-widest text-white shadow-xs hover:bg-violet-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500/50"
             >
               Login
             </button>
           </div>
         </form>
 
-        <p class="mt-10 text-center font-switzer text-sm/6 text-gray-500">
-          No account?
-          <!---->
-          <a
-            href="#"
-            class="font-switzer tracking-wider text-yellow-300 hover:text-yellow-200 duration-300 ease-in-out delay-150 hover:text-md hover:tracking-widest"
-            >Register now!</a
-          >
-        </p>
+        <form method="POST" action="{{ url_for('register') }}">
+          <p class="mt-10 text-center text-sm/6 text-gray-500">
+            Not a member?
+            <button
+              type="submit"
+              class="font-switzer tracking-wide text-yellow-300 hover:text-yellow-200 duration-300 ease-in-out delay-150 hover:text-md hover:tracking-wider"
+            >
+              Register now!
+            </button>
+          </p>
+        </form>
       </div>
     </div>
   </body>
