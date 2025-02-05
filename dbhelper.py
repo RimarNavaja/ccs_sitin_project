@@ -1,7 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask import request, abort
+from flask import request, abort, Flask
+
+app = Flask(__name__)
+
+# Update the database URI with the correct hostname, username, password, and database name
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@Rimar097851@localhost/ccs_sitin_project'
 
 db = SQLAlchemy()
+db.init_app(app)
 
 class User(db.Model):
     __tablename__ = 'users'  # Ensure the table name matches the schema

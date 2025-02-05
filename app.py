@@ -9,8 +9,8 @@ from flask import (
 from dbhelper import db, User
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1010@localhost/ccssitinproject' 
-# username - root password - 1010
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1010@localhost/ccs_sitin_project' 
+# username - root password - 1010/@Rimar097851 database - ccs_sitin_project/csssitinproject
 app.secret_key = 'supersecretkey'
 db.init_app(app)
 
@@ -34,9 +34,23 @@ def login() -> None:
 def returntologin():
     return redirect(url_for('login'))
 
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register() -> None:
     if request.method == "POST":
+        if not request.form:
+            return redirect(url_for('register'))
+
+        missing_fields = [field for field in [
+            'idno', 'lastname', 'firstname', 'midname', 'course',
+            'yearlevel', 'email', 'username', 'password', 'confirm_password'
+        ] if field not in request.form]
+
+        if missing_fields:
+            flash(f"Missing form fields: {', '.join(missing_fields)}", "error")
+            return redirect(url_for('register'))
+
         try:
             idno = request.form['idno']
             lastname = request.form['lastname']
@@ -51,7 +65,18 @@ def register() -> None:
 
             if password != confirm_password:
                 flash("Passwords do not match")
-                return redirect(url_for('register'))
+                return render_template("register.html", form=request.form.to_dict())
+
+            #  Check for existing user with the same idno, email, or username
+            if User.query.filter_by(idno=idno).first():
+                flash("ID Number already exists")
+                return render_template("register.html", form=request.form.to_dict())
+            if User.query.filter_by(email=email).first():
+                flash("Email already exists")
+                return render_template("register.html", form=request.form.to_dict())
+            if User.query.filter_by(username=username).first():
+                flash("Username already exists")
+                return render_template("register.html", form=request.form.to_dict())
 
             new_user = User(
                 idno=idno,
@@ -66,7 +91,8 @@ def register() -> None:
             )
             db.session.add(new_user)
             db.session.commit()
-            return redirect(url_for('login'))
+            flash("Registration successful!")
+            return redirect(url_for('returntologin'))
         except KeyError as e:
             flash(f"Missing form field: {e}")
             return redirect(url_for('register'))

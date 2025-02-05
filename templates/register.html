@@ -9,16 +9,31 @@
       href="https://api.fontshare.com/v2/css?f[]=khand@700&f[]=switzer@400&display=swap"
       rel="stylesheet"
     />
+    <script src="/static/js/script.js"></script>
     <title>Registration</title>
   </head>
   <body>
     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <h2
-          class="mt-6 text-center text-3xl font-bold font-khand tracking-wider text-yellow-300"
+          class="mt-6 text-center text-4xl font-bold font-khand tracking-wider text-yellow-300"
         >
           Register for an account
         </h2>
+      </div>
+      <!-- Flash messages -->
+      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <ul
+          id="flash-messages"
+          class="bg-yellow-100/30 font-switzer border border-violet-400 text-violet-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
+          {% for message in messages %}
+          <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %} {% endwith %}
       </div>
       <!-- registration form -->
       <div
@@ -39,6 +54,7 @@
                     type="text"
                     name="idno"
                     id="idno"
+                    value="{{ form.idno if form else '' }}"
                     required
                     class="block w-full py-2.5 px-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-violet-500 sm:text-sm"
                   />
@@ -55,6 +71,7 @@
                     type="text"
                     name="lastname"
                     id="lastname"
+                    value="{{ form.lastname if form else '' }}"
                     required
                     class="block w-full py-2.5 px-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
@@ -71,6 +88,7 @@
                     type="text"
                     name="firstname"
                     id="firstname"
+                    value="{{ form.firstname if form else '' }}"
                     required
                     class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
@@ -87,6 +105,7 @@
                     type="text"
                     name="midname"
                     id="midname"
+                    value="{{ form.midname if form else '' }}"
                     required
                     class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
@@ -108,8 +127,8 @@
                     required
                     class="block w-full font-switzer rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm pr-4"
                   >
-                    <option value="BSIT">BSIT</option>
-                    <option value="BSCS">BSCS</option>
+                    <option value="BSIT" {% if form and form.course == 'BSIT' %}selected{% endif %}>BSIT</option>
+                    <option value="BSCS" {% if form and form.course == 'BSCS' %}selected{% endif %}>BSCS</option>
                   </select>
                 </div>
               </div>
@@ -126,10 +145,10 @@
                     required
                     class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   >
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
+                    <option value="1" {% if form and form.yearlevel == '1' %}selected{% endif %}>1</option>
+                    <option value="2" {% if form and form.yearlevel == '2' %}selected{% endif %}>2</option>
+                    <option value="3" {% if form and form.yearlevel == '3' %}selected{% endif %}>3</option>
+                    <option value="4" {% if form and form.yearlevel == '4' %}selected{% endif %}>4</option>
                   </select>
                 </div>
               </div>
@@ -144,6 +163,7 @@
                     type="email"
                     name="email"
                     id="email"
+                    value="{{ form.email if form else '' }}"
                     required
                     class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
@@ -160,6 +180,7 @@
                     type="text"
                     name="username"
                     id="username"
+                    value="{{ form.username if form else '' }}"
                     required
                     class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
@@ -177,7 +198,7 @@
                     name="password"
                     id="password"
                     required
-                    class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm focus-visible:"
                   />
                 </div>
               </div>

@@ -9,12 +9,27 @@
       href="https://api.fontshare.com/v2/css?f[]=khand@700&f[]=switzer@400&display=swap"
       rel="stylesheet"
     />
+    <script src="/static/js/script.js"></script>
     <title>Dashboard</title>
   </head>
   <body>
+    <!-- Flash messages -->
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <ul
+        id="flash-messages"
+        class="bg-yellow-100/30 font-switzer border border-violet-400 text-violet-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %} {% endwith %}
+    </div>
     <div class="flex min-h-screen justify-center">
       <h1 class="font-khand tracking-wider text-violet-700 text-5xl/9 mt-10">
-        Hello Welcome to Dashboard!
+        Welcome to Dashboard!
       </h1>
     </div>
   </body>
