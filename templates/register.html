@@ -181,19 +181,35 @@
                   />
                 </div>
               </div>
+              <div>
+                <label
+                  for="confirm_password"
+                  class="block text-sm font-switzer font-medium text-gray-700"
+                  >Confirm Password</label
+                >
+                <div class="mt-1">
+                  <input
+                    type="password"
+                    name="confirm_password"
+                    id="confirm_password"
+                    required
+                    class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                </div>
+              </div>
             </div>
             <!-- right -->
           </div>
           <div>
             <button
               type="submit"
-              class="w-full flex justify-center py-2.5 px-2 border border-transparent rounded-md shadow-sm text-sm font-switzer tracking-wide font-medium text-white bg-violet-800 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500/50"
+              class="w-full flex justify-center py-2.5 px-2 border border-transparent rounded-md shadow-sm text-sm font-semibold font-switzer tracking-widest text-white bg-violet-800 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500/50"
             >
               Register
             </button>
           </div>
         </form>
-        <form action="{{ url_for('login')}}" method="POST">
+        <form action="{{ url_for('returntologin')}}" method="POST">
           <p class="mt-10 text-center text-sm text-gray-500">
             Already a member?
             <button
