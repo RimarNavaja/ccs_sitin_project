@@ -26,7 +26,7 @@
         {% with messages = get_flashed_messages() %} {% if messages %}
         <ul
           id="flash-messages"
-          class="bg-yellow-100/30 font-switzer border border-violet-400 text-violet-700 px-4 py-3 rounded relative"
+          class="bg-yellow-100/30 font-switzer border text-center border-violet-400 text-violet-700 px-4 py-3 rounded relative"
           role="alert"
         >
           {% for message in messages %}
@@ -54,6 +54,7 @@
                     type="text"
                     name="idno"
                     id="idno"
+                    placeholder="1001"
                     value="{{ form.idno if form else '' }}"
                     required
                     class="block w-full py-2.5 px-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-violet-500 sm:text-sm"
@@ -114,24 +115,24 @@
             </div>
             <!-- right -->
             <div class="flex flex-col space-y-6">
-              <div>
+                <div>
                 <label
                   for="course"
                   class="block text-sm font-switzer font-medium text-gray-700 mt-4"
                   >Course</label
                 >
                 <div class="mt-1">
-                  <select
-                    name="course"
-                    id="course"
-                    required
-                    class="block w-full font-switzer rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm pr-4"
-                  >
-                    <option value="BSIT" {% if form and form.course == 'BSIT' %}selected{% endif %}>BSIT</option>
-                    <option value="BSCS" {% if form and form.course == 'BSCS' %}selected{% endif %}>BSCS</option>
-                  </select>
+                  <input
+                  type="text"
+                  name="course"
+                  id="course"
+                  value="{{ form.course if form else '' }}"
+                  required
+                  placeholder="e.g., BSIT"
+                  class="block w-full font-switzer rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
                 </div>
-              </div>
+                </div>
               <div>
                 <label
                   for="yearlevel"
@@ -163,6 +164,7 @@
                     type="email"
                     name="email"
                     id="email"
+                    placeholder="juandelacruz@gmail.com"
                     value="{{ form.email if form else '' }}"
                     required
                     class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -180,6 +182,7 @@
                     type="text"
                     name="username"
                     id="username"
+                    placeholder="juandelacruz143"
                     value="{{ form.username if form else '' }}"
                     required
                     class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"

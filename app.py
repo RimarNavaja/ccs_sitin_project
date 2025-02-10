@@ -37,6 +37,19 @@ def returntologin():
 
 
 @app.route("/register", methods=["GET", "POST"])
+# 
+# Handle user registration.
+# GET: Render the registration form.
+# POST: Process the registration form data.
+#     - Validate form fields.
+#     - Check for missing fields.
+#     - Ensure passwords match.
+#     - Check for existing user with the same idno, email, or username.
+#     - Add new user to the database.
+#     - Flash appropriate messages for errors or success.
+# Returns:
+#     None
+#
 def register() -> None:
     if request.method == "POST":
         if not request.form:
@@ -62,7 +75,7 @@ def register() -> None:
             username = request.form['username']
             password = request.form['password']
             confirm_password = request.form['confirm_password']
-
+            # Check if do not passwords match render_template and retain the form data
             if password != confirm_password:
                 flash("Passwords do not match")
                 return render_template("register.html", form=request.form.to_dict())
