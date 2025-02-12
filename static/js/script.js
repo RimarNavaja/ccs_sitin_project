@@ -30,3 +30,4 @@ window.onclick = function (event) {
     }
   }
 };
+

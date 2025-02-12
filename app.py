@@ -125,5 +125,28 @@ def dashboard():
         return redirect(url_for('login'))
     return render_template("dashboard.html")
 
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    user = User.query.filter_by(username=session['user']).first()
+    return render_template("profile.html", user=user)
+
+@app.route("/edit_profile", methods=["POST"])
+def edit_profile():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    user = User.query.filter_by(username=session['user']).first()
+    user.firstname = request.form['firstname']
+    user.midname = request.form['midname']
+    user.lastname = request.form['lastname']
+    user.course = request.form['course']
+    user.yearlevel = request.form['yearlevel']
+    user.email = request.form['email']
+    user.username = request.form['username']
+    db.session.commit()
+    flash("Profile updated successfully")
+    return redirect(url_for('profile'))
+
 if __name__ == "__main__":
     app.run(debug=True)

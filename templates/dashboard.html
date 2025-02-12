@@ -10,7 +10,7 @@
       rel="stylesheet"
     />
     <script src="/static/js/script.js"></script>
-    <title>Dashboard</title>
+    <title>CCS SIT IN</title>
   </head>
   <body class="h-full">
     <div class="min-h-full">
@@ -22,7 +22,7 @@
               <div class="shrink-0">
                 <img
                   class="size-8"
-                  src="./static/src/images/CCS_LOGO.png"
+                  src="./static/src/images/logos/CCS_LOGO.png"
                   alt="College of Computer Studies"
                 />
               </div>
@@ -33,27 +33,22 @@
                     href="#"
                     class="rounded-md bg-violet-800 px-3 py-2 text-sm font-medium text-white"
                     aria-current="page"
-                    >Dashboard</a
+                    >HOME</a
                   >
                   <a
                     href="#"
-                    class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-violet-800 hover:text-white"
-                    >Team</a
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-200 hover:bg-violet-800 hover:text-white"
+                    >Lab Rules & Regulation</a
                   >
                   <a
                     href="#"
-                    class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-violet-800 hover:text-white"
-                    >Projects</a
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-200 hover:bg-violet-800 hover:text-white"
+                    >Sit-in History</a
                   >
                   <a
                     href="#"
-                    class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-violet-800 hover:text-white"
-                    >Calendar</a
-                  >
-                  <a
-                    href="#"
-                    class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-violet-800 hover:text-white"
-                    >Reports</a
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-200 hover:bg-violet-800 hover:text-white"
+                    >Reservation</a
                   >
                 </div>
               </div>
@@ -124,22 +119,24 @@
                     tabindex="-1"
                   >
                     <!-- Active: "bg-gray-100 outline-hidden", Not Active: "" -->
-                    <a
-                      href="#"
-                      class="block px-4 py-2 text-sm font-switzer text-gray-700"
-                      role="menuitem"
-                      tabindex="-1"
-                      id="user-menu-item-0"
-                      >Your Profile</a
-                    >
-                    <a
+                    <form method="GET" action="{{ url_for('profile') }}">
+                      <button
+                        class="block px-4 py-2 text-sm font-switzer hover:text-yellow-300 text-gray-700 duration-300 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
+                        role="menuitem"
+                        tabindex="-1"
+                      >
+                        Profile
+                      </button>
+                    </form>
+
+                    <!-- <a
                       href="#"
                       class="block px-4 py-2 text-sm font-switzer text-gray-700"
                       role="menuitem"
                       tabindex="-1"
                       id="user-menu-item-1"
                       >Settings</a
-                    >
+                    > -->
                     <!-- <a
                       href="#"
                       class="block px-4 py-2 text-sm font-switzer text-gray-700"
@@ -301,8 +298,8 @@
 
       <header class="bg-white shadow-sm">
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 class="text-3xl font-bold tracking-tight text-gray-900">
-            Dashboard
+          <h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900">
+            Announcement
           </h1>
         </div>
       </header>

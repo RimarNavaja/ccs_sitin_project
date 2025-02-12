@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./static/src/output.css" rel="stylesheet" />
+    <!-- Font khand_bold, Switzer_regular -->
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=khand@700&f[]=switzer@400&display=swap"
+      rel="stylesheet"
+    />
+    <script src="/static/js/script.js"></script>
+    <title>Profile</title>
+  </head>
+  <body>
+    <div class="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8">
+      <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2
+          class="mt-6 text-center text-4xl font-bold font-khand tracking-wider text-yellow-300"
+        >
+          User Profile
+        </h2>
+      </div>
+      <!-- Flash messages -->
+      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <ul
+          id="flash-messages"
+          class="bg-yellow-100/30 font-switzer border text-center border-violet-400 text-violet-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
+          {% for message in messages %}
+          <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %} {% endwith %}
+      </div>
+      <!-- User Info -->
+      <div
+        class="mt-8 sm:mx-auto sm:w-full sm:max-w-md shadow-lg shadow-violet-800/30 inset-shadow-2xs p-8 rounded-lg"
+      >
+        <div class="space-y-6">
+          <div>
+            <label class="block text-md font-switzer font-semibold  text-gray-900 tracking-wide">ID Number</label>
+            <p class="mt-1 text-sm font-switzer">{{ user.idno }}</p>
+          </div>
+          <div>
+            <label class="block text-md font-switzer font-semibold  text-gray-900 tracking-wide">Name</label>
+            <p class="mt-1 text-sm font-switzer">{{ user.firstname }} {{ user.midname }} {{ user.lastname }}</p>
+          </div>
+          <div>
+            <label class="block text-md font-switzer font-semibold  text-gray-900 tracking-wide">Course</label>
+            <p class="mt-1 text-sm font-switzer">{{ user.course }}</p>
+          </div>
+          <div>
+            <label class="block text-md font-switzer font-semibold  text-gray-900 tracking-wide">Year Level</label>
+            <p class="mt-1 text-sm font-switzer">{{ user.yearlevel }}</p>
+          </div>
+          <div>
+            <label class="block text-md font-switzer font-semibold  text-gray-900 tracking-wide">Email</label>
+            <p class="mt-1 text-sm font-switzer">{{ user.email }}</p>
+          </div>
+          <div>
+            <label class="block text-md font-switzer font-semibold  text-gray-900 tracking-wide">Username</label>
+            <p class="mt-1 text-sm font-switzer">{{ user.username }}</p>
+          </div>
+          <div>
+            <button
+              class="w-full flex justify-center py-2.5 px-2 border border-transparent rounded-md shadow-sm text-sm font-semibold font-switzer tracking-widest text-white bg-violet-800 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500/50"
+              onclick="openModal()"
+            >
+              Edit Profile
+            </button>
+            <form  action="{{ url_for('dashboard') }}">
+                <p class="text-center mt-2">
+                    <button
+                    type="submit"
+                    class="font-switzer tracking-wide text-yellow-300 hover:text-yellow-200 duration-300 ease-in-out delay-150 hover:text-md hover:tracking-wider"
+                  >
+                    Back to Dashboard
+                  </button>
+                </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editModal" class="fixed inset-0 hidden z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-md">
+          <div class="px-6 py-4">
+            <h3 class="text-3xl font-bold font-khand text-center tracking-wider bg-gradient-to-r from-purple-800 to-yellow-300 bg-clip-text text-transparent">Edit Profile</h3>
+            <form class="space-y-6" action="/edit_profile" method="POST">
+              <div>
+                <label for="firstname" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">First Name</label>
+                <input
+                  type="text"
+                  name="firstname"
+                  id="firstname"
+                  value="{{ user.firstname }}"
+                  required
+                  class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label for="midname" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">Middle Name</label>
+                <input
+                  type="text"
+                  name="midname"
+                  id="midname"
+                  value="{{ user.midname }}"
+                  required
+                  class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label for="lastname" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">Last Name</label>
+                <input
+                  type="text"
+                  name="lastname"
+                  id="lastname"
+                  value="{{ user.lastname }}"
+                  required
+                  class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label for="course" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">Course</label>
+                <input
+                  type="text"
+                  name="course"
+                  id="course"
+                  value="{{ user.course }}"
+                  required
+                  class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label for="yearlevel" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">Year Level</label>
+                <select
+                  name="yearlevel"
+                  id="yearlevel"
+                  required
+                  class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                >
+                  <option value="1" {% if user.yearlevel == '1' %}selected{% endif %}>1</option>
+                  <option value="2" {% if user.yearlevel == '2' %}selected{% endif %}>2</option>
+                  <option value="3" {% if user.yearlevel == '3' %}selected{% endif %}>3</option>
+                  <option value="4" {% if user.yearlevel == '4' %}selected{% endif %}>4</option>
+                </select>
+              </div>
+              <div>
+                <label for="email" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  value="{{ user.email }}"
+                  required
+                  class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label for="username" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  id="username"
+                  value="{{ user.username }}"
+                  required
+                  class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div class="flex justify-end">
+                <button
+                  type="button"
+                  class="py-2 px-4 bg-gray-500 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                  onclick="closeModal()"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="ml-2 py-2 px-4 bg-violet-800 text-white rounded-md hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function openModal() {
+        document.getElementById('editModal').classList.remove('hidden');
+      }
+
+      function closeModal() {
+        document.getElementById('editModal').classList.add('hidden');
+      }
+    </script>
+  </body>
+</html>
