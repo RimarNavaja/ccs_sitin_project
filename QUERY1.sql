@@ -16,7 +16,8 @@ CREATE TABLE users (
 
 );
 
-ALTER TABLE users
-ADD COLUMN photo VARCHAR(255) NOT NULL;
+ALTER TABLE users 
+ADD COLUMN photo_url VARCHAR(200);
 
 SELECT * FROM users;
+
