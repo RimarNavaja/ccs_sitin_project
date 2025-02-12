@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="font-switzer">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,37 +9,47 @@
       href="https://api.fontshare.com/v2/css?f[]=khand@700&f[]=switzer@400&display=swap"
       rel="stylesheet"
     />
+    
     <script src="/static/js/script.js"></script>
     <title>Profile</title>
   </head>
   <body>
+    <!-- Flash messages -->
+    <div class="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <ul
+        id="flash-messages"
+        class="bg-yellow-100/30 font-switzer border text-center border-violet-400 text-violet-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %} {% endwith %}
+    </div>
     <div class="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8">
       <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <h2
-          class="mt-6 text-center text-4xl font-bold font-khand tracking-wider text-yellow-300"
+          class="mt-6 text-center text-4xl font-bold font-khand tracking-wider bg-gradient-to-r from-violet-900 to-yellow-400 bg-clip-text text-transparent"
         >
           User Profile
         </h2>
       </div>
-      <!-- Flash messages -->
-      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        {% with messages = get_flashed_messages() %} {% if messages %}
-        <ul
-          id="flash-messages"
-          class="bg-yellow-100/30 font-switzer border text-center border-violet-400 text-violet-700 px-4 py-3 rounded relative"
-          role="alert"
-        >
-          {% for message in messages %}
-          <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-        {% endif %} {% endwith %}
-      </div>
+      
+      
       <!-- User Info -->
       <div
         class="mt-8 sm:mx-auto sm:w-full sm:max-w-md shadow-lg shadow-violet-800/30 inset-shadow-2xs p-8 rounded-lg"
       >
         <div class="space-y-6">
+          <div class="text-center">
+            <img
+              class="inline-block h-24 w-24 rounded-full ring-2 ring-violet-700"
+              src="{{ user.photo_url if user.photo_url else './static/src/images/userphotos/defaultphoto.png' }}"
+              alt="Profile Photo"
+            />
+          </div>
           <div>
             <label class="block text-md font-switzer font-semibold  text-gray-900 tracking-wide">ID Number</label>
             <p class="mt-1 text-sm font-switzer">{{ user.idno }}</p>
@@ -66,7 +76,7 @@
           </div>
           <div>
             <button
-              class="w-full flex justify-center py-2.5 px-2 border border-transparent rounded-md shadow-sm text-sm font-semibold font-switzer tracking-widest text-white bg-violet-800 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500/50"
+              class="w-full flex justify-center py-2.5 px-2 border border-transparent rounded-md shadow-sm text-md font-semibold font-switzer tracking-widest text-white bg-violet-800 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500/50"
               onclick="openModal()"
             >
               Edit Profile
@@ -75,7 +85,7 @@
                 <p class="text-center mt-2">
                     <button
                     type="submit"
-                    class="font-switzer tracking-wide text-yellow-300 hover:text-yellow-200 duration-300 ease-in-out delay-150 hover:text-md hover:tracking-wider"
+                    class="font-switzer font-semibold tracking-wider text-yellow-300 hover:text-yellow-200 duration-300 ease-in-out delay-150 hover:text-md hover:tracking-widest"
                   >
                     Back to Dashboard
                   </button>
@@ -89,10 +99,28 @@
     <!-- Edit Profile Modal -->
     <div id="editModal" class="fixed inset-0 hidden z-50 overflow-y-auto">
       <div class="flex items-center justify-center min-h-screen px-4">
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-md">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-lg">
           <div class="px-6 py-4">
             <h3 class="text-3xl font-bold font-khand text-center tracking-wider bg-gradient-to-r from-purple-800 to-yellow-300 bg-clip-text text-transparent">Edit Profile</h3>
-            <form class="space-y-6" action="/edit_profile" method="POST">
+            <form class="space-y-6 mt-4 " action="/edit_profile" method="POST" enctype="multipart/form-data">
+              <div class="flex justify-center flex-col items-center shadow-sm inset-shadow-violet-700/50 bg-violet-300/10 p-4 rounded-lg">
+                <div class="text-center">
+                  <img
+                    class="inline-block h-24 w-24 rounded-full m-5 ring-2 ring-violet-700"
+                    src="{{ user.photo_url if user.photo_url else './static/src/images/userphotos/defaultphoto.png' }}"
+                    alt="Profile Photo"
+                  />
+                </div>
+                <!-- <label for="photo" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">Profile Photo</label>  -->
+                <input
+                  type="file"
+                  name="photo"
+                  id="photo"
+                  accept="image/*"
+                  class="border border-violet-400 rounded-full file:mr-4 file:rounded-full file:border-0 file:bg-violet-100  file:px-4 file:font-switzer file:py-2 file:text-sm file:font-semibold file:text-violet-700 hover:file:bg-violet-200 "
+                />
+                
+              </div>
               <div>
                 <label for="firstname" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">First Name</label>
                 <input
@@ -203,5 +231,6 @@
         document.getElementById('editModal').classList.add('hidden');
       }
     </script>
+
   </body>
 </html>

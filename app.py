@@ -7,12 +7,16 @@ from flask import (
     flash,
     session
 )
+from werkzeug.utils import secure_filename
+import os
 from dbhelper import db, User
 
 app = Flask(__name__)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1010@localhost/ccs_sitin_project' 
 # username - root password - 1010/@Rimar097851 database - ccs_sitin_project/csssitinproject
 app.secret_key = 'supersecretkey'
+app.config['UPLOAD_FOLDER'] = './static/src/images/userphotos'
 db.init_app(app)
 
 with app.app_context():
@@ -35,7 +39,7 @@ def login() -> None:
 @app.route('/logout', methods=['POST'])
 def logout():
     session.pop('user', None)
-    flash("Successfully logged out")
+    flash("Successfully signed out")
     return redirect(url_for('login'))
 
 @app.route("/returntologin", methods=["GET","POST"])
@@ -77,7 +81,7 @@ def register() -> None:
             lastname = request.form['lastname']
             firstname = request.form['firstname']
             midname = request.form['midname']
-            course = request.form['course']
+            course = request.form['course'].upper()
             yearlevel = request.form['yearlevel']
             email = request.form['email']
             username = request.form['username']
@@ -123,7 +127,8 @@ def register() -> None:
 def dashboard():
     if 'user' not in session:
         return redirect(url_for('login'))
-    return render_template("dashboard.html")
+    user = User.query.filter_by(username=session['user']).first()
+    return render_template("dashboard.html", user=user)
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
@@ -144,6 +149,13 @@ def edit_profile():
     user.yearlevel = request.form['yearlevel']
     user.email = request.form['email']
     user.username = request.form['username']
+    if 'photo' in request.files:
+        photo = request.files['photo']
+        if photo.filename != '':
+            filename = secure_filename(photo.filename)
+            photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            photo.save(photo_path)
+            User.update_profile_photo(user.id, photo_path)
     db.session.commit()
     flash("Profile updated successfully")
     return redirect(url_for('profile'))
