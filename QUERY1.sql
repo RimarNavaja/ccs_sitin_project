@@ -1,3 +1,7 @@
+CREATE DATABASE ccs_sitin_project;
+
+USE ccs_sitin_project;
+
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     idno VARCHAR(50) NOT NULL UNIQUE,
@@ -9,6 +13,10 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL
+
 );
+
+ALTER TABLE users
+ADD COLUMN photo VARCHAR(255) NOT NULL;
 
 SELECT * FROM users;
