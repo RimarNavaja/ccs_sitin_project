@@ -4,7 +4,8 @@ from flask import (
     request,
     redirect,
     url_for,
-    flash
+    flash,
+    session
 )
 from dbhelper import db, User
 
@@ -23,12 +24,19 @@ def login() -> None:
         username = request.form['username']
         password = request.form['password']
         if User.verify_credentials(username, password):
+            session['user'] = username
             flash("Successfully logged in") # temporary message
             return redirect(url_for('dashboard')) # redirect to dashboard
         else:
             flash("Invalid username or password")
             return redirect(url_for('login'))
     return render_template("login.html")
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('user', None)
+    flash("Successfully logged out")
+    return redirect(url_for('login'))
 
 @app.route("/returntologin", methods=["GET","POST"])
 def returntologin():
@@ -113,6 +121,8 @@ def register() -> None:
 
 @app.route("/dashboard")
 def dashboard():
+    if 'user' not in session:
+        return redirect(url_for('login'))
     return render_template("dashboard.html")
 
 if __name__ == "__main__":
