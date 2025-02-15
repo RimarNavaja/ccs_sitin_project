@@ -1,19 +1,5 @@
-<!DOCTYPE html>
-<html lang="en" class="font-switzer">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="./static/src/output.css" rel="stylesheet" />
-    <!-- Font khand_bold, Switzer_regular -->
-    <link
-      href="https://api.fontshare.com/v2/css?f[]=khand@700&f[]=switzer@400&display=swap"
-      rel="stylesheet"
-    />
-    
-    <script src="/static/js/script.js"></script>
-    <title>Profile</title>
-  </head>
-  <body>
+{% extends 'dashboard.html' %}
+{% block content %}
     <!-- Flash messages -->
     <div class="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
       {% with messages = get_flashed_messages() %} {% if messages %}
@@ -28,7 +14,8 @@
       </ul>
       {% endif %} {% endwith %}
     </div>
-    <div class="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8">
+    <!-- user profile -->
+    <div class="flex flex-col justify-center px-6 py-12 lg:px-8">
       <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <h2
           class="mt-6 text-center text-4xl font-bold font-khand tracking-wider bg-gradient-to-r from-violet-900 to-yellow-400 bg-clip-text text-transparent"
@@ -221,16 +208,7 @@
         </div>
       </div>
     </div>
+{% endblock %}
+    
 
-    <script>
-      function openModal() {
-        document.getElementById('editModal').classList.remove('hidden');
-      }
-
-      function closeModal() {
-        document.getElementById('editModal').classList.add('hidden');
-      }
-    </script>
-
-  </body>
-</html>
+ 

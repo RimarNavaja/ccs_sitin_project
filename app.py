@@ -5,7 +5,8 @@ from flask import (
     redirect,
     url_for,
     flash,
-    session
+    session,
+    url_for
 )
 from werkzeug.utils import secure_filename
 import os
@@ -159,6 +160,10 @@ def edit_profile():
     db.session.commit()
     flash("Profile updated successfully")
     return redirect(url_for('profile'))
+
+@app.route("/")
+def index() -> None:
+    return render_template("index.html",pagetitle = "CCS Sit-in")
 
 if __name__ == "__main__":
     app.run(debug=True)
