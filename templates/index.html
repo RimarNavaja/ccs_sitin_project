@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full font-switzer">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./static/src/output.css" rel="stylesheet" />
+    <!-- Font khand_bold, Switzer_regular -->
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=khand@700&f[]=switzer@400&display=swap"
+      rel="stylesheet"
+    />
+    <script src="/static/js/script.js"></script>
+    <title>CCS Sit-in</title>
+    <link rel="icon" type="image/x-icon" href="./static/src/images/logos/CCS_LOGO.png">
+   
+    </style>
+  </head>
+  <body class="flex flex-col min-h-screen">
+    <div class="flex-1">
+      <nav
+        class="bg-linear-to-r from-purple-900 to-yellow-300"
+        style="position: sticky; top: 0; z-index: 1"
+      >
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="flex h-16 items-center justify-between">
+            <div class="flex items-center">
+              <!-- logo -->
+              <!-- <div class="shrink-0">
+                <img
+                  class="size-8"
+                  src="./static/src/images/logos/CCS_LOGO.png"
+                  alt="College of Computer Studies"
+                />
+              </div> -->
+              <p
+                class="rounded-md px-3 py-2 text-3xl font-khand tracking-wider text-white"
+              >
+                CCS Sit-in Monitoring System
+              </p>
+              <div class="hidden">
+                <div class="ml-10 flex items-baseline space-x-4">
+                  <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+                  <a
+                    href="#"
+                    class="rounded-md bg-violet-800 px-3 py-2 text-sm font-medium text-white"
+                    aria-current="page"
+                    >HOME</a
+                  >
+                  <a
+                    href="#"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-200 hover:bg-violet-800 hover:text-white"
+                    >Lab Rules & Regulation</a
+                  >
+                  <a
+                    href="#"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-200 hover:bg-violet-800 hover:text-white"
+                    >Sit-in History</a
+                  >
+                  <a
+                    href="#"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-200 hover:bg-violet-800 hover:text-white"
+                    >Reservation</a
+                  >
+                </div>
+              </div>
+            </div>
+            <div>
+              <form action="{{ url_for('returntologin') }}" method="POST">
+                <p>
+                  <button
+                    type="submit"
+                    class="tracking-wide text-black hover:text-yellow-100 duration-300 ease-in-out delay-150 hover:text-lg  hover:underline-offset-8 hover:tracking-wider cursor-pointer"
+                  >
+                    Login
+                  </button>
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <main>
+        <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <!-- Your content -->
+          {% block content %} {% endblock %}
+        </div>
+      </main>
+    </div>
+    <!-- footer -->
+    <footer class="bg-gray-50">
+      <div class="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 lg:px-8">
+        <div class="sm:flex sm:justify-between sm:items-center">
+          <div class="flex justify-center items-center sm:justify-start">
+            <!-- CCS logo -->
+            <div class="shrink-0">
+              <img
+                class="size-8"
+                src="./static/src/images/logos/CCS_LOGO.png"
+                alt="College of Computer Studies"
+              />
+            </div>
+            <p class="ml-5 font-khand text-xl font-semibold">
+              College of Computer Studies
+            </p>
+          </div>
+
+          <p
+            class="mt-4 text-center text-sm text-gray-500 sm:mt-0 lg:text-right"
+          >
+            Copyright &copy; 2025. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
