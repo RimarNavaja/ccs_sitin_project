@@ -64,7 +64,18 @@
                 </div>
               </div>
             </div>
-            <div>
+            <div class="flex flex-row space-x-4">
+              <form action="{{ url_for('return_to_index') }}" method="POST">
+                <p>
+                  <button
+                    type="submit"
+                    class="tracking-wide text-black hover:text-yellow-100 duration-300 ease-in-out delay-150 hover:text-lg  hover:underline-offset-8 hover:tracking-wider cursor-pointer"
+                  >
+                    Home
+                  </button>
+                </p>
+              </form>
+            
               <form action="{{ url_for('returntologin') }}" method="POST">
                 <p>
                   <button
@@ -75,6 +86,7 @@
                   </button>
                 </p>
               </form>
+              
             </div>
           </div>
         </div>
@@ -91,6 +103,16 @@
       <div class="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 lg:px-8">
         <div class="sm:flex sm:justify-between sm:items-center">
           <div class="flex justify-center items-center sm:justify-start">
+            <div class="flex flex-row space-x-4">
+              <!-- UC logo -->
+            <div class="shrink-0 ">
+              <img
+                class="size-8"
+                src="{{ url_for('static', filename= 'src/images/logos/UC_LOGO.png') }}"
+                alt="College of Computer Studies"
+              />
+            </div>
+            
             <!-- CCS logo -->
             <div class="shrink-0">
               <img
@@ -98,6 +120,7 @@
                 src="./static/src/images/logos/CCS_LOGO.png"
                 alt="College of Computer Studies"
               />
+            </div>
             </div>
             <p class="ml-5 font-khand text-xl font-semibold">
               College of Computer Studies

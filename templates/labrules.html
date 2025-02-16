@@ -1,0 +1,83 @@
+{% extends 'dashboard.html' %} {% block content %}
+<div class="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 font-switzer">
+    <!-- container -->
+    <div class="p-10 shadow-xl rounded-2xl">
+
+        <div class="flex flex-row space-x-2">
+            <!-- UC logo -->
+            <div class="shrink-0">
+              <img
+                class="size-20"
+                src="{{ url_for('static', filename= 'src/images/logos/UC_LOGO.png') }}"
+                alt="College of Computer Studies"
+              />
+            </div>
+            <div>
+                <h1
+                class="text-center text-4xl font-bold font-khand tracking-wider text-amber-300"
+            >
+                University of Cebu
+                </h1>
+                <h2 class="text-center text-xl font-bold uppercase text-gray-700">
+                    College of Information & Computer Studies
+                </h2>
+            </div>
+            <!-- CCS logo -->
+            <div class="shrink-0">
+              <img
+                class="size-20"
+                src="./static/src/images/logos/CCS_LOGO.png"
+                alt="College of Computer Studies"
+              />
+            </div>
+          </div>
+        
+
+        <h2 class="text-center uppercase mt-10 text-2xl font-semibold text-violet-800">
+            Laboratory Rules and Regulations
+        </h2>
+        <p class="mt-2 text-gray-600">
+            &nbsp; &nbsp; &nbsp; &nbsp;To avoid embarrassment and maintain camaraderie with your friends and
+            superiors at our laboratories, please observe the following:
+        </p>
+
+        
+        <div class="px-6">
+            <ol class="mt-4  text-gray-700 list-decimal list-inside">
+            <li> &nbsp; Maintain silence, proper decorum, and discipline inside the laboratory. Mobile phones, walkmans, and other personal equipment must be switched off.</li>
+            <li> &nbsp; Games are not allowed inside the lab, including computer-related games, card games, and others that may disturb the lab.</li>
+            <li> &nbsp; Internet usage is only allowed with the instructor's permission. Downloading and installing software is strictly prohibited.</li>
+            <li> &nbsp; Accessing inappropriate or non-course-related websites is strictly prohibited.</li>
+            <li> &nbsp; Tampering with computer files or settings is a major offense.</li>
+            <li> &nbsp; Computer usage is limited to 15 minutes when others are waiting.</li>
+            <li class="flex flex-col">
+                <li> &nbsp; Observe proper decorum:</li>
+                <ul class="mt-2 space-y-2 pl-6 list-none list-inside text-gray-600">
+                    <li> &nbsp; a. Enter the lab only when the instructor is present.</li>
+                    <li> &nbsp; b. Deposit bags at the counter.</li>
+                    <li> &nbsp; c. Follow the seating arrangement.</li>
+                    <li> &nbsp; d. Close all programs at the end of class.</li>
+                    <li> &nbsp; e. Return chairs to their proper places.</li>
+                </ul>
+            </li>
+            <li> &nbsp; Eating, drinking, smoking, and vandalism are prohibited.</li>
+            <li> &nbsp; Continuous disturbances will result in removal from the lab.</li>
+            <li> &nbsp; Hostile or threatening behavior will not be tolerated.</li>
+            <li> &nbsp; Severe offenses will be reported to security.</li>
+            <li> &nbsp; Report technical issues to lab personnel immediately.</li>
+        </ol></div>
+
+        <div class="mt-10 bg-violet-100 p-8 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-violet-800">Disciplinary Action</h2>
+            <ul class="mt-3 space-y-2 list-disc text-gray-700">
+                <li>
+                    <strong>First Offense:</strong> - The Head or the Dean or OIC recommends to the Guidance Center for a suspension from classes for each offender.
+                </li>
+                <li>
+                    <strong>Second & Subsequent Offenses:</strong> - A recommendation for a heavier sanction will be endorsed to the Guidance Center.
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

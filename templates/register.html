@@ -1,3 +1,4 @@
+<!-- extends to index html -->
 {% extends 'index.html'%}
 {% block content %}
     <div class="flex  flex-col justify-center px-6 py-12 lg:px-8">
@@ -143,7 +144,7 @@
               <div>
                 <label
                   for="email"
-                  class=" block text-md font-switzer font-semibold tracking-wider text-gray-900"
+                  class="block  text-md font-switzer font-semibold tracking-wider text-gray-900"
                   >Email Address</label
                 >
                 <div class="mt-1">
@@ -154,7 +155,7 @@
                     placeholder="juandelacruz@gmail.com"
                     value="{{ form.email if form else '' }}"
                     required
-                    class="placeholder:italic placeholder:font-switzer placeholder:text-gray-300 block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    class="invalid:text-red-400 invalid:border-red-400 focus:invalid:border-red-500 placeholder:italic placeholder:font-switzer placeholder:text-gray-300 block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
               </div>

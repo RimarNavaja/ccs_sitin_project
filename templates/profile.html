@@ -1,19 +1,6 @@
 {% extends 'dashboard.html' %}
 {% block content %}
-    <!-- Flash messages -->
-    <div class="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-      {% with messages = get_flashed_messages() %} {% if messages %}
-      <ul
-        id="flash-messages"
-        class="bg-yellow-100/30 font-switzer border text-center border-violet-400 text-violet-700 px-4 py-3 rounded relative"
-        role="alert"
-      >
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %} {% endwith %}
-    </div>
+    
     <!-- user profile -->
     <div class="flex flex-col justify-center px-6 py-12 lg:px-8">
       <div class="sm:mx-auto sm:w-full sm:max-w-md">

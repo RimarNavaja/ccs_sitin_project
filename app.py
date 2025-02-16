@@ -131,12 +131,21 @@ def dashboard():
     user = User.query.filter_by(username=session['user']).first()
     return render_template("dashboard.html", user=user)
 
+@app.route("/lab_rules")
+def lab_rules():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    user = User.query.filter_by(username=session['user']).first()
+    return render_template("labrules.html", user=user)
+
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     if 'user' not in session:
         return redirect(url_for('login'))
     user = User.query.filter_by(username=session['user']).first()
     return render_template("profile.html", user=user)
+
+
 
 @app.route("/edit_profile", methods=["POST"])
 def edit_profile():
@@ -160,6 +169,10 @@ def edit_profile():
     db.session.commit()
     flash("Profile updated successfully")
     return redirect(url_for('profile'))
+
+@app.route("/return_to_index", methods=["GET","POST"])
+def return_to_index():
+    return redirect("/")
 
 @app.route("/")
 def index() -> None:

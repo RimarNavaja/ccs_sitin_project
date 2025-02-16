@@ -39,3 +39,31 @@ function openModal() {
 function closeModal() {
   document.getElementById("editModal").classList.add("hidden");
 }
+
+// Function to toggle active class for navigation links
+// function toggleActiveLink(event) {
+//   const links = document.querySelectorAll("nav a");
+//   links.forEach((link) => {
+//     link.classList.remove("bg-violet-800", "text-white");
+//     link.classList.add(
+//       "text-gray-300",
+//       "hover:bg-gray-700",
+//       "hover:text-white"
+//     );
+//     link.removeAttribute("aria-current");
+//   });
+//   event.currentTarget.classList.add("bg-violet-800", "text-white");
+//   event.currentTarget.classList.remove(
+//     "text-gray-300",
+//     "hover:bg-gray-700",
+//     "hover:text-white"
+//   );
+//   event.currentTarget.setAttribute("aria-current", "page");
+// }
+
+// // Attach event listeners to navigation links after DOM is fully loaded
+// document.addEventListener("DOMContentLoaded", function () {
+//   document.querySelectorAll("nav a").forEach((link) => {
+//     link.addEventListener("click", toggleActiveLink);
+//   });
+// });

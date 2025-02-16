@@ -9,8 +9,14 @@
       href="https://api.fontshare.com/v2/css?f[]=khand@700&f[]=switzer@400&display=swap"
       rel="stylesheet"
     />
+    <!-- js script -->
     <script src="/static/js/script.js"></script>
-    <title>CCS SIT IN</title>
+    <title>CCS Sit-in</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="./static/src/images/logos/CCS_LOGO.png"
+    />
   </head>
   <body class="flex flex-col min-h-screen">
     <!-- base content -->
@@ -36,23 +42,23 @@
                   <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
                   <a
                     href="{{ url_for('dashboard') }}"
-                    class="rounded-md bg-violet-800 px-3 py-2 text-sm font-medium text-white"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
                     aria-current="page"
                     >HOME</a
                   >
                   <a
-                    href="#"
-                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-200 hover:bg-violet-800 hover:text-white"
+                    href="{{ url_for('lab_rules') }}"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
                     >Lab Rules & Regulation</a
                   >
                   <a
                     href="#"
-                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-200 hover:bg-violet-800 hover:text-white"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
                     >Sit-in History</a
                   >
                   <a
                     href="#"
-                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-200 hover:bg-violet-800 hover:text-white"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
                     >Reservation</a
                   >
                 </div>
@@ -89,7 +95,7 @@
                   <div>
                     <button
                       type="button"
-                      class="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-violet-800 focus:ring-offset-2 focus:ring-offset-yellow-300 focus:outline-hidden"
+                      class="relative flex max-w-xs items-center rounded-full bg-gray-100 text-sm focus:ring-2 focus:ring-violet-800 focus:ring-offset-2 focus:ring-offset-yellow-300 focus:outline-hidden"
                       id="user-menu-button"
                       aria-expanded="false"
                       aria-haspopup="true"
@@ -98,7 +104,7 @@
                       <span class="absolute -inset-1.5"></span>
                       <span class="sr-only">Open user menu</span>
                       <img
-                        class="size-10 rounded-full"
+                        class="size-12 rounded-full"
                         src="{{ user.photo_url if user.photo_url else './static/src/images/userphotos/defaultphoto.png' }}"
                         alt="Profile Photo"
                       />
@@ -301,13 +307,13 @@
         </div>
       </nav>
 
-      <header class="bg-white shadow-sm">
+      <!-- <header class="bg-white shadow-sm">
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900">
             Announcement
           </h1>
         </div>
-      </header>
+      </header> -->
 
       <main>
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -336,13 +342,24 @@
       <div class="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 lg:px-8">
         <div class="sm:flex sm:justify-between sm:items-center">
           <div class="flex justify-center items-center sm:justify-start">
-            <!-- CCS logo -->
-            <div class="shrink-0">
-              <img
-                class="size-8"
-                src="./static/src/images/logos/CCS_LOGO.png"
-                alt="College of Computer Studies"
-              />
+            <div class="flex flex-row space-x-4">
+              <!-- UC logo -->
+              <div class="shrink-0">
+                <img
+                  class="size-8"
+                  src="{{ url_for('static', filename= 'src/images/logos/UC_LOGO.png') }}"
+                  alt="College of Computer Studies"
+                />
+              </div>
+
+              <!-- CCS logo -->
+              <div class="shrink-0">
+                <img
+                  class="size-8"
+                  src="./static/src/images/logos/CCS_LOGO.png"
+                  alt="College of Computer Studies"
+                />
+              </div>
             </div>
             <p class="ml-5 font-khand text-xl font-semibold">
               College of Computer Studies
@@ -357,5 +374,7 @@
         </div>
       </div>
     </footer>
+    <!-- Load script at the end of the body -->
+    <script src="/static/js/script.js"></script>
   </body>
 </html>
