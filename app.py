@@ -168,7 +168,11 @@ def edit_profile():
             User.update_profile_photo(user.id, photo_path)
     if request.form['password'] and request.form['confirm_password']:
         if request.form['password'] == request.form['confirm_password']:
-            user.password = request.form['password']
+            if User.verify_credentials(user.username, request.form['old_password']):
+                user.password = request.form['password']
+            else:
+                flash("Old password is incorrect")
+                return redirect(url_for('profile'))
         else:
             flash("Passwords do not match")
             return redirect(url_for('profile'))
