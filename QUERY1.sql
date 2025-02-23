@@ -19,5 +19,7 @@ CREATE TABLE users (
 ALTER TABLE users 
 ADD COLUMN photo_url VARCHAR(200);
 
+
+
 SELECT * FROM users;
 

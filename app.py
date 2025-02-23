@@ -166,6 +166,16 @@ def edit_profile():
             photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             photo.save(photo_path)
             User.update_profile_photo(user.id, photo_path)
+    if request.form['password'] and request.form['confirm_password']:
+        if request.form['password'] == request.form['confirm_password']:
+            if User.verify_credentials(user.username, request.form['old_password']):
+                user.password = request.form['password']
+            else:
+                flash("Old password is incorrect")
+                return redirect(url_for('profile'))
+        else:
+            flash("Passwords do not match")
+            return redirect(url_for('profile'))
     db.session.commit()
     flash("Profile updated successfully")
     return redirect(url_for('profile'))

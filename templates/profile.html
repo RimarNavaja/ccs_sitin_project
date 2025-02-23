@@ -72,7 +72,7 @@
 
     <!-- Edit Profile Modal -->
     <div id="editModal" class="fixed inset-0 hidden z-50 overflow-y-auto">
-      <div class="flex items-center justify-center min-h-screen px-4">
+      <div class="flex items-center justify-center min-h-screen py-6 px-6">
         <div class="bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-lg">
           <div class="px-6 py-4">
             <h3 class="text-3xl font-bold font-khand text-center tracking-wider bg-gradient-to-r from-purple-800 to-yellow-300 bg-clip-text text-transparent">Edit Profile</h3>
@@ -175,6 +175,33 @@
                   class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
+              <div>
+                <label for="old_password" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">Old Password</label>
+                <input
+                  type="password"
+                  name="old_password"
+                  id="old_password"
+                  class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label for="password" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">New Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label for="confirm_password" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">Confirm New Password</label>
+                <input
+                  type="password"
+                  name="confirm_password"
+                  id="confirm_password"
+                  class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
               <div class="flex justify-end">
                 <button
                   type="button"
@@ -196,6 +223,5 @@
       </div>
     </div>
 {% endblock %}
-    
 
- 
+
