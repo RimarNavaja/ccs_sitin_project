@@ -63,6 +63,7 @@
     --text-4xl--line-height: calc(2.5 / 2.25);
     --text-5xl: 3rem;
     --text-5xl--line-height: 1;
+    --font-weight-light: 300;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
@@ -293,8 +294,14 @@
   .sticky {
     position: sticky;
   }
+  .-inset-0 {
+    inset: calc(var(--spacing) * -0);
+  }
   .-inset-0\.5 {
     inset: calc(var(--spacing) * -0.5);
+  }
+  .-inset-1 {
+    inset: calc(var(--spacing) * -1);
   }
   .-inset-1\.5 {
     inset: calc(var(--spacing) * -1.5);
@@ -430,6 +437,9 @@
   }
   .m-5 {
     margin: calc(var(--spacing) * 5);
+  }
+  .m-9 {
+    margin: calc(var(--spacing) * 9);
   }
   .mx-auto {
     margin-inline: auto;
@@ -587,6 +597,9 @@
     width: calc(var(--spacing) * 30);
     height: calc(var(--spacing) * 30);
   }
+  .h-6 {
+    height: calc(var(--spacing) * 6);
+  }
   .h-10 {
     height: calc(var(--spacing) * 10);
   }
@@ -610,6 +623,9 @@
   }
   .min-h-screen {
     min-height: 100vh;
+  }
+  .w-1 {
+    width: calc(var(--spacing) * 1);
   }
   .w-1\/2 {
     width: calc(1/2 * 100%);
@@ -1366,6 +1382,9 @@
   .bg-violet-100 {
     background-color: var(--color-violet-100);
   }
+  .bg-violet-300 {
+    background-color: var(--color-violet-300);
+  }
   .bg-violet-300\/10 {
     background-color: color-mix(in oklab, var(--color-violet-300) 10%, transparent);
   }
@@ -1374,6 +1393,9 @@
   }
   .bg-white {
     background-color: var(--color-white);
+  }
+  .bg-yellow-100 {
+    background-color: var(--color-yellow-100);
   }
   .bg-yellow-100\/30 {
     background-color: color-mix(in oklab, var(--color-yellow-100) 30%, transparent);
@@ -1738,6 +1760,10 @@
     --tw-font-weight: var(--font-weight-extrabold);
     font-weight: var(--font-weight-extrabold);
   }
+  .font-light {
+    --tw-font-weight: var(--font-weight-light);
+    font-weight: var(--font-weight-light);
+  }
   .font-medium {
     --tw-font-weight: var(--font-weight-medium);
     font-weight: var(--font-weight-medium);
@@ -2080,17 +2106,26 @@
   .shadow-initial {
     --tw-shadow-color: initial;
   }
+  .shadow-violet-800 {
+    --tw-shadow-color: var(--color-violet-800);
+  }
   .shadow-violet-800\/30 {
     --tw-shadow-color: color-mix(in oklab, var(--color-violet-800) 30%, transparent);
   }
   .ring-violet-700 {
     --tw-ring-color: var(--color-violet-700);
   }
+  .ring-violet-800 {
+    --tw-ring-color: var(--color-violet-800);
+  }
   .ring-violet-800\/5 {
     --tw-ring-color: color-mix(in oklab, var(--color-violet-800) 5%, transparent);
   }
   .inset-shadow-initial {
     --tw-inset-shadow-color: initial;
+  }
+  .inset-shadow-violet-700 {
+    --tw-inset-shadow-color: var(--color-violet-700);
   }
   .inset-shadow-violet-700\/50 {
     --tw-inset-shadow-color: color-mix(in oklab, var(--color-violet-700) 50%, transparent);
@@ -2689,6 +2724,11 @@
   .sm\:flex {
     @media (width >= 40rem) {
       display: flex;
+    }
+  }
+  .sm\:hidden {
+    @media (width >= 40rem) {
+      display: none;
     }
   }
   .sm\:w-full {
