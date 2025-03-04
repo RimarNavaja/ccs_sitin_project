@@ -22,7 +22,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     photo_url = db.Column(db.String(200), nullable=True)
-    student_session = db.Column(db.Integer, nullable=False)
+    student_session = db.Column(db.Integer, nullable=False) # Added the student_session column
 
     @staticmethod
     def verify_credentials(username, password):
