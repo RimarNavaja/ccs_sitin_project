@@ -26,11 +26,11 @@
           </div>
           <div>
             <label class="block text-md font-switzer font-semibold  text-gray-900 tracking-wide">ID Number</label>
-            <p class="mt-1 text-sm font-switzer">{{ user.idno }}</p>
+            <p class="mt-1 text-sm font-switzer ">{{ user.idno }}</p>
           </div>
           <div>
             <label class="block text-md font-switzer font-semibold  text-gray-900 tracking-wide">Name</label>
-            <p class="mt-1 text-sm font-switzer">{{ user.firstname }} {{ user.midname }} {{ user.lastname }}</p>
+            <p class="mt-1 text-sm font-switzer ">{{ user.firstname.capitalize() }} {{ user.midname.capitalize()  }} {{ user.lastname.capitalize()  }}</p>
           </div>
           <div>
             <label class="block text-md font-switzer font-semibold  text-gray-900 tracking-wide">Course</label>
@@ -47,6 +47,10 @@
           <div>
             <label class="block text-md font-switzer font-semibold  text-gray-900 tracking-wide">Username</label>
             <p class="mt-1 text-sm font-switzer">{{ user.username }}</p>
+          </div>
+          <div>
+            <label class="block text-md font-switzer font-semibold  text-gray-900 tracking-wide">Session</label>
+            <p class="mt-1 text-sm font-switzer">{{ user.student_session }}</p>
           </div>
           <div>
             <button
@@ -95,6 +99,18 @@
                 />
                 
               </div>
+              <!-- Id number edit -->
+              <!-- <div>
+                <label for="idno" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">ID Number</label>
+                <input
+                  type="text"
+                  name="idno"
+                  id="idno"
+                  value="{{ user.idno }}"
+                  required
+                  class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div> -->
               <div>
                 <label for="firstname" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">First Name</label>
                 <input
