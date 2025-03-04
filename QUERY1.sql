@@ -19,7 +19,14 @@ CREATE TABLE users (
 ALTER TABLE users 
 ADD COLUMN photo_url VARCHAR(200);
 
+ALTER TABLE users 
+ADD COLUMN student_session INT;
 
+UPDATE users
+SET student_session = CASE 
+    WHEN course IN ('Bachelor of Science in Information Technology', 'Bachelor of Science Computer Science', 'BSIT', 'BSCS') THEN 30
+    ELSE 15
+END;
 
 SELECT * FROM users;
 

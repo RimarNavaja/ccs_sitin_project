@@ -104,6 +104,9 @@ def register() -> None:
                 flash("Username already exists")
                 return render_template("register.html", form=request.form.to_dict())
 
+            # Set student session based on course 30 minutes for BSIT and BSCS, 15 minutes for others
+            student_session = 30 if course in ['BSIT', 'BSCS', 'Bachelor of Science in Information Technology', 'Bachelor of Science Computer Science'] else 15
+
             new_user = User(
                 idno=idno,
                 lastname=lastname,
@@ -113,7 +116,8 @@ def register() -> None:
                 yearlevel=yearlevel,
                 email=email,
                 username=username,
-                password=password
+                password=password,
+                student_session=student_session
             )
             db.session.add(new_user)
             db.session.commit()
@@ -152,6 +156,9 @@ def edit_profile():
     if 'user' not in session:
         return redirect(url_for('login'))
     user = User.query.filter_by(username=session['user']).first()
+    # Update user ID number
+    # user.idno = request.form['idno']
+
     user.firstname = request.form['firstname']
     user.midname = request.form['midname']
     user.lastname = request.form['lastname']
