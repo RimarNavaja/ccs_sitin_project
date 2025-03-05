@@ -19,9 +19,20 @@ CREATE TABLE users (
 ALTER TABLE users 
 ADD COLUMN photo_url VARCHAR(200);
 
+--
+
+ALTER TABLE users
+MODIFY COLUMN midname VARCHAR(50) NULL;
+
+
+
+
+-- add student_session column
 ALTER TABLE users 
 ADD COLUMN student_session INT;
 
+-- update student_session column set to 30 if course is Bachelor of Science in Information Technology or Bachelor of Science Computer Science
+-- otherwise set to 15
 UPDATE users
 SET student_session = CASE 
     WHEN course IN ('Bachelor of Science in Information Technology', 'Bachelor of Science Computer Science', 'BSIT', 'BSCS') THEN 30
