@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-100">
+<html lang="en" class="h-full bg-gray-50">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -99,7 +99,7 @@
                       id="user-menu-button"
                       aria-expanded="false"
                       aria-haspopup="true"
-                      onclick="toggleDropdown()"
+                      onclick="toggleProfileDropdown()"
                     >
                       <span class="absolute -inset-1.5"></span>
                       <span class="sr-only">Open user menu</span>
@@ -333,8 +333,114 @@
             </ul>
             {% endif %} {% endwith %}
           </div>
+
           <!-- extend -->
-          {% block content %} {% endblock %}
+          {% block content %}
+
+          <!-- Main Dashboard Content - START -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <!-- User Info - LEFT COLUMN -->
+            <div
+              class="shadow-lg shadow-violet-800/30 inset-shadow-2xs rounded-lg"
+            >
+              <div
+                class="flex items-center justify-center w-full h-10 bg-violet-800 text-white"
+              >
+                <p class="font-khand tracking-widest text-lg">Student Info</p>
+              </div>
+              <div class="space-y-4 p-8">
+                <div class="text-center">
+                  <img
+                    class="inline-block h-24 w-24 rounded-full ring-2 ring-violet-700"
+                    src="{{ user.photo_url if user.photo_url else './static/src/images/userphotos/defaultphoto.png' }}"
+                    alt="Profile Photo"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="block text-md font-switzer font-semibold text-gray-900 tracking-wide"
+                    >ID Number:</label
+                  >
+                  <p class="mt-1 text-sm font-switzer">{{ user.idno }}</p>
+                </div>
+                <div>
+                  <label
+                    class="block text-md font-switzer font-semibold text-gray-900 tracking-wide"
+                    >Name:</label
+                  >
+                  <p class="mt-1 text-sm font-switzer">
+                    {{ user.firstname.capitalize() }} {{
+                    user.midname.capitalize() }} {{ user.lastname.capitalize()
+                    }}
+                  </p>
+                </div>
+                <div>
+                  <label
+                    class="block text-md font-switzer font-semibold text-gray-900 tracking-wide"
+                    >Course:</label
+                  >
+                  <p class="mt-1 text-sm font-switzer">{{ user.course }}</p>
+                </div>
+                <div>
+                  <label
+                    class="block text-md font-switzer font-semibold text-gray-900 tracking-wide"
+                    >Year Level:</label
+                  >
+                  <p class="mt-1 text-sm font-switzer">{{ user.yearlevel }}</p>
+                </div>
+                <div>
+                  <label
+                    class="block text-md font-switzer font-semibold text-gray-900 tracking-wide"
+                    >Email:</label
+                  >
+                  <p class="mt-1 text-sm font-switzer">{{ user.email }}</p>
+                </div>
+                <div>
+                  <label
+                    class="block text-md font-switzer font-semibold text-gray-900 tracking-wide"
+                    >Session</label
+                  >
+                  <p class="mt-1 text-sm font-switzer">
+                    {{ user.student_session }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Announcements - RIGHT COLUMN (Takes up 2/3 of the grid) -->
+            <div
+              class="md:col-span-2 shadow-lg shadow-violet-800/30 inset-shadow-2xs rounded-lg"
+            >
+              <div
+                class="flex items-center justify-center w-full h-10 bg-violet-800 text-white"
+              >
+                <p class="font-khand tracking-widest text-lg">Announcements</p>
+              </div>
+              <div class="p-6 h-full">
+                <!-- Announcement content goes here -->
+                <div class="space-y-4">
+                  {% if announcements %} {% for announcement in announcements %}
+                  <div class="border-b border-gray-200 pb-4">
+                    <h3 class="text-lg font-semibold font-switzer">
+                      {{ announcement.title }}
+                    </h3>
+                    <p class="text-sm text-gray-500">{{ announcement.date }}</p>
+                    <div class="mt-2 text-sm font-switzer">
+                      {{ announcement.content }}
+                    </div>
+                  </div>
+                  {% endfor %} {% else %}
+                  <p class="text-center text-gray-500 italic">
+                    No announcements at this time.
+                  </p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Main Dashboard Content - END -->
+
+          {% endblock %}
         </div>
       </main>
     </div>

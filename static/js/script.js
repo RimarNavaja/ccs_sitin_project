@@ -6,8 +6,8 @@ setTimeout(function () {
   }
 }, 3000);
 
-//toggle dropdown desktop
-function toggleDropdown() {
+//toggle dropdown desktop - renamed to toggleProfileDropdown
+function toggleProfileDropdown() {
   const dropdown = document.getElementById("user-menu");
   dropdown.classList.toggle("hidden");
 }
@@ -40,8 +40,7 @@ function closeModal() {
   document.getElementById("editModal").classList.add("hidden");
 }
 
-
-// Toggle dropdown function for labrules.html
+// Toggle dropdown function for labrules.html - keep this function name for content dropdowns
 function toggleDropdown(contentId) {
   const content = document.getElementById(contentId);
   const button = content.previousElementSibling;
@@ -51,10 +50,12 @@ function toggleDropdown(contentId) {
   content.classList.toggle("open");
 
   // Rotate the arrow icon
-  if (!content.classList.contains("open")) {
-    icon.classList.remove("rotate-180");
-  } else {
-    icon.classList.add("rotate-180");
+  if (icon) {
+    if (!content.classList.contains("open")) {
+      icon.classList.remove("rotate-180");
+    } else {
+      icon.classList.add("rotate-180");
+    }
   }
 }
 
