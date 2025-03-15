@@ -11,6 +11,7 @@ from flask import (
 from werkzeug.utils import secure_filename
 import os
 from dbhelper import db, User
+from datetime import timedelta
 
 app = Flask(__name__)
 
@@ -29,6 +30,16 @@ def login() -> None:
         username = request.form['username']
         password = request.form['password']
         if User.verify_credentials(username, password):
+            # Set session lifetime based on remember_me checkbox
+            remember_me = 'remember_me' in request.form
+            session.permanent = remember_me  # Make the session permanent if remember_me is checked
+            if remember_me:
+                # Set session to expire after 30 days
+                app.permanent_session_lifetime = timedelta(days=30)
+            else:
+                # Default session timeout (browser session)
+                app.permanent_session_lifetime = timedelta(hours=1)
+                
             session['user'] = username
             flash("Successfully logged in") # temporary message
             return redirect(url_for('dashboard')) # redirect to dashboard
