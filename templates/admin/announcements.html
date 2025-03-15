@@ -117,7 +117,12 @@
               <div class="flex justify-end space-x-2">
                 <!-- Edit Button -->
                 <button
-                  onclick="openEditModal({{ announcement.id }}, `{{ announcement.title }}`, `{{ announcement.content|replace('\n', '\\n') }}`, {{ announcement.priority }}, {{ 'true' if announcement.is_active else 'false' }})"
+                  data-id="{{ announcement.id }}"
+                  data-title="{{ announcement.title }}"
+                  data-content="{{ announcement.content|replace('\n', '\\n') }}"
+                  data-priority="{{ announcement.priority }}"
+                  data-active="{{ 'true' if announcement.is_active else 'false' }}"
+                  onclick="openEditModal(this.dataset.id, this.dataset.title, this.dataset.content, this.dataset.priority, this.dataset.active === 'true')"
                   class="cursor-pointer text-white bg-violet-800 py-1 px-4 rounded-md hover:bg-violet-700 transition duration-200"
                 >
                   Edit
