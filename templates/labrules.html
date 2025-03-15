@@ -1,86 +1,11 @@
 {% extends 'dashboard.html' %} {% block content %}
 
 <div
-  class="flex flex-row mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 font-switzer gap-4"
+  class="flex flex-col mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8 font-switzer gap-4"
 >
-  <!-- containers -->
-  <div class="basis-1/2 p-10 max-h-auto shadow-xl rounded-2xl">
-    <div class="flex flex-row items-center space-x-2 md:space-x-4">
-        <!-- UC logo -->
-        <div class="shrink-0">
-            <img
-                class="w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 object-contain"
-                src="{{ url_for('static', filename='src/images/logos/UC_LOGO.png') }}
-                alt="College of Computer Studies"
-            />
-        </div>
-        <div class="text-center">
-            <h1
-                class="text-2xl sm:text-3xl md:text-4xl font-bold font-khand tracking-wider text-amber-300"
-            >
-                University of Cebu
-            </h1>
-            <h2
-                class="text-sm sm:text-lg md:text-xl font-bold uppercase text-gray-700"
-            >
-                College of Information & Computer Studies
-            </h2>
-        </div>
-        <!-- CCS logo -->
-        <div class="shrink-0">
-            <img
-                class="w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 object-contain"
-                src="./static/src/images/logos/CCS_LOGO.png"
-                alt="College of Computer Studies"
-            />
-        </div>
-    </div>
-    
-
-    <h2 class="text-center uppercase mt-10 text-xl font-semibold text-violet-800">
-        SIT-IN RULES & PROTOCOLS
-    </h2>
-    <hr class="mt-2">
-    <div class="px-6 text-gray-900 text-justify">
-        <ol class="space-y-2 mt-4  text-gray-700 list-decimal list-inside">
-            <li> Sit-in will be allowed effectively Midterm period onwards and the only exception is Prelim period.</li>
-            <li> Sit in will only be allowed 15 minutes after the class entered the laboratory and with the permission 
-                of the Instructor who will be conducting the class excepy for no classes or vacant hours. Once the Instructor is absent
-                , the Laboratory supervisor will decide if they allow the students to sit-in.</li>
-            <li> Approach any of the laboratory in-charge (Working Scholar or Laboratory Supervisor) and not the Instructor who 
-                conducted the class before getting in.</li>
-            <li> Students (sit-inners) should submit their ID to any of the laboratory in-charge and tell the in-charge what
-                 activites they are going to do.</li>
-            <li> Students (sit-inners) must observe silence while working in their activities to avoid class distraction. 
-                Only those who need to sit-in are allowed to stay in the laboratory.</li>
-            <li> Once the class is over, sit-inners must save their files, close all applications, log off the computer, arrange 
-                the chair properly and claim their ID back from the laboratory in-charge before leaving.</li>
-        </ol>
-
-        <li class="list-none mt-4 text-left">We expect that you follow the above-mentioned rules accordingly.</li>
-
-        <li class="list-none mt-6">Thank You and God bless!</li>
-
-        <li class="list-none mt-6">Sincerely Yours,</li>
-
-    </div>
-
-    <div class="flex justify-center items-center gap-6 text-xs mt-10">
-        <p class="flex flex-col mt-6 font-bold ">Engr. Jeff Salimbangon <span class="text-center capitalize font-normal text-[10px]">lab supervisor</span></p>
-
-
-        <p class="flex flex-col mt-6 font-bold ">Ms. Jerrah Marie Son<span class="text-center capitalize font-normal text-[10px] ">lab supervisor</p>
-
-        <p class=" flex flex-col mt-6 font-bold ">Mr. Gail Garciano<span class="text-center capitalize font-normal text-[10px]">lab supervisor</p>
-    </div>
-
-
-    
-  </div>
-
-  <!-- Lab rules -->
-  <div class="basis-1/2 p-10 shadow-xl rounded-2xl">
-    <div class="flex flex-row items-center space-x-2 md:space-x-4">
+  <!-- single container for all rules -->
+  <div class="w-full p-10 max-h-auto shadow-xl rounded-2xl">
+    <div class="flex flex-row justify-center items-center space-x-2 md:space-x-4">
         <!-- UC logo -->
         <div class="shrink-0">
             <img
@@ -105,60 +30,131 @@
         <div class="shrink-0">
             <img
                 class="w-16 h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 object-contain"
-                src="./static/src/images/logos/CCS_LOGO.png"
+                src="{{ url_for('static', filename='src/images/logos/CCS_LOGO.png') }}"
                 alt="College of Computer Studies"
             />
         </div>
     </div>
     
+    <!-- Dropdown 1 - SIT-IN RULES -->
+    <div class="dropdown-container mt-10">
+        <button 
+            class="dropdown-toggle w-full flex justify-between items-center text-center uppercase text-xl font-semibold text-violet-800 p-2 border-b-2 border-violet-300 hover:bg-violet-50 transition-all duration-200"
+            onclick="toggleDropdown('sitin-rules-content')"
+        >
+            SIT-IN RULES & PROTOCOLS
+            <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </button>
+        
+        <div id="sitin-rules-content" class="dropdown-content max-h-0 overflow-hidden opacity-0 transition-all duration-300 ease-in-out">
+            <div class="content-inner px-6 text-gray-900 text-justify">
+                <ol class="space-y-2 mt-4 text-gray-700 list-decimal list-inside">
+                    <li> Sit-in will be allowed effectively Midterm period onwards and the only exception is Prelim period.</li>
+                    <li> Sit in will only be allowed 15 minutes after the class entered the laboratory and with the permission 
+                        of the Instructor who will be conducting the class excepy for no classes or vacant hours. Once the Instructor is absent
+                        , the Laboratory supervisor will decide if they allow the students to sit-in.</li>
+                    <li> Approach any of the laboratory in-charge (Working Scholar or Laboratory Supervisor) and not the Instructor who 
+                        conducted the class before getting in.</li>
+                    <li> Students (sit-inners) should submit their ID to any of the laboratory in-charge and tell the in-charge what
+                         activites they are going to do.</li>
+                    <li> Students (sit-inners) must observe silence while working in their activities to avoid class distraction. 
+                        Only those who need to sit-in are allowed to stay in the laboratory.</li>
+                    <li> Once the class is over, sit-inners must save their files, close all applications, log off the computer, arrange 
+                        the chair properly and claim their ID back from the laboratory in-charge before leaving.</li>
+                </ol>
 
-    <h2 class="text-center uppercase mt-10 text-xl font-semibold text-violet-800">
-        Laboratory Rules and Regulations
-    </h2>
-    <p class="mt-2 text-gray-600">
-        &nbsp; &nbsp; &nbsp; &nbsp;To avoid embarrassment and maintain camaraderie with your friends and
-        superiors at our laboratories, please observe the following:
-    </p>
+                <li class="list-none mt-4 text-left">We expect that you follow the above-mentioned rules accordingly.</li>
 
-    
-    <div class="px-6">
-        <ol class="mt-4  text-gray-700 list-decimal list-inside">
-        <li> &nbsp; Maintain silence, proper decorum, and discipline inside the laboratory. Mobile phones, walkmans, and other personal equipment must be switched off.</li>
-        <li> &nbsp; Games are not allowed inside the lab, including computer-related games, card games, and others that may disturb the lab.</li>
-        <li> &nbsp; Surfing the Internet is allowed only with the permission of the instructor. Downloading and installing of software are strictly prohibited.</li>
-        <li> &nbsp; Getting access to other websites not related to the course (especially pornographic and illicit sites) is strictly prohibited.</li>
-        <li> &nbsp; Deleting computer files and changing the set-up of the computer is a major offense.</li>
-        <li> &nbsp; Observe computer time usage carefully. A fifteen-minute allowance is given for each use. Otherwise, the unit will be given to those who wish to "sit-in"</li>
-        <li class="flex flex-col">
-            <li> &nbsp; Observe proper decorum while inside the laboratory</li>
-            <ul class="mt-2 space-y-2 pl-6 list-none list-inside text-gray-600">
-                <li> &nbsp; a. Do not get inside the lab unless the instructor is present.</li>
-                <li> &nbsp; b. All bags, knapsacks, and the likes must be deposited at the counter.</li>
-                <li> &nbsp; c. Follow the seating arrangement of your instructor.</li>
-                <li> &nbsp; d. At the end of class, all software programs must be closed.</li>
-                <li> &nbsp; e. Return chairs to their proper places after using.</li>
-            </ul>
-        </li>
-        <li> &nbsp; Chewing gum, eating, drinking, smoking, and other forms of vandalism are prohibited insite the lab.</li>
-        <li> &nbsp; Anyone causing a continual disturbance will be asked to leave the lab. Acts or gestures offensive to the members of the community, including public display of phtsical intimacy, are not tolerated.</li>
-        <li> &nbsp; Persons exhibiting hostile or threatening behavior such as yelling, swearing, or disregarding requests made by lab personnel will be asked to leave the lab.</li>
-        <li> &nbsp; For serious offense, the lab personnel may call the Civil Security Office (CSU) for assistance.</li>
-        <li> &nbsp; Any technical problem or difficulty must be addressed to the laboratory supervisor, student assistand or instructor immediately.</li>
-    </ol></div>
+                <li class="list-none mt-6">Thank You and God bless!</li>
 
-    <div class="mt-10 bg-violet-100 p-8 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold text-violet-800">Disciplinary Action</h2>
-        <ul class="mt-3 space-y-2 list-disc text-gray-700">
-            <li>
-                <strong>First Offense:</strong> - The Head or the Dean or OIC recommends to the Guidance Center for a suspension from classes for each offender.
-            </li>
-            <li>
-                <strong>Second & Subsequent Offenses:</strong> - A recommendation for a heavier sanction will be endorsed to the Guidance Center.
-            </li>
-        </ul>
+                <li class="list-none mt-6">Sincerely Yours,</li>
+            </div>
+
+            <div class="flex justify-center items-center gap-6 text-xs mt-10">
+                <p class="flex flex-col mt-6 font-bold ">Engr. Jeff Salimbangon <span class="text-center capitalize font-normal text-[10px]">lab supervisor</span></p>
+                <p class="flex flex-col mt-6 font-bold ">Ms. Jerrah Marie Son<span class="text-center capitalize font-normal text-[10px] ">lab supervisor</p>
+                <p class=" flex flex-col mt-6 font-bold ">Mr. Gail Garciano<span class="text-center capitalize font-normal text-[10px]">lab supervisor</p>
+            </div>
+        </div>
     </div>
 
+    <!-- Dropdown 2 - Laboratory Rules -->
+    <div class="dropdown-container mt-10">
+        <button 
+            class="dropdown-toggle w-full flex justify-between items-center text-center uppercase text-xl font-semibold text-violet-800 p-2 border-b-2 border-violet-300 hover:bg-violet-50 transition-all duration-200"
+            onclick="toggleDropdown('lab-rules-content')"
+        >
+            Laboratory Rules and Regulations
+            <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </button>
+        
+        <div id="lab-rules-content" class="dropdown-content max-h-0 overflow-hidden opacity-0 transition-all duration-300 ease-in-out">
+            <div class="content-inner">
+                <p class="mt-2 text-gray-600">
+                    &nbsp; &nbsp; &nbsp; &nbsp;To avoid embarrassment and maintain camaraderie with your friends and
+                    superiors at our laboratories, please observe the following:
+                </p>
+                
+                <div class="px-6">
+                    <ol class="mt-4 text-gray-700 list-decimal list-inside">
+                        <li> &nbsp; Maintain silence, proper decorum, and discipline inside the laboratory. Mobile phones, walkmans, and other personal equipment must be switched off.</li>
+                        <li> &nbsp; Games are not allowed inside the lab, including computer-related games, card games, and others that may disturb the lab.</li>
+                        <li> &nbsp; Surfing the Internet is allowed only with the permission of the instructor. Downloading and installing of software are strictly prohibited.</li>
+                        <li> &nbsp; Getting access to other websites not related to the course (especially pornographic and illicit sites) is strictly prohibited.</li>
+                        <li> &nbsp; Deleting computer files and changing the set-up of the computer is a major offense.</li>
+                        <li> &nbsp; Observe computer time usage carefully. A fifteen-minute allowance is given for each use. Otherwise, the unit will be given to those who wish to "sit-in"</li>
+                        <li class="flex flex-col">
+                            <li> &nbsp; Observe proper decorum while inside the laboratory</li>
+                            <ul class="mt-2 space-y-2 pl-6 list-none list-inside text-gray-600">
+                                <li> &nbsp; a. Do not get inside the lab unless the instructor is present.</li>
+                                <li> &nbsp; b. All bags, knapsacks, and the likes must be deposited at the counter.</li>
+                                <li> &nbsp; c. Follow the seating arrangement of your instructor.</li>
+                                <li> &nbsp; d. At the end of class, all software programs must be closed.</li>
+                                <li> &nbsp; e. Return chairs to their proper places after using.</li>
+                            </ul>
+                        </li>
+                        <li> &nbsp; Chewing gum, eating, drinking, smoking, and other forms of vandalism are prohibited insite the lab.</li>
+                        <li> &nbsp; Anyone causing a continual disturbance will be asked to leave the lab. Acts or gestures offensive to the members of the community, including public display of phtsical intimacy, are not tolerated.</li>
+                        <li> &nbsp; Persons exhibiting hostile or threatening behavior such as yelling, swearing, or disregarding requests made by lab personnel will be asked to leave the lab.</li>
+                        <li> &nbsp; For serious offense, the lab personnel may call the Civil Security Office (CSU) for assistance.</li>
+                        <li> &nbsp; Any technical problem or difficulty must be addressed to the laboratory supervisor, student assistand or instructor immediately.</li>
+                    </ol>
+                </div>
+
+                <div class="mt-10 bg-violet-100 p-8 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold text-violet-800">Disciplinary Action</h2>
+                    <ul class="mt-3 space-y-2 list-disc text-gray-700">
+                        <li>
+                            <strong>First Offense:</strong> - The Head or the Dean or OIC recommends to the Guidance Center for a suspension from classes for each offender.
+                        </li>
+                        <li>
+                            <strong>Second & Subsequent Offenses:</strong> - A recommendation for a heavier sanction will be endorsed to the Guidance Center.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
   </div>
 </div>
+
+<!-- Add inline styles for transitions -->
+<style>
+    .dropdown-content.open {
+        max-height: 2000px; /* Large enough to contain content */
+        opacity: 1;
+        margin-top: 1rem;
+    }
+    .dropdown-content {
+        margin-top: 0;
+    }
+    .content-inner {
+        padding: 1rem 0;
+    }
+</style>
 {% endblock %}

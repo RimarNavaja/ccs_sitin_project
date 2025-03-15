@@ -40,6 +40,24 @@ function closeModal() {
   document.getElementById("editModal").classList.add("hidden");
 }
 
+
+// Toggle dropdown function for labrules.html
+function toggleDropdown(contentId) {
+  const content = document.getElementById(contentId);
+  const button = content.previousElementSibling;
+  const icon = button.querySelector("svg");
+
+  // Toggle the content visibility with transitions
+  content.classList.toggle("open");
+
+  // Rotate the arrow icon
+  if (!content.classList.contains("open")) {
+    icon.classList.remove("rotate-180");
+  } else {
+    icon.classList.add("rotate-180");
+  }
+}
+
 // Function to toggle active class for navigation links
 // function toggleActiveLink(event) {
 //   const links = document.querySelectorAll("nav a");
