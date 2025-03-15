@@ -1,0 +1,201 @@
+{% extends 'admin/admin_layout.html' %}
+
+{% block content %}
+<div class="px-4 py-6">
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900 mb-4">
+      Sit-in Reports
+    </h1>
+    <p class="text-lg font-switzer text-gray-600">
+      Generate and view reports for sit-in activities
+    </p>
+  </div>
+  
+  <!-- Report Generator Controls -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <h3 class="text-lg font-semibold font-switzer mb-4">Report Period</h3>
+        <div class="space-y-4">
+          <div>
+            <label for="start-date" class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+            <input type="date" id="start-date" class="w-full border-gray-300 rounded-md shadow-sm focus:border-violet-500 focus:ring-violet-500">
+          </div>
+          <div>
+            <label for="end-date" class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+            <input type="date" id="end-date" class="w-full border-gray-300 rounded-md shadow-sm focus:border-violet-500 focus:ring-violet-500">
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <h3 class="text-lg font-semibold font-switzer mb-4">Filter Options</h3>
+        <div class="space-y-4">
+          <div>
+            <label for="course-filter" class="block text-sm font-medium text-gray-700 mb-2">Course</label>
+            <select id="course-filter" class="w-full border-gray-300 rounded-md shadow-sm focus:border-violet-500 focus:ring-violet-500">
+              <option>All Courses</option>
+              <option>BSIT</option>
+              <option>BSCS</option>
+              <option>Other Courses</option>
+            </select>
+          </div>
+          <div>
+            <label for="year-level" class="block text-sm font-medium text-gray-700 mb-2">Year Level</label>
+            <select id="year-level" class="w-full border-gray-300 rounded-md shadow-sm focus:border-violet-500 focus:ring-violet-500">
+              <option>All Years</option>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+              <option>4th Year</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <h3 class="text-lg font-semibold font-switzer mb-4">Report Options</h3>
+        <div class="space-y-4">
+          <div>
+            <label for="report-type" class="block text-sm font-medium text-gray-700 mb-2">Report Type</label>
+            <select id="report-type" class="w-full border-gray-300 rounded-md shadow-sm focus:border-violet-500 focus:ring-violet-500">
+              <option>Summary Report</option>
+              <option>Detailed Report</option>
+              <option>Student Usage</option>
+              <option>Session Duration Analysis</option>
+            </select>
+          </div>
+          <div class="pt-4">
+            <button type="button" class="w-full bg-violet-800 text-white py-2 px-4 rounded-md hover:bg-violet-700">
+              Generate Report
+            </button>
+          </div>
+          <div class="flex space-x-2 pt-2">
+            <button type="button" class="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 text-sm flex items-center justify-center">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Export PDF
+            </button>
+            <button type="button" class="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 text-sm flex items-center justify-center">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Export CSV
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Report Visualization -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Chart 1: Sit-in Usage Over Time -->
+    <div class="bg-white rounded-lg shadow-md">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="font-khand tracking-widest text-xl text-gray-800">Sit-in Usage Over Time</h2>
+      </div>
+      <div class="p-6">
+        <!-- This would be a chart in a real implementation -->
+        <div class="bg-gray-100 rounded-lg h-64 flex items-center justify-center">
+          <div class="text-center">
+            <p class="text-gray-500 font-switzer">Chart visualization would appear here</p>
+            <p class="text-sm text-gray-400 mt-2">Data shows student usage patterns over selected time period</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chart 2: Distribution by Course -->
+    <div class="bg-white rounded-lg shadow-md">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="font-khand tracking-widest text-xl text-gray-800">Distribution by Course</h2>
+      </div>
+      <div class="p-6">
+        <!-- This would be a chart in a real implementation -->
+        <div class="bg-gray-100 rounded-lg h-64 flex items-center justify-center">
+          <div class="text-center">
+            <p class="text-gray-500 font-switzer">Pie chart visualization would appear here</p>
+            <p class="text-sm text-gray-400 mt-2">Data shows distribution of sit-ins by course</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Report Summary -->
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="font-khand tracking-widest text-xl text-gray-800">Summary Statistics</h2>
+    </div>
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="border rounded-lg p-4">
+          <h3 class="text-lg font-semibold font-switzer text-violet-800 mb-2">Total Sit-ins</h3>
+          <p class="text-3xl font-bold font-khand">152</p>
+          <p class="text-sm text-gray-500 mt-1">During selected period</p>
+        </div>
+        <div class="border rounded-lg p-4">
+          <h3 class="text-lg font-semibold font-switzer text-violet-800 mb-2">Average Duration</h3>
+          <p class="text-3xl font-bold font-khand">27 min</p>
+          <p class="text-sm text-gray-500 mt-1">Per session</p>
+        </div>
+        <div class="border rounded-lg p-4">
+          <h3 class="text-lg font-semibold font-switzer text-violet-800 mb-2">Peak Usage</h3>
+          <p class="text-3xl font-bold font-khand">Tue, 10 AM</p>
+          <p class="text-sm text-gray-500 mt-1">Highest activity</p>
+        </div>
+      </div>
+      
+      <div class="mt-8">
+        <h3 class="text-lg font-semibold font-switzer mb-4">Top Users</h3>
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Student ID
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Course
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Sessions
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Total Duration
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">20220123</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">John Doe</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">BSIT</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">7h 30m</td>
+            </tr>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">20220345</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jane Smith</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">BSCS</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">6h 15m</td>
+            </tr>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">20220567</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Mike Johnson</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">BSIT</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">10</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">5h 00m</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

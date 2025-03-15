@@ -320,7 +320,7 @@
           <!-- Contents -->
 
           <!-- Flash messages -->
-          <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          <div class="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
             {% with messages = get_flashed_messages() %} {% if messages %}
             <ul
               id="flash-messages"
@@ -344,7 +344,7 @@
               class="shadow-lg shadow-violet-800/30 inset-shadow-2xs rounded-lg"
             >
               <div
-                class="flex items-center justify-center w-full h-10 bg-violet-800 text-white"
+                class="flex items-center justify-center w-full h-10 bg-violet-800 text-yellow-300 uppercase rounded-t-lg"
               >
                 <p class="font-khand tracking-widest text-lg">Student Info</p>
               </div>
@@ -412,9 +412,13 @@
               class="md:col-span-2 shadow-lg shadow-violet-800/30 inset-shadow-2xs rounded-lg"
             >
               <div
-                class="flex items-center justify-center w-full h-10 bg-violet-800 text-white"
+                class="flex items-center justify-center w-full h-10 bg-violet-800 text-white rounded-t-lg"
               >
-                <p class="font-khand tracking-widest text-lg">Announcements</p>
+                <p
+                  class="font-khand tracking-widest text-lg text-yellow-300 uppercase"
+                >
+                  Announcements
+                </p>
               </div>
               <div class="p-6 h-full">
                 <!-- Announcement content goes here -->

@@ -117,7 +117,7 @@ def register() -> None:
             #     flash("Username already exists")
             #     return render_template("register.html", form=request.form.to_dict())
 
-            # Set student session based on course 30 minutes for BSIT and BSCS, 15 minutes for others
+            # Set student session based on course 30 session(how many times they will sit-in) for BSIT and BSCS, 15 session (how many times they will sit-in) for others
             student_session = 30 if course in ['BSIT', 'BSCS', 'Bachelor of Science in Information Technology', 'Bachelor of Science Computer Science'] else 15
 
             new_user = User(
@@ -207,6 +207,74 @@ def return_to_index():
 @app.route("/")
 def index() -> None:
     return render_template("index.html",pagetitle = "CCS Sit-in")
+
+# Admin routes
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login() -> None:
+    if request.method == "POST":
+        username = request.form['username']
+        password = request.form['password']
+        # In a real implementation, check against admin credentials
+        # For now, we'll use placeholder credentials
+        if username == "admin" and password == "admin123":
+            # Set session
+            session['admin'] = username
+            session.permanent = True
+            app.permanent_session_lifetime = timedelta(hours=2)
+            flash("Admin login successful")
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash("Invalid admin credentials")
+            return redirect(url_for('admin_login'))
+    return render_template("admin/login.html")
+
+@app.route('/admin/logout', methods=['POST'])
+def admin_logout():
+    session.pop('admin', None)
+    flash("Admin signed out successfully")
+    return redirect(url_for('admin_login'))
+
+@app.route("/admin/dashboard")
+def admin_dashboard():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template("admin/dashboard.html")
+
+@app.route("/admin/sit-in-records")
+def admin_sit_in_records():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template("admin/sit-in-records.html")
+
+@app.route("/admin/sit-in-reports")
+def admin_sit_in_reports():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template("admin/sit-in-reports.html")
+
+@app.route("/admin/feedback-reports")
+def admin_feedback_reports():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template("admin/feedback-reports.html")
+
+@app.route("/admin/search-students")
+def admin_search_students():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template("admin/search-students.html")
+
+@app.route("/admin/sit-in-form")
+def admin_sit_in_form():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template("admin/sit-in-form.html")
+
+@app.route("/admin/reservation")
+def admin_reservation():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    return render_template("admin/reservation.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/static/src/output.css" rel="stylesheet" />
+    <!-- Font khand_bold, Switzer_regular -->
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=khand@700&f[]=switzer@400&display=swap"
+      rel="stylesheet"
+    />
+    <title>CCS Sit-in Admin</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="/static/src/images/logos/CCS_LOGO.png"
+    />
+  </head>
+  <body class="flex flex-col min-h-screen">
+    <div class="flex-1">
+      <!-- Top Navigation Bar -->
+      <nav
+        class="bg-linear-to-r from-purple-900 to-yellow-300"
+        style="position: sticky; top: 0; z-index: 1"
+      >
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="flex h-16 items-center justify-between">
+            <div class="flex items-center">
+              <!-- CCS logo -->
+              <div class="shrink-0">
+                <img
+                  class="size-8"
+                  src="/static/src/images/logos/CCS_LOGO.png"
+                  alt="College of Computer Studies"
+                />
+              </div>
+              <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-4">
+                  <!-- Top Navigation Items -->
+                  <a
+                    href="{{ url_for('admin_dashboard') }}"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
+                    aria-current="page"
+                    >HOME</a
+                  >
+                  <a
+                    href="{{ url_for('admin_search_students') }}"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >SEARCH STUDENTS</a
+                  >
+                  <a
+                    href="{{ url_for('admin_sit_in_form') }}"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >SIT-IN FORM</a
+                  >
+                  <a
+                    href="{{ url_for('admin_reservation') }}"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
+                    >RESERVATION</a
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="hidden md:block">
+              <div class="ml-4 flex items-center md:ml-6">
+                <div class="relative ml-3">
+                  <div>
+                    <button
+                      type="button"
+                      class="relative flex max-w-xs items-center rounded-full bg-gray-100 text-sm focus:ring-2 focus:ring-violet-800 focus:ring-offset-2 focus:ring-offset-yellow-300 focus:outline-hidden"
+                      id="user-menu-button"
+                      aria-expanded="false"
+                      aria-haspopup="true"
+                      onclick="toggleProfileDropdown()"
+                    >
+                      <span class="absolute -inset-1.5"></span>
+                      <span class="sr-only">Open user menu</span>
+                      <img
+                        class="size-12 rounded-full"
+                        src="/static/src/images/userphotos/admin-avatar.webp"
+                        alt="Admin Photo"
+                      />
+                    </button>
+                  </div>
+
+                  <div
+                    id="user-menu"
+                    class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-violet-800/5 focus:outline-hidden"
+                    role="menu"
+                    aria-orientation="vertical"
+                    aria-labelledby="user-menu-button"
+                    tabindex="-1"
+                  >
+                    <form method="POST" action="{{ url_for('admin_logout') }}">
+                      <button
+                        class="block px-4 py-2 text-sm font-switzer hover:text-yellow-300 text-gray-700 duration-300 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
+                        role="menuitem"
+                        tabindex="-1"
+                      >
+                        Logout
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="-mr-2 flex md:hidden">
+              <!-- Mobile menu button -->
+              <button
+                type="button"
+                class="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
+                aria-controls="mobile-menu"
+                aria-expanded="false"
+                onclick="toggleMobileMenu()"
+              >
+                <span class="absolute -inset-0.5"></span>
+                <span class="sr-only">Open main menu</span>
+                <!-- Menu open: "hidden", Menu closed: "block" -->
+                <svg
+                  class="block size-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                  />
+                </svg>
+                <!-- Menu open: "block", Menu closed: "hidden" -->
+                <svg
+                  class="hidden size-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18 18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div class="md:hidden" id="mobile-menu">
+          <div class="space-y-1 px-2 pt-2 pb-3 sm:px-3">
+            <a
+              href="{{ url_for('admin_dashboard') }}"
+              class="block rounded-md bg-violet-800 px-3 py-2 text-base font-medium text-white"
+              aria-current="page"
+              >Home</a
+            >
+            <a
+              href="{{ url_for('admin_search_students') }}"
+              class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+              >Search Students</a
+            >
+            <a
+              href="{{ url_for('admin_sit_in_form') }}"
+              class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+              >Sit-in Form</a
+            >
+            <a
+              href="{{ url_for('admin_reservation') }}"
+              class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+              >Reservation</a
+            >
+          </div>
+          <div class="border-t border-gray-700 pt-4 pb-3">
+            <div class="flex items-center px-5">
+              <div class="shrink-0">
+                <img
+                  class="size-10 rounded-full"
+                  src="/static/src/images/userphotos/admin-avatar.webp"
+                  alt="Admin Avatar"
+                />
+              </div>
+              <div class="ml-3">
+                <div class="text-base/5 font-medium text-white">Admin User</div>
+              </div>
+            </div>
+            <div class="mt-3 space-y-1 px-2">
+              <form method="POST" action="{{ url_for('admin_logout') }}">
+                <button
+                  class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                >
+                  Logout
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main class="flex">
+        <!-- Sidebar Navigation -->
+        <div class="hidden lg:block w-64 bg-gray-800 min-h-screen p-4">
+          <div class="flex items-center justify-center mb-8">
+            <h2 class="text-xl font-khand tracking-wide text-yellow-300">
+              ADMIN PANEL
+            </h2>
+          </div>
+          <nav>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="{{ url_for('admin_dashboard') }}"
+                  class="flex items-center py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+                >
+                  <svg
+                    class="w-5 h-5 mr-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                    ></path>
+                  </svg>
+                  <span class="font-switzer">Dashboard</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="{{ url_for('admin_sit_in_records') }}"
+                  class="flex items-center py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+                >
+                  <svg
+                    class="w-5 h-5 mr-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                    ></path>
+                  </svg>
+                  <span class="font-switzer">View Sit-in Records</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="{{ url_for('admin_sit_in_reports') }}"
+                  class="flex items-center py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+                >
+                  <svg
+                    class="w-5 h-5 mr-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    ></path>
+                  </svg>
+                  <span class="font-switzer">Sit-in Reports</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="{{ url_for('admin_feedback_reports') }}"
+                  class="flex items-center py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+                >
+                  <svg
+                    class="w-5 h-5 mr-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                    ></path>
+                  </svg>
+                  <span class="font-switzer">Feedback Reports</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 p-6">
+          <!-- Flash messages -->
+          <div class="max-w-7xl mx-auto">
+            {% with messages = get_flashed_messages() %} {% if messages %}
+            <ul
+              id="flash-messages"
+              class="bg-yellow-100/30 font-switzer border text-center border-violet-400 text-violet-700 px-4 py-3 rounded relative mb-6"
+              role="alert"
+            >
+              {% for message in messages %}
+              <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %} {% endwith %}
+          </div>
+
+          <!-- Page content -->
+          <div class="max-w-7xl mx-auto">{% block content %}{% endblock %}</div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100">
+      <div class="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 lg:px-8">
+        <div class="sm:flex sm:justify-between sm:items-center">
+          <div class="flex justify-center items-center sm:justify-start">
+            <div class="flex flex-row space-x-4">
+              <!-- UC logo -->
+              <div class="shrink-0">
+                <img
+                  class="size-8"
+                  src="/static/src/images/logos/UC_LOGO.png"
+                  alt="University of Cebu"
+                />
+              </div>
+
+              <!-- CCS logo -->
+              <div class="shrink-0">
+                <img
+                  class="size-8"
+                  src="/static/src/images/logos/CCS_LOGO.png"
+                  alt="College of Computer Studies"
+                />
+              </div>
+            </div>
+            <p class="ml-5 font-khand text-xl font-semibold">
+              College of Computer Studies
+            </p>
+          </div>
+
+          <p
+            class="flex flex-col mt-4 text-center text-sm text-gray-500 sm:mt-0 lg:text-right"
+          >
+            Copyright &copy; 2025. All rights reserved.
+            <span
+              class="sm:hidden ml-4 font-light font-khand text-black tracking-widest"
+              >SYSARCH</span
+            >
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Load script at the end of the body -->
+    <script src="/static/js/script.js"></script>
+  </body>
+</html>

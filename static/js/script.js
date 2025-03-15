@@ -25,7 +25,7 @@ window.onclick = function (event) {
     !event.target.closest("#user-menu")
   ) {
     const dropdown = document.getElementById("user-menu");
-    if (!dropdown.classList.contains("hidden")) {
+    if (dropdown && !dropdown.classList.contains("hidden")) {
       dropdown.classList.add("hidden");
     }
   }
@@ -59,30 +59,51 @@ function toggleDropdown(contentId) {
   }
 }
 
-// Function to toggle active class for navigation links
-// function toggleActiveLink(event) {
-//   const links = document.querySelectorAll("nav a");
-//   links.forEach((link) => {
-//     link.classList.remove("bg-violet-800", "text-white");
-//     link.classList.add(
-//       "text-gray-300",
-//       "hover:bg-gray-700",
-//       "hover:text-white"
-//     );
-//     link.removeAttribute("aria-current");
-//   });
-//   event.currentTarget.classList.add("bg-violet-800", "text-white");
-//   event.currentTarget.classList.remove(
-//     "text-gray-300",
-//     "hover:bg-gray-700",
-//     "hover:text-white"
-//   );
-//   event.currentTarget.setAttribute("aria-current", "page");
-// }
+// Admin dashboard specific functions
 
-// // Attach event listeners to navigation links after DOM is fully loaded
-// document.addEventListener("DOMContentLoaded", function () {
-//   document.querySelectorAll("nav a").forEach((link) => {
-//     link.addEventListener("click", toggleActiveLink);
-//   });
-// });
+// Function to open reservation modal
+function openReservationModal() {
+  const modal = document.getElementById("reservationModal");
+  if (modal) {
+    modal.classList.remove("hidden");
+  }
+}
+
+// Function to close reservation modal
+function closeReservationModal() {
+  const modal = document.getElementById("reservationModal");
+  if (modal) {
+    modal.classList.add("hidden");
+  }
+}
+
+// Function to initialize admin dashboard event listeners
+function initAdminDashboard() {
+  const createReservationBtn = document.querySelector(
+    ".admin-create-reservation"
+  );
+  if (createReservationBtn) {
+    createReservationBtn.addEventListener("click", openReservationModal);
+  }
+}
+
+// Initialize event listeners when DOM is loaded
+document.addEventListener("DOMContentLoaded", function () {
+  // Initialize admin dashboard if we're on that page
+  if (window.location.href.includes("/admin/")) {
+    initAdminDashboard();
+  }
+
+  // Add active class to current page link in navigation
+  const currentPath = window.location.pathname;
+  const navLinks = document.querySelectorAll("nav a");
+
+  navLinks.forEach((link) => {
+    const linkPath = link.getAttribute("href");
+    if (linkPath && currentPath.includes(linkPath) && linkPath !== "/") {
+      // Add active class to sidebar links
+      link.classList.add("bg-violet-700", "text-white");
+      link.classList.remove("text-gray-300", "hover:bg-gray-700");
+    }
+  });
+});

@@ -31,6 +31,7 @@ MODIFY COLUMN midname VARCHAR(50) NULL;
 ALTER TABLE users 
 ADD COLUMN student_session INT;
 
+
 -- update student_session column set to 30 if course is Bachelor of Science in Information Technology or Bachelor of Science Computer Science
 -- otherwise set to 15
 UPDATE users

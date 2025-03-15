@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="/static/src/output.css" rel="stylesheet" />
+  <!-- Font khand_bold, Switzer_regular -->
+  <link
+    href="https://api.fontshare.com/v2/css?f[]=khand@700&f[]=switzer@400&display=swap"
+    rel="stylesheet"
+  />
+  <title>CCS Sit-in Admin</title>
+  <link
+    rel="icon"
+    type="image/x-icon"
+    href="/static/src/images/logos/CCS_LOGO.png"
+  />
+</head>
+<body class="h-full">
+  <div class="flex min-h-full flex-col justify-center px-6 py-6 lg:px-8">
+    <div class="flex justify-center sm:mx-auto sm:w-full sm:max-w-sm">
+      <img
+        class="size-30"
+        src="/static/src/images/logos/CCS_LOGO.png"
+        alt="College of Computer Studies"
+      />
+    </div>
+    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+      <h2
+        class="mt-10 text-center text-6xl font-khand bg-gradient-to-r from-violet-900 to-yellow-400 bg-clip-text text-transparent"
+      >
+        ADMIN LOGIN
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-500 font-switzer">
+        CCS Sit-in Monitoring System
+      </p>
+    </div>
+
+    <!-- Flash messages -->
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <ul
+        id="flash-messages"
+        class="bg-yellow-100/30 font-switzer border text-center border-violet-400 text-violet-700 px-4 py-3 rounded relative"
+        role="alert"
+      >
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %} {% endwith %}
+    </div>
+
+    <div
+      class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm shadow-lg shadow-violet-800/30 inset-shadow-2xs p-8 rounded-lg"
+    >
+      <form class="space-y-6" action="/admin/login" method="POST">
+        <div>
+          <label
+            for="username"
+            class="block text-sm/6 font-medium font-switzer text-gray-900 tracking-wide"
+            >Username</label
+          >
+          <div class="mt-2">
+            <input
+              type="text"
+              name="username"
+              id="username"
+              autocomplete="username"
+              required
+              class="block w-full rounded-md bg-white px-3 py-2.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+            />
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between">
+            <label
+              for="password"
+              class="block text-sm/6 font-medium font-switzer text-gray-900"
+              >Password</label
+            >
+          </div>
+          <div class="mt-2">
+            <input
+              type="password"
+              name="password"
+              id="password"
+              autocomplete="current-password"
+              required
+              class="block w-full rounded-md bg-white px-3 py-2.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+            />
+          </div>
+        </div>
+
+        <!-- Login Button -->
+        <div>
+          <button
+            type="submit"
+            class="flex w-full justify-center rounded-md bg-violet-800 px-3 py-2.5 text-md/6 font-semibold font-switzer tracking-widest text-white shadow-xs hover:bg-violet-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500/50"
+          >
+            Admin Login
+          </button>
+        </div>
+      </form>
+
+      <p class="mt-10 text-center text-sm/6 text-gray-500">
+        <a 
+          href="{{ url_for('login') }}"
+          class="font-switzer tracking-wide text-yellow-300 hover:text-yellow-200 duration-300 ease-in-out delay-150 hover:text-md hover:tracking-wider"
+        >
+          Return to User Login
+        </a>
+      </p>
+    </div>
+  </div>
+  
+  <!-- Load script at the end of the body -->
+  <script src="/static/js/script.js"></script>
+</body>
+</html>
