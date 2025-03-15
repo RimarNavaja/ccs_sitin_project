@@ -54,7 +54,7 @@
           </div>
           <div>
             <button
-              class="w-full flex justify-center py-2.5 px-2 border border-transparent rounded-md shadow-sm text-md font-semibold font-switzer tracking-widest text-white bg-violet-800 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500/50"
+              class="cursor-pointer w-full flex justify-center py-2.5 px-2 border border-transparent rounded-md shadow-sm text-md font-semibold font-switzer tracking-widest text-white bg-violet-800 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500/50"
               onclick="openModal()"
             >
               Edit Profile
@@ -63,7 +63,7 @@
                 <p class="text-center mt-2">
                     <button
                     type="submit"
-                    class="font-switzer font-semibold tracking-wider text-yellow-300 hover:text-yellow-200 duration-300 ease-in-out delay-150 hover:text-md hover:tracking-widest"
+                    class="cursor-pointer font-switzer font-semibold tracking-wider text-yellow-300 hover:text-yellow-200 duration-300 ease-in-out delay-150 hover:text-md hover:tracking-widest"
                   >
                     Back to Dashboard
                   </button>
@@ -89,13 +89,13 @@
                     alt="Profile Photo"
                   />
                 </div>
-                <!-- <label for="photo" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">Profile Photo</label>  -->
+                <!-- <label for="photo" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">Profile Photo</label>   -->
                 <input
                   type="file"
                   name="photo"
                   id="photo"
                   accept="image/*"
-                  class="border border-violet-400 rounded-full file:mr-4 file:rounded-full file:border-0 file:bg-violet-100  file:px-4 file:font-switzer file:py-2 file:text-sm file:font-semibold file:text-violet-700 hover:file:bg-violet-200 "
+                  class="border cursor-pointer file:cursor-pointer border-violet-400 rounded-full file:mr-4 file:rounded-full file:border-0 file:bg-violet-100  file:px-4 file:font-switzer file:py-2 file:text-sm file:font-semibold file:text-violet-700 hover:file:bg-violet-200 "
                 />
                 
               </div>
@@ -191,6 +191,8 @@
                   class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
+
+              <!-- Change password -->
               <div>
                 <label for="old_password" class="block text-md font-switzer font-semibold tracking-wide text-gray-800">Old Password</label>
                 <input
@@ -218,6 +220,8 @@
                   class="block w-full rounded-md py-2.5 px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
               </div>
+              <!-- Change password - END -->
+               
               <div class="flex justify-end">
                 <button
                   type="button"

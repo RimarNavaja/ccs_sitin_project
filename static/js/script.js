@@ -77,6 +77,45 @@ function closeReservationModal() {
   }
 }
 
+// Announcement management functions
+function openAnnouncementModal() {
+  const modal = document.getElementById("announcementModal");
+  if (modal) {
+    modal.classList.remove("hidden");
+  }
+}
+
+function closeAnnouncementModal() {
+  const modal = document.getElementById("announcementModal");
+  if (modal) {
+    modal.classList.add("hidden");
+  }
+}
+
+function openEditModal(id, title, content, priority, isActive) {
+  const form = document.getElementById("editAnnouncementForm");
+  if (form) {
+    form.action = `/admin/announcements/edit/${id}`;
+
+    document.getElementById("edit-title").value = title;
+    document.getElementById("edit-content").value = content.replace(
+      /\\n/g,
+      "\n"
+    );
+    document.getElementById("edit-priority").value = priority;
+    document.getElementById("edit-is-active").checked = isActive;
+
+    document.getElementById("editAnnouncementModal").classList.remove("hidden");
+  }
+}
+
+function closeEditModal() {
+  const modal = document.getElementById("editAnnouncementModal");
+  if (modal) {
+    modal.classList.add("hidden");
+  }
+}
+
 // Function to initialize admin dashboard event listeners
 function initAdminDashboard() {
   const createReservationBtn = document.querySelector(
@@ -84,6 +123,14 @@ function initAdminDashboard() {
   );
   if (createReservationBtn) {
     createReservationBtn.addEventListener("click", openReservationModal);
+  }
+
+  // Add announcement button listener if on announcements page
+  const createAnnouncementBtn = document.querySelector(
+    "button[onclick='openAnnouncementModal()']"
+  );
+  if (createAnnouncementBtn) {
+    createAnnouncementBtn.addEventListener("click", openAnnouncementModal);
   }
 }
 

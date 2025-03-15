@@ -6,12 +6,13 @@ from flask import (
     url_for,
     flash,
     session,
-    url_for
+    url_for,
+    jsonify
 )
 from werkzeug.utils import secure_filename
 import os
-from dbhelper import db, User
-from datetime import timedelta
+from dbhelper import db, User, Announcement
+from datetime import timedelta, datetime
 
 app = Flask(__name__)
 
@@ -146,7 +147,8 @@ def dashboard():
     if 'user' not in session:
         return redirect(url_for('login'))
     user = User.query.filter_by(username=session['user']).first()
-    return render_template("dashboard.html", user=user)
+    announcements = Announcement.get_active_announcements()
+    return render_template("dashboard.html", user=user, announcements=announcements)
 
 @app.route("/lab_rules")
 def lab_rules():
@@ -238,7 +240,18 @@ def admin_logout():
 def admin_dashboard():
     if 'admin' not in session:
         return redirect(url_for('admin_login'))
-    return render_template("admin/dashboard.html")
+    
+    # Get announcement stats
+    total_announcements = Announcement.query.count()
+    active_announcements = Announcement.query.filter_by(is_active=True).count()
+    
+    return render_template(
+        "admin/dashboard.html",
+        announcement_stats={
+            'total': total_announcements,
+            'active': active_announcements
+        }
+    )
 
 @app.route("/admin/sit-in-records")
 def admin_sit_in_records():
@@ -275,6 +288,92 @@ def admin_reservation():
     if 'admin' not in session:
         return redirect(url_for('admin_login'))
     return render_template("admin/reservation.html")
+
+# Admin announcements routes
+@app.route("/admin/announcements")
+def admin_announcements():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    announcements = Announcement.get_all_announcements()
+    return render_template("admin/announcements.html", announcements=announcements)
+
+@app.route("/admin/announcements/create", methods=["POST"])
+def admin_create_announcement():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    
+    title = request.form.get('title')
+    content = request.form.get('content')
+    priority = int(request.form.get('priority', 0))
+    is_active = request.form.get('is_active') == 'on'
+    
+    if not title or not content:
+        flash("Title and content are required")
+        return redirect(url_for('admin_announcements'))
+    
+    new_announcement = Announcement(
+        title=title,
+        content=content,
+        priority=priority,
+        is_active=is_active
+    )
+    
+    db.session.add(new_announcement)
+    db.session.commit()
+    
+    flash("Announcement created successfully")
+    return redirect(url_for('admin_announcements'))
+
+@app.route("/admin/announcements/edit/<int:id>", methods=["POST"])
+def admin_edit_announcement(id):
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    
+    announcement = Announcement.get_announcement_by_id(id)
+    if not announcement:
+        flash("Announcement not found")
+        return redirect(url_for('admin_announcements'))
+    
+    announcement.title = request.form.get('title')
+    announcement.content = request.form.get('content')
+    announcement.priority = int(request.form.get('priority', 0))
+    announcement.is_active = request.form.get('is_active') == 'on'
+    
+    db.session.commit()
+    
+    flash("Announcement updated successfully")
+    return redirect(url_for('admin_announcements'))
+
+@app.route("/admin/announcements/delete/<int:id>", methods=["POST"])
+def admin_delete_announcement(id):
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    
+    announcement = Announcement.get_announcement_by_id(id)
+    if announcement:
+        db.session.delete(announcement)
+        db.session.commit()
+        flash("Announcement deleted successfully")
+    else:
+        flash("Announcement not found")
+    
+    return redirect(url_for('admin_announcements'))
+
+@app.route("/admin/announcements/toggle/<int:id>", methods=["POST"])
+def admin_toggle_announcement(id):
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    
+    announcement = Announcement.get_announcement_by_id(id)
+    if announcement:
+        announcement.is_active = not announcement.is_active
+        db.session.commit()
+        status = "activated" if announcement.is_active else "deactivated"
+        flash(f"Announcement {status} successfully")
+    else:
+        flash("Announcement not found")
+    
+    return redirect(url_for('admin_announcements'))
 
 if __name__ == "__main__":
     app.run(debug=True)

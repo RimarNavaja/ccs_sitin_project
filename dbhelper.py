@@ -39,3 +39,49 @@ class User(db.Model):
             db.session.commit()
         else:
             abort(404, description="User not found")
+
+class Announcement(db.Model):
+    __tablename__ = 'announcements'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+    is_active = db.Column(db.Boolean, default=True)
+    priority = db.Column(db.Integer, default=0)
+    
+    def __init__(self, title, content, priority=0, is_active=True):
+        self.title = title
+        self.content = content
+        self.priority = priority
+        self.is_active = is_active
+    
+    # Added the get_active_announcements method
+    @classmethod
+    def get_active_announcements(cls):
+        """Get all active announcements ordered by priority (highest first) and then by date (newest first)"""
+        return cls.query.filter_by(is_active=True).order_by(cls.priority.desc(), cls.created_at.desc()).all()
+    
+    # Added the get_all_announcements method
+    @classmethod
+    def get_all_announcements(cls):
+        """Get all announcements ordered by priority (highest first) and then by date (newest first)"""
+        return cls.query.order_by(cls.priority.desc(), cls.created_at.desc()).all()
+    
+    @classmethod
+    def get_announcement_by_id(cls, id):
+        """Get announcement by id"""
+        return cls.query.get(id)
+    
+    def to_dict(self):
+        """Convert announcement to dictionary"""
+        return {
+            'id': self.id,
+            'title': self.title,
+            'content': self.content,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'is_active': self.is_active,
+            'priority': self.priority
+        }
