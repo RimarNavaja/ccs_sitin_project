@@ -3753,4 +3753,7 @@
   syntax: "*";
   inherits: false;
 }
-@property --tw-c
+@property --tw-contain-style {
+  syntax: "*";
+  inherits: false;
+}
