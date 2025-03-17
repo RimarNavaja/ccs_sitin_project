@@ -39,6 +39,30 @@ class User(db.Model):
             db.session.commit()
         else:
             abort(404, description="User not found")
+    
+    def deduct_session(self):
+        """Deduct one session from the user's available sessions"""
+        if self.student_session > 0:
+            self.student_session -= 1
+            db.session.commit()
+            return True
+        return False
+    
+    def add_session(self, count=1):
+        """Add sessions to the user's available sessions"""
+        self.student_session += count
+        db.session.commit()
+        return True
+    
+    @classmethod
+    def get_user_by_id(cls, user_id):
+        """Get a user by ID"""
+        return cls.query.get(user_id)
+    
+    @classmethod
+    def get_user_by_idno(cls, idno):
+        """Get a user by ID number"""
+        return cls.query.filter_by(idno=idno).first()
 
 class Announcement(db.Model):
     __tablename__ = 'announcements'

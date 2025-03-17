@@ -13,6 +13,7 @@ from werkzeug.utils import secure_filename
 import os
 from dbhelper import db, User, Announcement
 from datetime import timedelta, datetime
+from models.sit_in_session import SitInSession
 
 app = Flask(__name__)
 
@@ -374,6 +375,99 @@ def admin_toggle_announcement(id):
         flash("Announcement not found")
     
     return redirect(url_for('admin_announcements'))
+
+@app.route("/admin/start-sit-in", methods=["POST"])
+def admin_start_sit_in():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    
+    student_id = request.form.get('student_id')
+    computer_number = request.form.get('computer_number')
+    purpose = request.form.get('purpose')
+    notes = request.form.get('notes')
+    
+    if not student_id or not computer_number or not purpose:
+        flash("Student ID, computer number, and purpose are required")
+        return redirect(url_for('admin_sit_in_form'))
+    
+    user = User.get_user_by_idno(student_id)
+    if not user:
+        flash("Student not found")
+        return redirect(url_for('admin_sit_in_form'))
+    
+    # Check if the user has available sessions
+    if user.student_session <= 0:
+        flash("Student has no available sit-in sessions remaining")
+        return redirect(url_for('admin_sit_in_form'))
+    
+    # Create new sit-in session
+    new_session = SitInSession(
+        user_id=user.id,
+        computer_number=computer_number,
+        purpose=purpose,
+        notes=notes
+    )
+    
+    # Deduct one session from the user's available sessions
+    user.deduct_session()
+    
+    db.session.add(new_session)
+    db.session.commit()
+    
+    flash("Sit-in session started successfully")
+    return redirect(url_for('admin_sit_in_form'))
+
+@app.route("/admin/end-sit-in/<int:session_id>", methods=["POST"])
+def admin_end_sit_in(session_id):
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    
+    sit_in_session = SitInSession.get_session_by_id(session_id)
+    if not sit_in_session:
+        flash("Sit-in session not found")
+        return redirect(url_for('admin_sit_in_form'))
+    
+    # End the sit-in session
+    sit_in_session.end_session()
+    db.session.commit()
+    
+    flash("Sit-in session ended successfully")
+    return redirect(url_for('admin_sit_in_form'))
+
+@app.route("/admin/search-student", methods=["POST"])
+def admin_search_student():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    
+    search_term = request.form.get('student_search')
+    if not search_term:
+        return jsonify({'success': False, 'message': 'Search term is required'})
+    
+    # Search for students by ID or name
+    users = User.query.filter(
+        (User.idno.like(f"%{search_term}%")) |
+        (User.firstname.like(f"%{search_term}%")) |
+        (User.lastname.like(f"%{search_term}%"))
+    ).limit(5).all()
+    
+    if not users:
+        return jsonify({'success': False, 'message': 'No students found'})
+    
+    # Format user data for response
+    user_data = []
+    for user in users:
+        user_data.append({
+            'id': user.id,
+            'idno': user.idno,
+            'name': f"{user.firstname} {user.lastname}",
+            'course': user.course,
+            'year_level': user.yearlevel,
+            'email': user.email,
+            'remaining_sessions': user.student_session,
+            'photo_url': user.photo_url or '/static/src/images/userphotos/defaultphoto.png'
+        })
+    
+    return jsonify({'success': True, 'students': user_data})
 
 if __name__ == "__main__":
     app.run(debug=True)
