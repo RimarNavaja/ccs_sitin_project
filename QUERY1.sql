@@ -46,10 +46,11 @@ CREATE TABLE announcements (
 
 -- Sample announcement data
 INSERT INTO announcements (title, content, priority) VALUES
-('Welcome to CCS Sit-in System', 'The CCS Sit-in system is now live! Please use this system to register for computer lab usage.', 1),
-('Lab Hours Update', 'Please note that the computer lab will be closed for maintenance on Saturday, May 20th from 9AM to 12PM.', 2),
-('Reminder: Lab Rules', 'All students are reminded to follow lab rules. No food or drinks allowed in the computer lab.', 0);
+('Lab Hours Update', 'Please note that the computer lab will be closed', 2);
+
 
 SELECT * FROM users;
 SELECT * FROM announcements;
 
+DESCRIBE users;
+DESCRIBE announcements;
