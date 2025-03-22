@@ -2776,16 +2776,6 @@
       color: var(--color-violet-700);
     }
   }
-  .placeholder\:px-2 {
-    &::placeholder {
-      padding-inline: calc(var(--spacing) * 2);
-    }
-  }
-  .placeholder\:pl-2 {
-    &::placeholder {
-      padding-left: calc(var(--spacing) * 2);
-    }
-  }
   .placeholder\:font-switzer {
     &::placeholder {
       font-family: var(--font-switzer);
