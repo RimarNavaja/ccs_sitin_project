@@ -1,3 +1,4 @@
+-- Active: 1742647664770@@127.0.0.1@3306@ccs_sitin_project
 CREATE DATABASE ccs_sitin_project;
 
 USE ccs_sitin_project;
@@ -5,7 +6,7 @@ USE ccs_sitin_project;
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     idno VARCHAR(50) NOT NULL UNIQUE,
-    lastname VARCHAR(50) NOT NULL,
+    lastname VARCHAR(50) NOT NULL, 
     firstname VARCHAR(50) NOT NULL,
     midname VARCHAR(50) NOT NULL,
     course VARCHAR(50) NOT NULL,
@@ -18,8 +19,11 @@ CREATE TABLE users (
 ALTER TABLE users 
 ADD COLUMN photo_url VARCHAR(200);
 
+--alter talbe users, change midname column to allow null values
+-- This is to allow users to not have a middle name
 ALTER TABLE users
 MODIFY COLUMN midname VARCHAR(50) NULL;
+
 
 -- add student_session column
 ALTER TABLE users 
@@ -44,6 +48,24 @@ CREATE TABLE announcements (
     priority INT DEFAULT 0
 );
 
+-- Create sit_in_sessions table
+CREATE TABLE sit_in_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    computer_number VARCHAR(10) NOT NULL,
+    purpose VARCHAR(100) NOT NULL,
+    lab VARCHAR(10),
+    notes TEXT,
+    start_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    end_time DATETIME,
+    status VARCHAR(20) DEFAULT 'active',
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Add missing lab column to sit_in_sessions table
+ALTER TABLE sit_in_sessions 
+ADD COLUMN lab VARCHAR(10) AFTER purpose;
+
 -- Sample announcement data
 INSERT INTO announcements (title, content, priority) VALUES
 ('Lab Hours Update', 'Please note that the computer lab will be closed', 2);
@@ -51,6 +73,7 @@ INSERT INTO announcements (title, content, priority) VALUES
 
 SELECT * FROM users;
 SELECT * FROM announcements;
+SELECT * FROM sit_in_sessions;
 
 DESCRIBE users;
 DESCRIBE announcements;

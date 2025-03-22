@@ -23,8 +23,25 @@ app.secret_key = 'supersecretkey'
 app.config['UPLOAD_FOLDER'] = './static/src/images/userphotos'
 db.init_app(app)
 
+def check_database_schema():
+    """Check and update database schema if needed"""
+    try:
+        # Check if lab column exists in sit_in_sessions table
+        with db.engine.connect() as conn:
+            # Try to select from the lab column - if it exists, this will succeed
+            result = conn.execute("SHOW COLUMNS FROM sit_in_sessions LIKE 'lab'")
+            lab_exists = result.rowcount > 0
+            
+            # If lab column doesn't exist, add it
+            if not lab_exists:
+                conn.execute("ALTER TABLE sit_in_sessions ADD COLUMN lab VARCHAR(10) AFTER purpose")
+                print("Added missing 'lab' column to sit_in_sessions table")
+    except Exception as e:
+        print(f"Error checking/updating database schema: {e}")
+
 with app.app_context():
     db.create_all()  # Ensure the tables are created
+    check_database_schema()  # Check and update schema if needed
 
 @app.route("/login",  methods=["GET", "POST"])
 def login() -> None:
@@ -385,10 +402,12 @@ def admin_start_sit_in():
     student_id = request.form.get('student_id')
     computer_number = request.form.get('computer_number')
     purpose = request.form.get('purpose')
+    lab = request.form.get('lab')
     notes = request.form.get('notes')
+    send_notification = 'send_notification' in request.form
     
-    if not student_id or not computer_number or not purpose:
-        flash("Student ID, computer number, and purpose are required")
+    if not student_id or not computer_number or not purpose or not lab:
+        flash("Student ID, computer number, purpose, and lab are required")
         return redirect(url_for('admin_sit_in_form'))
     
     user = User.get_user_by_idno(student_id)
@@ -401,11 +420,17 @@ def admin_start_sit_in():
         flash("Student has no available sit-in sessions remaining")
         return redirect(url_for('admin_sit_in_form'))
     
+    # Check if the user already has an active session
+    if SitInSession.user_has_active_session(user.id):
+        flash(f"Student {user.firstname.capitalize()} {user.lastname.capitalize()} already has an active sit-in session")
+        return redirect(url_for('admin_sit_in_form'))
+    
     # Create new sit-in session
     new_session = SitInSession(
         user_id=user.id,
         computer_number=computer_number,
         purpose=purpose,
+        lab=lab,
         notes=notes
     )
     
@@ -414,6 +439,11 @@ def admin_start_sit_in():
     
     db.session.add(new_session)
     db.session.commit()
+    
+    # TODO: Implement email notification if send_notification is True
+    if send_notification:
+        # This would be implemented with an email service
+        pass
     
     flash("Sit-in session started successfully")
     return redirect(url_for('admin_sit_in_form'))
@@ -457,18 +487,66 @@ def admin_search_student():
     # Format user data for response
     user_data = []
     for user in users:
+        # Process the photo_url
+        photo_url = user.photo_url or '/static/src/images/userphotos/defaultphoto.png'
+        # Remove leading './' if present
+        if photo_url.startswith('./'):
+            photo_url = photo_url[2:]
+        # Ensure it starts with '/'
+        if not photo_url.startswith('/') and not photo_url.startswith('http'):
+            photo_url = '/' + photo_url
+            
         user_data.append({
             'id': user.id,
             'idno': user.idno,
-            'name': f"{user.firstname} {user.lastname}",
+            'name': f"{user.firstname.capitalize()} {user.lastname.capitalize()}",
             'course': user.course,
             'year_level': user.yearlevel,
             'email': user.email,
             'remaining_sessions': user.student_session,
-            'photo_url': user.photo_url or '/static/src/images/userphotos/defaultphoto.png'
+            'photo_url': photo_url
         })
     
     return jsonify({'success': True, 'students': user_data})
+
+@app.route("/admin/get-active-sessions")
+def admin_get_active_sessions():
+    if 'admin' not in session:
+        return jsonify({'success': False, 'message': 'Not authorized'})
+    
+    # Get active sessions
+    active_sessions = SitInSession.get_active_sessions()
+    
+    # Format session data for response
+    formatted_sessions = []
+    for sit_in in active_sessions:
+        user = User.query.get(sit_in.user_id)
+        # Ensure photo_url is properly formatted
+        photo_url = user.photo_url or '/static/src/images/userphotos/defaultphoto.png'
+        # Remove leading './' if present
+        if photo_url.startswith('./'):
+            photo_url = photo_url[2:]
+        # Ensure it starts with '/'
+        if not photo_url.startswith('/') and not photo_url.startswith('http'):
+            photo_url = '/' + photo_url
+            
+        formatted_sessions.append({
+            'id': sit_in.id,
+            'student_id': user.idno,
+            'student_name': f"{user.firstname.capitalize()} {user.lastname.capitalize()}",
+            'photo_url': photo_url,
+            'start_time': sit_in.start_time.isoformat(),
+            'purpose': sit_in.purpose,
+            'lab': sit_in.lab,
+            'computer_number': sit_in.computer_number,
+            'notes': sit_in.notes,
+            'remaining_sessions': user.student_session  # Add the remaining sessions
+        })
+    
+    return jsonify({
+        'success': True, 
+        'sessions': formatted_sessions
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
