@@ -244,6 +244,7 @@ def admin_dashboard():
     
     # Get announcement stats
     total_announcements = Announcement.query.count()
+    # Counts the active announcements
     active_announcements = Announcement.query.filter_by(is_active=True).count()
     
     return render_template(
