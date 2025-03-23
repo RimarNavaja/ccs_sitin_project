@@ -95,7 +95,7 @@
                   <div>
                     <button
                       type="button"
-                      class="relative flex max-w-xs items-center rounded-full bg-gray-100 text-sm focus:ring-2 focus:ring-violet-800 focus:ring-offset-2 focus:ring-offset-yellow-300 focus:outline-hidden"
+                      class="cursor-pointer relative flex max-w-xs items-center rounded-full bg-gray-100 text-sm focus:ring-2 focus:ring-violet-800 focus:ring-offset-2 focus:ring-offset-yellow-300 focus:outline-hidden"
                       id="user-menu-button"
                       aria-expanded="false"
                       aria-haspopup="true"
@@ -132,7 +132,7 @@
                     <!-- Active: "bg-gray-100 outline-hidden", Not Active: "" -->
                     <form method="GET" action="{{ url_for('profile') }}">
                       <button
-                        class="block px-4 py-2 text-sm font-switzer hover:text-yellow-300 text-gray-700 duration-300 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
+                        class="cursor-pointer block px-4 py-2 text-sm font-switzer hover:text-yellow-300 text-gray-700 duration-300 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
                         role="menuitem"
                         tabindex="-1"
                       >
@@ -158,7 +158,7 @@
                     <!-- Logout/sign out -->
                     <form method="POST" action="{{ url_for('logout') }}">
                       <button
-                        class="block px-4 py-2 text-sm font-switzer hover:text-yellow-300 text-gray-700 duration-300 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
+                        class="cursor-pointer block px-4 py-2 text-sm font-switzer hover:text-yellow-300 text-gray-700 duration-300 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
                         role="menuitem"
                         tabindex="-1"
                       >
@@ -350,11 +350,15 @@
               </div>
               <div class="space-y-4 p-8">
                 <div class="text-center">
-                  <img
-                    class="inline-block h-24 w-24 rounded-full ring-2 ring-violet-700"
-                    src="{{ user.photo_url if user.photo_url else './static/src/images/userphotos/defaultphoto.png' }}"
-                    alt="Profile Photo"
-                  />
+                  <form method="GET" action="{{ url_for('profile') }}">
+                    <button>
+                      <img
+                        class="cursor-pointer inline-block h-24 w-24 rounded-full ring-3 ring-violet-700 hover:ring-yellow-300"
+                        src="{{ user.photo_url if user.photo_url else './static/src/images/userphotos/defaultphoto.png' }}"
+                        alt="Profile Photo"
+                      />
+                    </button>
+                  </form>
                 </div>
                 <div>
                   <label
@@ -426,18 +430,18 @@
                   {% if announcements %} {% for announcement in announcements %}
                   <div class="border-b border-gray-200 pb-4">
                     <div class="flex justify-between items-start">
-                      <h3 class="text-lg font-semibold font-switzer">
+                      <h3 class="tracking-wider text-lg font-khand">
                         {{ announcement.title }} {% if announcement.priority > 0
                         %}
                         <span
-                          class="ml-2 px-2 py-0.5 text-xs rounded-full {% if announcement.priority == 2 %}bg-red-100 text-red-800{% else %}bg-yellow-100 text-yellow-800{% endif %}"
+                          class="tracking-wide font-switzer font-semibold ml-2 px-2 py-0.5 text-xs rounded-full {% if announcement.priority == 2 %}bg-red-100 text-red-800{% else %}bg-yellow-100 text-yellow-800{% endif %}"
                         >
                           {% if announcement.priority == 2 %}Urgent{% else
                           %}Important{% endif %}
                         </span>
                         {% endif %}
                       </h3>
-                      <span class="text-sm text-gray-500">
+                      <span class="text-xs font-switzer text-gray-500">
                         {{ announcement.created_at.strftime('%b %d, %Y') if
                         announcement.created_at else 'N/A' }}
                       </span>

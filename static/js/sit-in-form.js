@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   </div>
                   ${activeSessionBadge}
                 </div>
-                <button class="select-student-btn cursor-pointer px-3 py-1 bg-violet-100 text-violet-800 rounded-md text-sm font-medium hover:bg-violet-200">
+                <button class="select-student-btn cursor-pointer px-5 py-1 bg-violet-200 tracking-wide text-violet-800 rounded-md text-sm font-switzer hover:bg-violet-300">
                   Select
                 </button>
               `;
