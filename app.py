@@ -14,6 +14,7 @@ import os
 from dbhelper import db, User, Announcement
 from datetime import timedelta, datetime
 from models.sit_in_session import SitInSession
+from sqlalchemy import text
 
 app = Flask(__name__)
 
@@ -29,12 +30,12 @@ def check_database_schema():
         # Check if lab column exists in sit_in_sessions table
         with db.engine.connect() as conn:
             # Try to select from the lab column - if it exists, this will succeed
-            result = conn.execute("SHOW COLUMNS FROM sit_in_sessions LIKE 'lab'")
+            result = conn.execute(text("SHOW COLUMNS FROM sit_in_sessions LIKE 'lab'"))
             lab_exists = result.rowcount > 0
             
             # If lab column doesn't exist, add it
             if not lab_exists:
-                conn.execute("ALTER TABLE sit_in_sessions ADD COLUMN lab VARCHAR(10) AFTER purpose")
+                conn.execute(text("ALTER TABLE sit_in_sessions ADD COLUMN lab VARCHAR(10) AFTER purpose"))
                 print("Added missing 'lab' column to sit_in_sessions table")
     except Exception as e:
         print(f"Error checking/updating database schema: {e}")

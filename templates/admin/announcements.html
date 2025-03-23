@@ -26,19 +26,6 @@
     </button>
   </div>
 
-  <!-- Flash Messages -->
-  {% with messages = get_flashed_messages() %} {% if messages %}
-  <div id="flash-messages" class="mb-6">
-    {% for message in messages %}
-    <div
-      class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-2"
-    >
-      {{ message }}
-    </div>
-    {% endfor %}
-  </div>
-  {% endif %} {% endwith %}
-
   <!-- Announcements List -->
   <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-200">
