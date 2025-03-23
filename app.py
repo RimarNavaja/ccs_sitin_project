@@ -549,5 +549,110 @@ def admin_get_active_sessions():
         'sessions': formatted_sessions
     })
 
+@app.route("/admin/get-students", methods=["GET"])
+def admin_get_students():
+    if 'admin' not in session:
+        return jsonify({'success': False, 'message': 'Not authorized'})
+    
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    search = request.args.get('search', '')
+    course_filter = request.args.get('course', '')
+    
+    # Base query
+    query = User.query
+    
+    # Apply search filter if provided
+    if search:
+        query = query.filter(
+            (User.idno.like(f"%{search}%")) |
+            (User.firstname.like(f"%{search}%")) |
+            (User.lastname.like(f"%{search}%"))
+        )
+    
+    # Apply course filter if provided
+    if course_filter:
+        if course_filter == 'OTHER':
+            # Filter for courses that are not BSIT or BSCS
+            query = query.filter(~User.course.in_(['BSIT', 'BSCS']))
+        else:
+            query = query.filter(User.course == course_filter)
+    
+    # Get total count for pagination
+    total = query.count()
+    
+    # Apply pagination
+    users = query.offset((page - 1) * per_page).limit(per_page).all()
+    
+    # Format user data
+    user_data = []
+    for user in users:
+        # Process photo URL
+        photo_url = user.photo_url or '/static/src/images/userphotos/defaultphoto.png'
+        if photo_url.startswith('./'):
+            photo_url = photo_url[2:]
+        if not photo_url.startswith('/') and not photo_url.startswith('http'):
+            photo_url = '/' + photo_url
+            
+        user_data.append({
+            'id': user.id,
+            'idno': user.idno,
+            'name': f"{user.firstname.capitalize()} {user.lastname.capitalize()}",
+            'course': user.course,
+            'year_level': user.yearlevel,
+            'email': user.email,
+            'student_session': user.student_session,
+            'photo_url': photo_url
+        })
+    
+    return jsonify({
+        'success': True,
+        'students': user_data,
+        'total': total,
+        'page': page,
+        'per_page': per_page,
+        'total_pages': (total + per_page - 1) // per_page  # Ceiling division
+    })
+
+@app.route("/admin/delete-student", methods=["POST"])
+def admin_delete_student():
+    try:
+        if 'admin' not in session:
+            return jsonify({'success': False, 'message': 'Not authorized'})
+        
+        student_id = request.form.get('student_id')
+        
+        if not student_id:
+            return jsonify({'success': False, 'message': 'Student ID is required'})
+        
+        user = User.query.filter_by(idno=student_id).first()
+        if not user:
+            return jsonify({'success': False, 'message': 'Student not found'})
+        
+        # Check if user has active sit-in sessions
+        has_active_session = SitInSession.user_has_active_session(user.id)
+        if has_active_session:
+            return jsonify({'success': False, 'message': 'Cannot delete student with active sit-in session'})
+        
+        # First, delete all related sit-in sessions (both active and inactive)
+        # This prevents the foreign key constraint error
+        SitInSession.query.filter_by(user_id=user.id).delete()
+        
+        # Then delete the user
+        db.session.delete(user)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Student {student_id} deleted successfully'
+        })
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting student: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Error deleting student: {str(e)}'
+        })
+
 if __name__ == "__main__":
     app.run(debug=True)

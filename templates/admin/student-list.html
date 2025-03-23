@@ -42,12 +42,14 @@
       <div class="flex items-end">
         <button
           type="button"
+          id="search-btn"
           class="bg-violet-800 text-white py-2 px-4 rounded-md hover:bg-violet-700 mr-2"
         >
           Search
         </button>
         <button
           type="button"
+          id="reset-btn"
           class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300"
         >
           Reset
@@ -65,6 +67,7 @@
       <div class="flex space-x-2">
         <button
           type="button"
+          id="export-btn"
           class="font-switzer bg-gray-200 text-gray-700 py-1 px-3 rounded-md hover:bg-gray-300 text-sm"
         >
           Export List
@@ -120,156 +123,11 @@
             </th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <!-- Sample student data -->
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              20220001
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="flex items-center">
-                <div
-                  class="h-8 w-8 rounded-full overflow-hidden bg-gray-100 mr-3"
-                >
-                  <img
-                    src="/static/src/images/userphotos/defaultphoto.png"
-                    alt="Profile Photo"
-                  />
-                </div>
-                <div class="text-sm font-medium text-gray-900">John Doe</div>
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              BSIT
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              3rd Year
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              john.doe@example.com
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              23
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <button class="text-green-600 hover:text-green-900 mr-3">
-                New Sit-in
-              </button>
-              <button class="text-red-600 hover:text-red-900">Remove</button>
-            </td>
-          </tr>
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              20220002
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="flex items-center">
-                <div
-                  class="h-8 w-8 rounded-full overflow-hidden bg-gray-100 mr-3"
-                >
-                  <img
-                    src="/static/src/images/userphotos/defaultphoto.png"
-                    alt="Profile Photo"
-                  />
-                </div>
-                <div class="text-sm font-medium text-gray-900">Jane Smith</div>
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              BSCS
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              2nd Year
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              jane.smith@example.com
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              30
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <button class="text-green-600 hover:text-green-900 mr-3">
-                New Sit-in
-              </button>
-              <button class="text-red-600 hover:text-red-900">Remove</button>
-            </td>
-          </tr>
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              20220003
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="flex items-center">
-                <div
-                  class="h-8 w-8 rounded-full overflow-hidden bg-gray-100 mr-3"
-                >
-                  <img
-                    src="/static/src/images/userphotos/defaultphoto.png"
-                    alt="Profile Photo"
-                  />
-                </div>
-                <div class="text-sm font-medium text-gray-900">
-                  Mike Johnson
-                </div>
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              BSIT
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              4th Year
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              mike.johnson@example.com
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              30
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <button class="text-green-600 hover:text-green-900 mr-3">
-                New Sit-in
-              </button>
-              <button class="text-red-600 hover:text-red-900">Remove</button>
-            </td>
-          </tr>
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              20220004
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="flex items-center">
-                <div
-                  class="h-8 w-8 rounded-full overflow-hidden bg-gray-100 mr-3"
-                >
-                  <img
-                    src="/static/src/images/userphotos/defaultphoto.png"
-                    alt="Profile Photo"
-                  />
-                </div>
-                <div class="text-sm font-medium text-gray-900">
-                  Sarah Williams
-                </div>
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              BBA
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              1st Year
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              sarah.williams@example.com
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              15
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <button class="text-green-600 hover:text-green-900 mr-3">
-                New Sit-in
-              </button>
-              <button class="text-red-600 hover:text-red-900">Remove</button>
-            </td>
-          </tr>
+        <tbody
+          id="students-table-body"
+          class="bg-white divide-y divide-gray-200"
+        >
+          <!-- Student data will be loaded dynamically -->
         </tbody>
       </table>
     </div>
@@ -279,38 +137,39 @@
       class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
     >
       <div class="flex-1 flex justify-between sm:hidden">
-        <a
-          href="#"
+        <button
+          id="prev-page-mobile"
           class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
         >
           Previous
-        </a>
-        <a
-          href="#"
+        </button>
+        <button
+          id="next-page-mobile"
           class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
         >
           Next
-        </a>
+        </button>
       </div>
       <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
         <div>
           <p class="text-sm text-gray-700">
-            Showing <span class="font-medium">1</span> to
-            <span class="font-medium">10</span> of
-            <span class="font-medium">97</span> students
+            Showing <span id="page-start" class="font-medium">1</span> to
+            <span id="page-end" class="font-medium">10</span> of
+            <span id="total-students" class="font-medium">0</span> students
           </p>
         </div>
         <div>
           <nav
             class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
             aria-label="Pagination"
+            id="pagination-container"
           >
-            <a
-              href="#"
+            <!-- Pagination will be dynamically generated -->
+            <button
+              id="prev-page"
               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
             >
               <span class="sr-only">Previous</span>
-              <!-- Heroicon name: solid/chevron-left -->
               <svg
                 class="h-5 w-5"
                 xmlns="http://www.w3.org/2000/svg"
@@ -324,43 +183,15 @@
                   clip-rule="evenodd"
                 />
               </svg>
-            </a>
-            <a
-              href="#"
-              aria-current="page"
-              class="z-10 bg-violet-50 border-violet-500 text-violet-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-            >
-              1
-            </a>
-            <a
-              href="#"
-              class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-            >
-              2
-            </a>
-            <a
-              href="#"
-              class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-            >
-              3
-            </a>
-            <span
-              class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
-            >
-              ...
-            </span>
-            <a
-              href="#"
-              class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-            >
-              10
-            </a>
-            <a
-              href="#"
+            </button>
+            <div id="page-numbers" class="flex">
+              <!-- Page numbers will be dynamically generated -->
+            </div>
+            <button
+              id="next-page"
               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
             >
               <span class="sr-only">Next</span>
-              <!-- Heroicon name: solid/chevron-right -->
               <svg
                 class="h-5 w-5"
                 xmlns="http://www.w3.org/2000/svg"
@@ -370,15 +201,71 @@
               >
                 <path
                   fill-rule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  d="M7.293 14.707a1 1 010-1.414L10.586 10 7.293 6.707a1 1 011.414-1.414l4 4a1 1 010 1.414l-4 4a1 1 01-1.414 0z"
                   clip-rule="evenodd"
                 />
               </svg>
-            </a>
+            </button>
           </nav>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Delete Student Modal -->
+  <div
+    id="delete-student-modal"
+    style="display: none"
+    class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50"
+  >
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-gray-900">Remove Student</h3>
+        <button
+          id="close-delete-modal"
+          class="text-gray-400 hover:text-gray-500"
+        >
+          <svg
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+      <div class="mb-4">
+        <p class="text-sm text-gray-600 mb-4 font-switzer">
+          Are you sure you want to remove Student:
+          <span id="delete-student-name" class="font-switzer font-semibold"
+            >this student</span
+          >? This action cannot be undone.
+        </p>
+      </div>
+      <div class="flex justify-end">
+        <button
+          id="cancel-delete"
+          class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 mr-2"
+        >
+          Cancel
+        </button>
+        <button
+          id="confirm-delete"
+          class="bg-red-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-red-700"
+        >
+          Remove
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Include the student list JavaScript -->
+<script src="/static/js/student-list.js"></script>
 {% endblock %}
