@@ -291,11 +291,11 @@ def admin_feedback_reports():
         return redirect(url_for('admin_login'))
     return render_template("admin/feedback-reports.html")
 
-@app.route("/admin/search-students")
-def admin_search_students():
+@app.route("/admin/student-list")
+def admin_student_list():
     if 'admin' not in session:
         return redirect(url_for('admin_login'))
-    return render_template("admin/search-students.html")
+    return render_template("admin/student-list.html")
 
 @app.route("/admin/sit-in-form")
 def admin_sit_in_form():
