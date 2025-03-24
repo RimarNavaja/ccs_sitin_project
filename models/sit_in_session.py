@@ -6,7 +6,6 @@ class SitInSession(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    computer_number = db.Column(db.String(10), nullable=False)
     purpose = db.Column(db.String(100), nullable=False)
     lab = db.Column(db.String(10))
     notes = db.Column(db.Text)
@@ -17,9 +16,8 @@ class SitInSession(db.Model):
     # Define relationship with User model
     user = db.relationship('User', backref=db.backref('sit_in_sessions', lazy=True))
     
-    def __init__(self, user_id, computer_number, purpose, lab=None, notes=None):
+    def __init__(self, user_id, purpose, lab=None, notes=None):
         self.user_id = user_id
-        self.computer_number = computer_number
         self.purpose = purpose
         self.lab = lab
         self.notes = notes

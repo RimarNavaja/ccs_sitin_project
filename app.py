@@ -37,6 +37,15 @@ def check_database_schema():
             if not lab_exists:
                 conn.execute(text("ALTER TABLE sit_in_sessions ADD COLUMN lab VARCHAR(10) AFTER purpose"))
                 print("Added missing 'lab' column to sit_in_sessions table")
+                
+            # Check if computer_number column exists, and drop it if it does
+            result = conn.execute(text("SHOW COLUMNS FROM sit_in_sessions LIKE 'computer_number'"))
+            computer_number_exists = result.rowcount > 0
+            
+            if computer_number_exists:
+                conn.execute(text("ALTER TABLE sit_in_sessions DROP COLUMN computer_number"))
+                print("Removed deprecated 'computer_number' column from sit_in_sessions table")
+                
     except Exception as e:
         print(f"Error checking/updating database schema: {e}")
 
@@ -401,14 +410,13 @@ def admin_start_sit_in():
         return redirect(url_for('admin_login'))
     
     student_id = request.form.get('student_id')
-    computer_number = request.form.get('computer_number')
     purpose = request.form.get('purpose')
     lab = request.form.get('lab')
     notes = request.form.get('notes')
     send_notification = 'send_notification' in request.form
     
-    if not student_id or not computer_number or not purpose or not lab:
-        flash("Student ID, computer number, purpose, and lab are required")
+    if not student_id or not purpose or not lab:
+        flash("Student ID, purpose, and lab are required")
         return redirect(url_for('admin_sit_in_form'))
     
     user = User.get_user_by_idno(student_id)
@@ -423,13 +431,12 @@ def admin_start_sit_in():
     
     # Check if the user already has an active session
     if SitInSession.user_has_active_session(user.id):
-        flash(f"Student {user.firstname.capitalize()} {user.lastname.capitalize()} already has an active sit-in session")
+        flash(f"Student {user.firstname.upper()} {user.lastname.upper()} already has an active sit-in session")
         return redirect(url_for('admin_sit_in_form'))
     
     # Create new sit-in session
     new_session = SitInSession(
         user_id=user.id,
-        computer_number=computer_number,
         purpose=purpose,
         lab=lab,
         notes=notes
@@ -539,7 +546,6 @@ def admin_get_active_sessions():
             'start_time': sit_in.start_time.isoformat(),
             'purpose': sit_in.purpose,
             'lab': sit_in.lab,
-            'computer_number': sit_in.computer_number,
             'notes': sit_in.notes,
             'remaining_sessions': user.student_session  # Add the remaining sessions
         })

@@ -250,9 +250,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   ${session.lab}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ${session.computer_number}
-                </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <span class="px-2 py-1 inline-flex text-xs leading-4 rounded-full ${
                     session.remaining_sessions < 5
