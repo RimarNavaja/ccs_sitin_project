@@ -288,6 +288,105 @@ def admin_sit_in_records():
         return redirect(url_for('admin_login'))
     return render_template("admin/sit-in-records.html")
 
+@app.route("/admin/get-sit-in-records", methods=["GET"])
+def admin_get_sit_in_records():
+    if 'admin' not in session:
+        return jsonify({'success': False, 'message': 'Not authorized'})
+    
+    # Get query parameters for filtering and pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    date_filter = request.args.get('date_filter', 'all')
+    course_filter = request.args.get('course_filter', 'all')
+    
+    # Start with a base query for completed sessions
+    query = SitInSession.query.filter(SitInSession.status == 'completed')
+    
+    # Apply date filters
+    today = datetime.now().date()
+    if date_filter == 'today':
+        query = query.filter(db.func.date(SitInSession.start_time) == today)
+    elif date_filter == 'this_week':
+        start_of_week = today - timedelta(days=today.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+        query = query.filter(
+            db.func.date(SitInSession.start_time) >= start_of_week,
+            db.func.date(SitInSession.start_time) <= end_of_week
+        )
+    elif date_filter == 'this_month':
+        start_of_month = today.replace(day=1)
+        if today.month == 12:
+            end_of_month = today.replace(year=today.year + 1, month=1, day=1) - timedelta(days=1)
+        else:
+            end_of_month = today.replace(month=today.month + 1, day=1) - timedelta(days=1)
+        query = query.filter(
+            db.func.date(SitInSession.start_time) >= start_of_month,
+            db.func.date(SitInSession.start_time) <= end_of_month
+        )
+    
+    # Apply course filter (joins to the User table)
+    if course_filter and course_filter.lower() != 'all':
+        if course_filter.lower() == 'other':
+            query = query.join(User).filter(~User.course.in_(['BSIT', 'BSCS']))
+        else:
+            query = query.join(User).filter(User.course == course_filter)
+    
+    # Get total record count for pagination
+    total = query.count()
+    
+    # Order by start_time (newest first) and apply pagination
+    records = query.order_by(SitInSession.start_time.desc()).offset((page - 1) * per_page).limit(per_page).all()
+    
+    # Format records for response
+    formatted_records = []
+    for record in records:
+        user = User.get_user_by_id(record.user_id)
+        
+        # Format times
+        start_time = record.start_time.strftime('%I:%M %p') if record.start_time else 'N/A'
+        end_time = record.end_time.strftime('%I:%M %p') if record.end_time else 'N/A'
+        date = record.start_time.strftime('%b %d, %Y') if record.start_time else 'N/A'
+        
+        formatted_records.append({
+            'id': record.id,
+            'student_id': user.idno,
+            'student_name': f"{user.firstname.capitalize()} {user.lastname.capitalize()}",
+            'purpose': record.purpose,
+            'lab': record.lab,
+            'date': date,
+            'start_time': start_time,
+            'end_time': end_time,
+            'course': user.course,
+            'year_level': user.yearlevel
+        })
+    
+    return jsonify({
+        'success': True,
+        'records': formatted_records,
+        'total': total,
+        'page': page,
+        'per_page': per_page,
+        'total_pages': (total + per_page - 1) // per_page  # Ceiling division
+    })
+
+@app.route("/admin/delete-sit-in-record/<int:record_id>", methods=["POST"])
+def admin_delete_sit_in_record(record_id):
+    if 'admin' not in session:
+        return jsonify({'success': False, 'message': 'Not authorized'})
+    
+    record = SitInSession.get_session_by_id(record_id)
+    if not record:
+        return jsonify({'success': False, 'message': 'Record not found'})
+    
+    # Delete the record
+    db.session.delete(record)
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'message': 'Record deleted successfully'
+    })
+
 @app.route("/admin/sit-in-reports")
 def admin_sit_in_reports():
     if 'admin' not in session:

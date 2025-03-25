@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
               <a href="/admin/sit-in-form?student=${student.idno}" class="text-green-600 hover:text-green-900">
                 New Sit-in
               </a>
-              <button class="text-red-600 hover:text-red-900 delete-student-btn" data-id="${student.idno}" data-name="${student.name}">
+              <button class="cursor-pointer text-red-600 hover:text-red-900 delete-student-btn" data-id="${student.idno}" data-name="${student.name}">
                 Remove
               </button>
             </div>
