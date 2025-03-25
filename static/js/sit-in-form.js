@@ -250,11 +250,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   ${session.lab}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <span class="px-2 py-1 inline-flex text-xs leading-4 rounded-full ${
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">
+                  <span class="px-4 py-1 inline-flex text-xs leading-4 rounded-full ${
                     session.remaining_sessions < 5
-                      ? " text-red-800"
-                      : " text-blue-800"
+                      ? " bg-red-200 text-red-800"
+                      : " bg-blue-200 text-blue-800"
                   }">
                     ${session.remaining_sessions}
                   </span>
