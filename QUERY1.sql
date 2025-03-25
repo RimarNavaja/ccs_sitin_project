@@ -73,9 +73,12 @@ INSERT INTO announcements (title, content, priority) VALUES
 ('Lab Hours Update', 'Please note that the computer lab will be closed', 2);
 
 
+
+
 SELECT * FROM users;
 SELECT * FROM announcements;
 SELECT * FROM sit_in_sessions;
+
 
 DESCRIBE users;
 DESCRIBE announcements;
