@@ -1,4 +1,4 @@
--- Active: 1742647664770@@127.0.0.1@3306@ccs_sitin_project
+-- Active: 1742789649378@@127.0.0.1@3306@ccs_sitin_project
 CREATE DATABASE ccs_sitin_project;
 
 USE ccs_sitin_project;
@@ -52,7 +52,6 @@ CREATE TABLE announcements (
 CREATE TABLE sit_in_sessions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    computer_number VARCHAR(10) NOT NULL,
     purpose VARCHAR(100) NOT NULL,
     lab VARCHAR(10),
     notes TEXT,
@@ -61,6 +60,9 @@ CREATE TABLE sit_in_sessions (
     status VARCHAR(20) DEFAULT 'active',
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+-- Make sure computer_number column is removed from sit_in_sessions table
+ALTER TABLE sit_in_sessions DROP COLUMN IF EXISTS computer_number;
 
 -- Add missing lab column to sit_in_sessions table
 ALTER TABLE sit_in_sessions 
@@ -77,3 +79,5 @@ SELECT * FROM sit_in_sessions;
 
 DESCRIBE users;
 DESCRIBE announcements;
+
+DESCRIBE sit_in_sessions;
