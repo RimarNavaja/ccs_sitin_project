@@ -33,7 +33,7 @@ class User(db.Model):
 
     @staticmethod
     def update_profile_photo(user_id, photo_url):
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if user:
             user.photo_url = photo_url
             db.session.commit()
@@ -57,7 +57,7 @@ class User(db.Model):
     @classmethod
     def get_user_by_id(cls, user_id):
         """Get a user by ID"""
-        return cls.query.get(user_id)
+        return db.session.get(cls, user_id)
     
     @classmethod
     def get_user_by_idno(cls, idno):
@@ -96,7 +96,7 @@ class Announcement(db.Model):
     @classmethod
     def get_announcement_by_id(cls, id):
         """Get announcement by id"""
-        return cls.query.get(id)
+        return db.session.get(cls, id)
     
     def to_dict(self):
         """Convert announcement to dictionary"""

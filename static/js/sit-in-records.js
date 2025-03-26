@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
           <button 
-            class="text-red-600 hover:text-red-900 delete-record-btn" 
+            class="text-red-600 cursor-pointer hover:text-red-900 delete-record-btn" 
             data-record-id="${record.id}">
             Delete
           </button>

@@ -246,7 +246,7 @@ def admin_login() -> None:
         password = request.form['password']
         # In a real implementation, check against admin credentials
         # For now, we'll use placeholder credentials
-        if username == "admin" and password == "admin123":
+        if username == "admin" and password == "admin123!":
             # Set session
             session['admin'] = username
             session.permanent = True
@@ -760,4 +760,6 @@ def admin_delete_student():
         })
 
 if __name__ == "__main__":
+    # app.run(debug=True, host='172.19.131.163', port=5000)
     app.run(debug=True)
+    
