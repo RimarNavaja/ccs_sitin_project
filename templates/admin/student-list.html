@@ -1,15 +1,17 @@
 {% extends 'admin/admin_layout.html' %} {% block content %}
-<div class="px-4 py-6">
+<div class="px-2 sm:px-4 py-4 sm:py-6">
   <div class="mb-4">
-    <h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900 mb-4">
+    <h1
+      class="text-3xl sm:text-4xl font-bold font-khand tracking-wide text-gray-900 mb-4"
+    >
       Student List
     </h1>
   </div>
 
-  <!-- Simple Search and Filter Form -->
-  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="md:col-span-1">
+  <!-- Search and Filter Form - Improved for mobile -->
+  <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="col-span-1">
         <label for="search" class="block text-sm font-medium text-gray-700 mb-2"
           >Search Students</label
         >
@@ -43,14 +45,14 @@
         <button
           type="button"
           id="search-btn"
-          class="bg-violet-800 text-white py-2 px-4 rounded-md hover:bg-violet-700 mr-2"
+          class="bg-violet-800 text-white py-2 px-3 sm:px-4 rounded-md hover:bg-violet-700 mr-2 text-sm sm:text-base"
         >
           Search
         </button>
         <button
           type="button"
           id="reset-btn"
-          class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300"
+          class="bg-gray-200 text-gray-800 py-2 px-3 sm:px-4 rounded-md hover:bg-gray-300 text-sm sm:text-base"
         >
           Reset
         </button>
@@ -58,12 +60,14 @@
     </div>
   </div>
 
-  <!-- Students List -->
+  <!-- Students List - Responsive table -->
   <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
     <div
-      class="px-6 py-4 border-b border-gray-200 flex justify-between items-center"
+      class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center"
     >
-      <h2 class="font-khand tracking-widest text-xl text-gray-800">Students</h2>
+      <h2 class="font-khand tracking-widest text-xl text-gray-800 mb-2 sm:mb-0">
+        Students
+      </h2>
       <div class="flex space-x-2">
         <button
           type="button"
@@ -75,66 +79,71 @@
       </div>
     </div>
 
+    <!-- Responsive table container -->
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+      <div class="inline-block min-w-full align-middle">
+        <div class="overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  ID Number
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Name
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell"
+                >
+                  Course
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
+                >
+                  Year Level
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell"
+                >
+                  Email
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell"
+                >
+                  Session
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              id="students-table-body"
+              class="bg-white divide-y divide-gray-200"
             >
-              ID Number
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Name
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Course
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Year Level
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Email
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Session
-            </th>
-            <th
-              scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody
-          id="students-table-body"
-          class="bg-white divide-y divide-gray-200"
-        >
-          <!-- Student data will be loaded dynamically -->
-        </tbody>
-      </table>
+              <!-- Student data will be loaded dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <!-- Pagination -->
+    <!-- Pagination - Improved for mobile -->
     <div
-      class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
+      class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 flex-wrap"
     >
       <div class="flex-1 flex justify-between sm:hidden">
         <button
@@ -150,8 +159,10 @@
           Next
         </button>
       </div>
-      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-        <div>
+      <div
+        class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between flex-wrap"
+      >
+        <div class="mb-2 sm:mb-0">
           <p class="text-sm text-gray-700">
             Showing <span id="page-start" class="font-medium">1</span> to
             <span id="page-end" class="font-medium">10</span> of
@@ -184,7 +195,7 @@
                 />
               </svg>
             </button>
-            <div id="page-numbers" class="flex">
+            <div id="page-numbers" class="flex flex-wrap">
               <!-- Page numbers will be dynamically generated -->
             </div>
             <button
@@ -212,21 +223,23 @@
     </div>
   </div>
 
-  <!-- Delete Student Modal -->
+  <!-- Delete Student Modal - Improved sizing for mobile -->
   <div
     id="delete-student-modal"
     style="display: none"
-    class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50"
+    class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4"
   >
-    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-4 sm:p-6">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-gray-900">Remove Student</h3>
+        <h3 class="text-lg sm:text-xl font-bold text-gray-900">
+          Remove Student
+        </h3>
         <button
           id="close-delete-modal"
           class="text-gray-400 hover:text-gray-500"
         >
           <svg
-            class="h-6 w-6"
+            class="h-5 w-5 sm:h-6 sm:w-6"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -251,13 +264,13 @@
       <div class="flex justify-end">
         <button
           id="cancel-delete"
-          class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 mr-2"
+          class="bg-white py-2 px-3 sm:px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 mr-2"
         >
           Cancel
         </button>
         <button
           id="confirm-delete"
-          class="bg-red-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-red-700"
+          class="bg-red-600 py-2 px-3 sm:px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-red-700"
         >
           Remove
         </button>
