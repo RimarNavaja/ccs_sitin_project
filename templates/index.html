@@ -94,7 +94,57 @@
       <main>
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <!-- Your content -->
-          {% block content %} {% endblock %}
+          {% block content %}
+           <!-- Announcements - RIGHT COLUMN (Takes up 2/3 of the grid) -->
+           <div
+           class="md:col-span-2 shadow-lg shadow-violet-800/30 inset-shadow-2xs rounded-lg"
+         >
+           <div
+             class="flex items-center justify-content-end w-full h-14 bg-violet-800 text-white rounded-t-lg"
+           >
+             <p
+               class="font-khand  tracking-wider  text-2xl sm:text-3xl ml-6  text-yellow-300 uppercase"
+             >
+               Announcements
+             </p>
+           </div>
+           <div class="p-6 h-full">
+             <!-- Announcement content goes here -->
+             <div class="space-y-4">
+               {% if announcements %} {% for announcement in announcements %}
+               <div class="border-b border-gray-200 pb-4">
+                 <div class="flex justify-between items-start">
+                   <h3 class="tracking-wider text-lg font-khand">
+                     {{ announcement.title }} {% if announcement.priority > 0
+                     %}
+                     <span
+                       class="tracking-wide font-switzer font-semibold ml-2 px-2 py-0.5 text-xs rounded-full {% if announcement.priority == 2 %}bg-red-100 text-red-800{% else %}bg-yellow-100 text-yellow-800{% endif %}"
+                     >
+                       {% if announcement.priority == 2 %}Urgent{% else
+                       %}Important{% endif %}
+                     </span>
+                     {% endif %}
+                   </h3>
+                   <span class="text-xs font-switzer text-gray-500">
+                     {{ announcement.created_at.strftime('%b %d, %Y') if
+                     announcement.created_at else 'N/A' }}
+                   </span>
+                 </div>
+                 <div class="mt-2 text-sm font-switzer">
+                   {{ announcement.content }}
+                 </div>
+               </div>
+               {% endfor %} {% else %}
+               <p class="text-center text-gray-500 italic">
+                 No announcements at this time.
+               </p>
+               {% endif %}
+             </div>
+           </div>
+          </div>
+          
+          {% endblock %}
+          
         </div>
       </main>
     </div>

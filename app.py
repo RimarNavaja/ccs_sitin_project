@@ -236,7 +236,9 @@ def return_to_index():
 
 @app.route("/")
 def index() -> None:
-    return render_template("index.html",pagetitle = "CCS Sit-in")
+    # Get active announcements
+    announcements = Announcement.get_active_announcements()
+    return render_template("index.html", pagetitle="CCS Sit-in", announcements=announcements)
 
 # Admin routes
 @app.route("/admin/login", methods=["GET", "POST"])
