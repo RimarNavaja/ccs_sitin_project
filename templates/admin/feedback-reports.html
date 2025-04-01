@@ -1,0 +1,186 @@
+{% extends 'admin/admin_layout.html' %} {% block content %}
+<div class="px-4 py-6">
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900 mb-4">
+      Feedback Reports
+    </h1>
+    <p class="text-lg font-switzer text-gray-600">
+      View and analyze student feedback for sit-in sessions
+    </p>
+  </div>
+
+  <!-- Feedback Statistics -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div
+      class="bg-white rounded-lg shadow-md p-6 flex flex-col justify-center items-center border-l-4 border-violet-500"
+    >
+      <h2 class="text-lg font-semibold font-switzer text-gray-800 mb-2">
+        Average Rating
+      </h2>
+      <p class="text-4xl font-bold font-khand text-violet-800">
+        {{ "%.1f"|format(feedback_stats.average_rating) }}
+      </p>
+      <div class="mt-2 flex items-center">
+        {% for i in range(1, 6) %}
+        <svg
+          class="w-5 h-5 {{ 'text-yellow-400' if i <= feedback_stats.average_rating else 'text-gray-300' }}"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+          ></path>
+        </svg>
+        {% endfor %}
+      </div>
+      <p class="text-sm text-gray-500 mt-2">
+        Based on {{ feedback_stats.total_feedback }} feedbacks
+      </p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6 col-span-2">
+      <h2 class="text-lg font-semibold font-switzer text-gray-800 mb-4">
+        Rating Distribution
+      </h2>
+      <div class="space-y-2">
+        {% for i in range(5, 0, -1) %} {% set percent =
+        (feedback_stats.rating_distribution[i] / feedback_stats.total_feedback *
+        100) if feedback_stats.total_feedback > 0 else 0 %}
+        <div class="flex items-center">
+          <span class="text-sm font-medium w-1/6"
+            >{{ i }} star{% if i > 1 %}s{% endif %}</span
+          >
+          <div
+            class="w-4/6 bg-gray-200 rounded-full h-2.5 dark:bg-gray-200 mx-2"
+          >
+            <div
+              class="bg-violet-600 h-2.5 rounded-full"
+              style="width: {{ percent|string }}%"
+            ></div>
+          </div>
+          <span class="text-sm font-medium w-1/6"
+            >{{ feedback_stats.rating_distribution[i] }} ({{
+            "%.1f"|format(percent) }}%)</span
+          >
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Listing -->
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <div
+      class="px-6 py-4 border-b border-gray-200 flex justify-between items-center"
+    >
+      <h2 class="font-khand tracking-widest text-xl text-gray-800">
+        Recent Feedback
+      </h2>
+      <div>
+        <button
+          type="button"
+          class="bg-gray-200 text-gray-700 py-1 px-3 rounded-md hover:bg-gray-300 text-sm"
+        >
+          Export Report
+        </button>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      {% if feedback_list %}
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Student
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Rating
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Comments
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Session Info
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Submitted
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for feedback in feedback_list %}
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div>
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ feedback.student_name }}
+                  </div>
+                  <div class="text-xs text-gray-500">
+                    ID: {{ feedback.student_id }}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex">
+                {% for i in range(1, 6) %}
+                <svg
+                  class="w-4 h-4 {{ 'text-yellow-400' if i <= feedback.rating else 'text-gray-300' }}"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                  ></path>
+                </svg>
+                {% endfor %}
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="text-sm text-gray-900 max-w-xs truncate">
+                {% if feedback.comments %} {{ feedback.comments }} {% else %}
+                <span class="text-gray-400 italic">No comments provided</span>
+                {% endif %}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ feedback.purpose }}</div>
+              <div class="text-xs text-gray-500">
+                Lab: {{ feedback.lab }} | {{ feedback.date }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ feedback.created_at }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="p-6 text-center text-gray-500">
+        No feedback has been submitted yet.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -14,6 +14,7 @@ import os
 from dbhelper import db, User, Announcement
 from datetime import timedelta, datetime
 from models.sit_in_session import SitInSession
+from models.feedback import Feedback
 from sqlalchemy import text
 
 app = Flask(__name__)
@@ -399,7 +400,40 @@ def admin_sit_in_reports():
 def admin_feedback_reports():
     if 'admin' not in session:
         return redirect(url_for('admin_login'))
-    return render_template("admin/feedback-reports.html")
+    
+    # Get all feedback with related sit-in session and user information
+    feedback_list = db.session.query(
+        Feedback,
+        SitInSession,
+        User
+    ).join(
+        SitInSession, Feedback.session_id == SitInSession.id
+    ).join(
+        User, SitInSession.user_id == User.id
+    ).order_by(Feedback.created_at.desc()).all()
+    
+    # Get feedback statistics
+    feedback_stats = Feedback.get_feedback_stats()
+    
+    formatted_feedback = []
+    for feedback, sit_in, user in feedback_list:
+        formatted_feedback.append({
+            'id': feedback.id,
+            'student_name': f"{user.firstname.capitalize()} {user.lastname.capitalize()}",
+            'student_id': user.idno,
+            'rating': feedback.rating,
+            'comments': feedback.comments,
+            'purpose': sit_in.purpose,
+            'lab': sit_in.lab,
+            'date': sit_in.start_time.strftime('%b %d, %Y') if sit_in.start_time else 'N/A',
+            'created_at': feedback.created_at.strftime('%b %d, %Y at %I:%M %p')
+        })
+    
+    return render_template(
+        "admin/feedback-reports.html",
+        feedback_list=formatted_feedback,
+        feedback_stats=feedback_stats
+    )
 
 @app.route("/admin/student-list")
 def admin_student_list():
@@ -812,9 +846,8 @@ def sitin_history():
     # Format records for display
     formatted_records = []
     for record in sit_in_records:
-        # In a real implementation, you'd check against a Feedback model
-        # This is a simplified version assuming no feedback system in place yet
-        has_feedback = False  # Replace with actual check
+        # Check if feedback exists for this session
+        has_feedback = Feedback.query.filter_by(session_id=record.id).first() is not None
         
         formatted_records.append({
             'id': record.id,
@@ -843,7 +876,7 @@ def submit_feedback():
     
     session_id = request.form.get('session_id')
     rating = request.form.get('rating')
-    comments = request.form.get('comments')
+    comments = request.form.get('comments', '')
     
     if not session_id or not rating:
         flash("Session ID and rating are required")
@@ -861,10 +894,25 @@ def submit_feedback():
         flash("You can only submit feedback for your own sessions")
         return redirect(url_for('sitin_history'))
     
-    # In a real implementation, you would save the feedback to a database
-    # For now, we'll just flash a success message
+    # Check if feedback already exists for this session
+    existing_feedback = Feedback.query.filter_by(session_id=session_id).first()
+    if existing_feedback:
+        # Update existing feedback
+        existing_feedback.rating = rating
+        existing_feedback.comments = comments
+        db.session.commit()
+        flash("Feedback updated successfully")
+    else:
+        # Create new feedback
+        new_feedback = Feedback(
+            session_id=session_id,
+            rating=int(rating),
+            comments=comments
+        )
+        db.session.add(new_feedback)
+        db.session.commit()
+        flash("Feedback submitted successfully")
     
-    flash("Feedback submitted successfully")
     return redirect(url_for('sitin_history'))
 
 if __name__ == "__main__":

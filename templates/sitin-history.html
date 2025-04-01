@@ -135,13 +135,13 @@
             <button
               type="button"
               onclick="openFeedbackModal('{{ record.id }}')"
-              class="text-violet-600 hover:text-violet-900 cursor-pointer"
+              class="text-white bg-violet-600 hover:bg-violet-400 ho ver:text-yellow-300 rounded-md py-1 px-2 font-switzer cursor-pointer"
             >
               Give Feedback
             </button>
             {% else %}
             <span
-              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+              class="inline-flex text-sm leading-5 py-0.5 font-switzer font-semibold text-green-500"
             >
               Feedback Submitted
             </span>
@@ -260,7 +260,7 @@
       </h3>
       <button
         onclick="closeFeedbackModal()"
-        class="text-gray-400 hover:text-gray-500"
+        class="cursor-pointer text-gray-400 hover:text-gray-500"
       >
         <svg
           class="h-6 w-6"
@@ -326,7 +326,7 @@
             id="feedback-comments"
             name="comments"
             rows="4"
-            class="w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500"
+            class="p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500"
             placeholder="Please share your experience or any suggestions..."
           ></textarea>
         </div>
@@ -336,13 +336,13 @@
         <button
           type="button"
           onclick="closeFeedbackModal()"
-          class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 mr-2"
+          class="cursor-pointer px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 mr-2"
         >
           Cancel
         </button>
         <button
           type="submit"
-          class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-violet-800 hover:bg-violet-700"
+          class="cursor-pointer px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-violet-800 hover:bg-violet-600"
         >
           Submit Feedback
         </button>

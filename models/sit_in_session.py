@@ -66,3 +66,9 @@ class SitInSession(db.Model):
     def user_has_active_session(user_id):
         """Check if a user has any active sessions"""
         return SitInSession.query.filter_by(user_id=user_id, status='active').first() is not None
+
+    @staticmethod
+    def has_feedback(session_id):
+        """Check if feedback exists for a session"""
+        from models.feedback import Feedback
+        return Feedback.query.filter_by(session_id=session_id).first() is not None
