@@ -163,28 +163,36 @@
   <div
     class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
   >
+    <!-- Mobile pagination -->
     <div class="flex-1 flex justify-between sm:hidden">
       <a
-        href="#"
-        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+        href="{{ url_for('sitin_history', page=page-1, date_filter=request.args.get('date_filter', 'all'), lab_filter=request.args.get('lab_filter', '')) if page > 1 else '#' }}"
+        class="{{ 'cursor-not-allowed opacity-50' if page <= 1 else '' }} relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
       >
         Previous
       </a>
       <a
-        href="#"
-        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+        href="{{ url_for('sitin_history', page=page+1, date_filter=request.args.get('date_filter', 'all'), lab_filter=request.args.get('lab_filter', '')) if page < total_pages else '#' }}"
+        class="{{ 'cursor-not-allowed opacity-50' if page >= total_pages else '' }} ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
       >
         Next
       </a>
     </div>
+
+    <!-- Desktop pagination -->
     <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
       <div>
         <p id="records-count" class="text-sm text-gray-700">
-          Showing <span class="font-medium">1</span> to
-          <span class="font-medium">10</span> of
+          Showing
           <span class="font-medium"
-            >{{ total_records if total_records else '0' }}</span
+            >{{ (page-1) * per_page + 1 if total_records > 0 else 0 }}</span
           >
+          to
+          <span class="font-medium"
+            >{{ [page * per_page, total_records] | min }}</span
+          >
+          of
+          <span class="font-medium">{{ total_records }}</span>
           results
         </p>
       </div>
@@ -194,10 +202,10 @@
           class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
           aria-label="Pagination"
         >
-          <!-- Pagination will be added here -->
+          <!-- Previous page -->
           <a
-            href="#"
-            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+            href="{{ url_for('sitin_history', page=page-1, date_filter=request.args.get('date_filter', 'all'), lab_filter=request.args.get('lab_filter', '')) if page > 1 else '#' }}"
+            class="{{ 'cursor-not-allowed opacity-50' if page <= 1 else '' }} relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
           >
             <span class="sr-only">Previous</span>
             <svg
@@ -214,16 +222,31 @@
               />
             </svg>
           </a>
+
+          <!-- Page numbers -->
+          {% for p in range(1, total_pages + 1) %} {% if p == page %}
+          <!-- Current page -->
           <a
             href="#"
             aria-current="page"
             class="z-10 bg-violet-50 border-violet-500 text-violet-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
           >
-            1
+            {{ p }}
           </a>
+          {% elif p >= page - 2 and p <= page + 2 %}
+          <!-- Pages within range -->
           <a
-            href="#"
-            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+            href="{{ url_for('sitin_history', page=p, date_filter=request.args.get('date_filter', 'all'), lab_filter=request.args.get('lab_filter', '')) }}"
+            class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+          >
+            {{ p }}
+          </a>
+          {% endif %} {% endfor %}
+
+          <!-- Next page -->
+          <a
+            href="{{ url_for('sitin_history', page=page+1, date_filter=request.args.get('date_filter', 'all'), lab_filter=request.args.get('lab_filter', '')) if page < total_pages else '#' }}"
+            class="{{ 'cursor-not-allowed opacity-50' if page >= total_pages else '' }} relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
           >
             <span class="sr-only">Next</span>
             <svg
@@ -244,152 +267,175 @@
       </div>
     </div>
   </div>
-</div>
 
-<!-- Feedback Modal -->
-<div
-  id="feedback-modal"
-  class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50"
->
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
-    <div
-      class="px-6 py-4 border-b border-gray-200 flex justify-between items-center"
-    >
-      <h3 class="text-lg font-semibold font-khand tracking-wide text-gray-900">
-        Submit Feedback
-      </h3>
-      <button
-        onclick="closeFeedbackModal()"
-        class="cursor-pointer text-gray-400 hover:text-gray-500"
+  <!-- Feedback Modal -->
+  <div
+    id="feedback-modal"
+    class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50"
+  >
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+      <div
+        class="px-6 py-4 border-b border-gray-200 flex justify-between items-center"
       >
-        <svg
-          class="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+        <h3
+          class="text-lg font-semibold font-khand tracking-wide text-gray-900"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"
-          ></path>
-        </svg>
-      </button>
-    </div>
-
-    <form
-      id="feedback-form"
-      action="{{ url_for('submit_feedback') }}"
-      method="POST"
-    >
-      <input type="hidden" id="session-id" name="session_id" value="" />
-
-      <div class="px-6 py-4">
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2"
-            >Rate your experience:</label
+          Submit Feedback
+        </h3>
+        <button
+          onclick="closeFeedbackModal()"
+          class="cursor-pointer text-gray-400 hover:text-gray-500"
+        >
+          <svg
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-          <div class="flex items-center">
-            <div class="flex space-x-2">
-              {% for i in range(1, 6) %}
-              <label class="flex flex-col items-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="rating"
-                  value="{{ i }}"
-                  class="hidden peer"
-                  required
-                />
-                <div
-                  class="h-10 w-10 rounded-full flex items-center justify-center border-2 border-gray-200 text-gray-400 peer-checked:border-violet-500 peer-checked:bg-violet-50 peer-checked:text-violet-700"
-                >
-                  {{ i }}
-                </div>
-                <span class="text-xs mt-1 text-gray-500">
-                  {% if i == 1 %}Poor{% elif i == 2 %}Fair{% elif i == 3
-                  %}Good{% elif i == 4 %}Very Good{% else %}Excellent{% endif %}
-                </span>
-              </label>
-              {% endfor %}
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+      </div>
+
+      <form
+        id="feedback-form"
+        action="{{ url_for('submit_feedback') }}"
+        method="POST"
+      >
+        <input type="hidden" id="session-id" name="session_id" value="" />
+
+        <div class="px-6 py-4">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Rate your experience:</label
+            >
+            <div class="flex items-center">
+              <div class="flex space-x-2">
+                {% for i in range(1, 6) %}
+                <label class="flex flex-col items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="rating"
+                    value="{{ i }}"
+                    class="hidden peer"
+                    required
+                  />
+                  <div
+                    class="h-10 w-10 rounded-full flex items-center justify-center border-2 border-gray-200 text-gray-400 peer-checked:border-violet-500 peer-checked:bg-violet-50 peer-checked:text-violet-700"
+                  >
+                    {{ i }}
+                  </div>
+                  <span class="text-xs mt-1 text-gray-500">
+                    {% if i == 1 %}Poor{% elif i == 2 %}Fair{% elif i == 3
+                    %}Good{% elif i == 4 %}Very Good{% else %}Excellent{% endif
+                    %}
+                  </span>
+                </label>
+                {% endfor %}
+              </div>
             </div>
+          </div>
+
+          <div class="mb-4">
+            <label
+              for="feedback-comments"
+              class="block text-sm font-medium text-gray-700 mb-2"
+              >Comments:</label
+            >
+            <textarea
+              id="feedback-comments"
+              name="comments"
+              rows="4"
+              class="p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500"
+              placeholder="Please share your experience or any suggestions..."
+            ></textarea>
           </div>
         </div>
 
-        <div class="mb-4">
-          <label
-            for="feedback-comments"
-            class="block text-sm font-medium text-gray-700 mb-2"
-            >Comments:</label
+        <div class="px-6 py-3 bg-gray-50 text-right rounded-b-lg">
+          <button
+            type="button"
+            onclick="closeFeedbackModal()"
+            class="cursor-pointer px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 mr-2"
           >
-          <textarea
-            id="feedback-comments"
-            name="comments"
-            rows="4"
-            class="p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500"
-            placeholder="Please share your experience or any suggestions..."
-          ></textarea>
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="cursor-pointer px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-violet-800 hover:bg-violet-600"
+          >
+            Submit Feedback
+          </button>
         </div>
-      </div>
-
-      <div class="px-6 py-3 bg-gray-50 text-right rounded-b-lg">
-        <button
-          type="button"
-          onclick="closeFeedbackModal()"
-          class="cursor-pointer px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 mr-2"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          class="cursor-pointer px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-violet-800 hover:bg-violet-600"
-        >
-          Submit Feedback
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
-</div>
 
-<script>
-  // Function to open the feedback modal
-  function openFeedbackModal(sessionId) {
-    document.getElementById("session-id").value = sessionId;
-    document.getElementById("feedback-modal").classList.remove("hidden");
-    document.getElementById("feedback-modal").classList.add("flex");
-  }
+  <script>
+    // Function to open the feedback modal
+    function openFeedbackModal(sessionId) {
+      document.getElementById("session-id").value = sessionId;
+      document.getElementById("feedback-modal").classList.remove("hidden");
+      document.getElementById("feedback-modal").classList.add("flex");
+    }
 
-  // Function to close the feedback modal
-  function closeFeedbackModal() {
-    document.getElementById("feedback-modal").classList.add("hidden");
-    document.getElementById("feedback-modal").classList.remove("flex");
-    // Reset the form
-    document.getElementById("feedback-form").reset();
-  }
+    // Function to close the feedback modal
+    function closeFeedbackModal() {
+      document.getElementById("feedback-modal").classList.add("hidden");
+      document.getElementById("feedback-modal").classList.remove("flex");
+      // Reset the form
+      document.getElementById("feedback-form").reset();
+    }
 
-  // Close modal if user clicks outside the modal content
-  document
-    .getElementById("feedback-modal")
-    .addEventListener("click", function (event) {
-      if (event.target === this) {
-        closeFeedbackModal();
+    // Close modal if user clicks outside the modal content
+    document
+      .getElementById("feedback-modal")
+      .addEventListener("click", function (event) {
+        if (event.target === this) {
+          closeFeedbackModal();
+        }
+      });
+
+    // Apply filters button functionality
+    document
+      .getElementById("apply-filters-btn")
+      .addEventListener("click", function () {
+        const dateFilter = document.getElementById("date-filter").value;
+        const labFilter = document.getElementById("lab-filter").value;
+
+        // Construct URL with query parameters
+        let url = "{{ url_for('sitin_history') }}?";
+        if (dateFilter) url += "date_filter=" + dateFilter + "&";
+        if (labFilter) url += "lab_filter=" + labFilter + "&";
+
+        // Reset to page 1 when applying new filters
+        url += "page=1";
+
+        // Navigate to the URL
+        window.location.href = url;
+      });
+
+    // Pre-populate the filter select values from URL parameters
+    window.addEventListener("DOMContentLoaded", function () {
+      const urlParams = new URLSearchParams(window.location.search);
+
+      // Set date filter dropdown if present in URL
+      const dateFilter = urlParams.get("date_filter");
+      if (dateFilter) {
+        document.getElementById("date-filter").value = dateFilter;
+      }
+
+      // Set lab filter dropdown if present in URL
+      const labFilter = urlParams.get("lab_filter");
+      if (labFilter) {
+        document.getElementById("lab-filter").value = labFilter;
       }
     });
-
-  // Apply filters button functionality
-  document
-    .getElementById("apply-filters-btn")
-    .addEventListener("click", function () {
-      const dateFilter = document.getElementById("date-filter").value;
-      const labFilter = document.getElementById("lab-filter").value;
-
-      // Construct URL with query parameters
-      let url = "{{ url_for('sitin_history') }}?";
-      if (dateFilter) url += "date_filter=" + dateFilter + "&";
-      if (labFilter) url += "lab_filter=" + labFilter + "&";
-
-      // Remove trailing '&' and navigate
-      window.location.href = url.endsWith("&") ? url.slice(0, -1) : url;
-    });
-</script>
-{% endblock %}
+  </script>
+  {% endblock %}
+</div>

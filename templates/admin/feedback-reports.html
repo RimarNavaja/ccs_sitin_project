@@ -69,21 +69,71 @@
     </div>
   </div>
 
-  <!-- Feedback Listing -->
+  <!-- Feedback Listing with Search -->
   <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <div
       class="px-6 py-4 border-b border-gray-200 flex justify-between items-center"
     >
       <h2 class="font-khand tracking-widest text-xl text-gray-800">
-        Recent Feedback
+        Feedbacks
       </h2>
-      <div>
+      <div class="flex space-x-2">
         <button
           type="button"
           class="bg-gray-200 text-gray-700 py-1 px-3 rounded-md hover:bg-gray-300 text-sm"
+          onclick="exportToCSV()"
         >
           Export Report
         </button>
+      </div>
+    </div>
+
+    <!-- Search and Filter Controls -->
+    <div class="p-4 border-b border-gray-200 bg-gray-50">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Search box -->
+        <div>
+          <label
+            for="search-input"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Search</label
+          >
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search by student name or comments..."
+            class="w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 py-1.5 px-2"
+          />
+        </div>
+        <!-- Rating filter -->
+        <div>
+          <label
+            for="rating-filter"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Rating</label
+          >
+          <select
+            id="rating-filter"
+            class="cursor-pointer w-full py-1.5 px-2 border-gray-300 rounded-md shadow-sm focus:border-violet-500 focus:ring-violet-500"
+          >
+            <option value="all">All Ratings</option>
+            <option value="5">5 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="2">2 Stars</option>
+            <option value="1">1 Star</option>
+          </select>
+        </div>
+        <!-- Apply button -->
+        <div class="flex items-end">
+          <button
+            id="apply-filters-btn"
+            type="button"
+            class="cursor-pointer w-full bg-violet-800 text-white py-2 px-4 rounded-md hover:bg-violet-700"
+          >
+            Apply
+          </button>
+        </div>
       </div>
     </div>
 
@@ -181,6 +231,162 @@
       </div>
       {% endif %}
     </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div
+      class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
+    >
+      <div class="flex-1 flex justify-between sm:hidden">
+        <a
+          href="{{ url_for('admin_feedback_reports', page=prev_page, search=search, rating=rating) if prev_page else '#' }}"
+          class="{{ 'cursor-not-allowed opacity-50' if not prev_page else '' }} relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+        >
+          Previous
+        </a>
+        <a
+          href="{{ url_for('admin_feedback_reports', page=next_page, search=search, rating=rating) if next_page else '#' }}"
+          class="{{ 'cursor-not-allowed opacity-50' if not next_page else '' }} ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+        >
+          Next
+        </a>
+      </div>
+      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm text-gray-700">
+            Showing <span class="font-medium">{{ start_record }}</span> to
+            <span class="font-medium">{{ end_record }}</span> of
+            <span class="font-medium">{{ total_records }}</span> results
+          </p>
+        </div>
+        <div>
+          <nav
+            class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+            aria-label="Pagination"
+          >
+            <!-- Previous page -->
+            <a
+              href="{{ url_for('admin_feedback_reports', page=prev_page, search=search, rating=rating) if prev_page else '#' }}"
+              class="{{ 'cursor-not-allowed opacity-50' if not prev_page else '' }} relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+            >
+              <span class="sr-only">Previous</span>
+              <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </a>
+
+            <!-- Page numbers -->
+            {% for p in range(1, total_pages + 1) %} {% if p == page %}
+            <a
+              href="#"
+              aria-current="page"
+              class="z-10 bg-violet-50 border-violet-500 text-violet-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+            >
+              {{ p }}
+            </a>
+            {% elif p >= page - 2 and p <= page + 2 %}
+            <a
+              href="{{ url_for('admin_feedback_reports', page=p, search=search, rating=rating) }}"
+              class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+            >
+              {{ p }}
+            </a>
+            {% endif %} {% endfor %}
+
+            <!-- Next page -->
+            <a
+              href="{{ url_for('admin_feedback_reports', page=next_page, search=search, rating=rating) if next_page else '#' }}"
+              class="{{ 'cursor-not-allowed opacity-50' if not next_page else '' }} relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+            >
+              <span class="sr-only">Next</span>
+              <svg
+                class="h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </a>
+          </nav>
+        </div>
+      </div>
+    </div>
+    {% endif %}
   </div>
 </div>
+
+<script>
+  // Apply filters when button is clicked
+  document
+    .getElementById("apply-filters-btn")
+    .addEventListener("click", function () {
+      const searchInput = document.getElementById("search-input").value;
+      const ratingFilter = document.getElementById("rating-filter").value;
+
+      // Construct URL with query parameters
+      let url = '{{ url_for("admin_feedback_reports") }}?';
+      if (searchInput) url += `search=${encodeURIComponent(searchInput)}&`;
+      if (ratingFilter && ratingFilter !== "all")
+        url += `rating=${ratingFilter}&`;
+
+      // Remove trailing '&' and navigate
+      window.location.href = url.endsWith("&") ? url.slice(0, -1) : url;
+    });
+
+  // Allow pressing Enter in the search box to trigger search
+  document
+    .getElementById("search-input")
+    .addEventListener("keyup", function (event) {
+      if (event.key === "Enter") {
+        document.getElementById("apply-filters-btn").click();
+      }
+    });
+
+  // Pre-populate the filter fields from URL parameters
+  window.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Set search input value if present in URL
+    const searchParam = urlParams.get("search");
+    if (searchParam) {
+      document.getElementById("search-input").value = searchParam;
+    }
+
+    // Set rating dropdown if present in URL
+    const ratingParam = urlParams.get("rating");
+    if (ratingParam) {
+      document.getElementById("rating-filter").value = ratingParam;
+    }
+  });
+
+  // Export to CSV functionality
+  function exportToCSV() {
+    // Current filter parameters
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Construct export URL with current filters
+    let url = '{{ url_for("admin_export_feedback") }}?';
+    if (urlParams.has("search")) url += `search=${urlParams.get("search")}&`;
+    if (urlParams.has("rating")) url += `rating=${urlParams.get("rating")}&`;
+
+    // Remove trailing '&' and navigate to download
+    window.location.href = url.endsWith("&") ? url.slice(0, -1) : url;
+  }
+</script>
 {% endblock %}

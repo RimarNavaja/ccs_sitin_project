@@ -401,8 +401,14 @@ def admin_feedback_reports():
     if 'admin' not in session:
         return redirect(url_for('admin_login'))
     
-    # Get all feedback with related sit-in session and user information
-    feedback_list = db.session.query(
+    # Get query parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    search = request.args.get('search', '')
+    rating = request.args.get('rating', '')
+    
+    # Base query for all feedback with related session and user information
+    query = db.session.query(
         Feedback,
         SitInSession,
         User
@@ -410,13 +416,40 @@ def admin_feedback_reports():
         SitInSession, Feedback.session_id == SitInSession.id
     ).join(
         User, SitInSession.user_id == User.id
-    ).order_by(Feedback.created_at.desc()).all()
+    )
     
-    # Get feedback statistics
-    feedback_stats = Feedback.get_feedback_stats()
+    # Apply search filter if provided
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            db.or_(
+                User.firstname.like(search_term),
+                User.lastname.like(search_term),
+                Feedback.comments.like(search_term)
+            )
+        )
     
+    # Apply rating filter if provided
+    if rating and rating.isdigit():
+        query = query.filter(Feedback.rating == int(rating))
+    
+    # Get total count for pagination
+    total_records = query.count()
+    
+    # Apply pagination
+    query = query.order_by(Feedback.created_at.desc())
+    paginated_results = query.offset((page - 1) * per_page).limit(per_page).all()
+    
+    # Calculate pagination details
+    total_pages = (total_records + per_page - 1) // per_page if total_records > 0 else 1
+    prev_page = page - 1 if page > 1 else None
+    next_page = page + 1 if page < total_pages else None
+    start_record = (page - 1) * per_page + 1 if total_records > 0 else 0
+    end_record = min(page * per_page, total_records)
+    
+    # Format the feedback data
     formatted_feedback = []
-    for feedback, sit_in, user in feedback_list:
+    for feedback, sit_in, user in paginated_results:
         formatted_feedback.append({
             'id': feedback.id,
             'student_name': f"{user.firstname.capitalize()} {user.lastname.capitalize()}",
@@ -429,11 +462,100 @@ def admin_feedback_reports():
             'created_at': feedback.created_at.strftime('%b %d, %Y at %I:%M %p')
         })
     
+    # Get feedback statistics
+    feedback_stats = Feedback.get_feedback_stats()
+    
     return render_template(
         "admin/feedback-reports.html",
         feedback_list=formatted_feedback,
-        feedback_stats=feedback_stats
+        feedback_stats=feedback_stats,
+        page=page,
+        total_pages=total_pages,
+        prev_page=prev_page,
+        next_page=next_page,
+        start_record=start_record,
+        end_record=end_record,
+        total_records=total_records,
+        search=search,
+        rating=rating
     )
+
+@app.route("/admin/export-feedback")
+def admin_export_feedback():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    
+    # Get query parameters
+    search = request.args.get('search', '')
+    rating = request.args.get('rating', '')
+    
+    # Base query for all feedback with related session and user information
+    query = db.session.query(
+        Feedback,
+        SitInSession,
+        User
+    ).join(
+        SitInSession, Feedback.session_id == SitInSession.id
+    ).join(
+        User, SitInSession.user_id == User.id
+    )
+    
+    # Apply search filter if provided
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            db.or_(
+                User.firstname.like(search_term),
+                User.lastname.like(search_term),
+                Feedback.comments.like(search_term)
+            )
+        )
+    
+    # Apply rating filter if provided
+    if rating and rating.isdigit():
+        query = query.filter(Feedback.rating == int(rating))
+    
+    # Get all matching records
+    results = query.order_by(Feedback.created_at.desc()).all()
+    
+    # Generate CSV content
+    import csv
+    from io import StringIO
+    
+    output = StringIO()
+    writer = csv.writer(output)
+    
+    # Write header row
+    writer.writerow([
+        'Student ID', 'Student Name', 'Rating', 'Comments',
+        'Purpose', 'Lab', 'Date', 'Submission Time'
+    ])
+    
+    # Write data rows
+    for feedback, sit_in, user in results:
+        writer.writerow([
+            user.idno,
+            f"{user.firstname.capitalize()} {user.lastname.capitalize()}",
+            feedback.rating,
+            feedback.comments or 'No comments provided',
+            sit_in.purpose,
+            sit_in.lab,
+            sit_in.start_time.strftime('%b %d, %Y') if sit_in.start_time else 'N/A',
+            feedback.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        ])
+    
+    # Create response
+    from flask import Response
+    response = Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={
+            'Content-Disposition': f'attachment; filename=feedback_report_{datetime.now().strftime("%Y%m%d")}.csv',
+            'Cache-Control': 'no-cache'
+        }
+    )
+    
+    return response
 
 @app.route("/admin/student-list")
 def admin_student_list():
