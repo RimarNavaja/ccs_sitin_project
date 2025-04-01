@@ -1,4 +1,4 @@
--- Active: 1742789649378@@127.0.0.1@3306@ccs_sitin_project
+-- Active: 1743258099920@@127.0.0.1@3306@ccs_sitin_project
 CREATE DATABASE ccs_sitin_project;
 
 USE ccs_sitin_project;
@@ -79,6 +79,7 @@ SELECT * FROM users;
 SELECT * FROM announcements;
 SELECT * FROM sit_in_sessions;
 
+SELECT * FROM feedback;
 
 DESCRIBE users;
 DESCRIBE announcements;

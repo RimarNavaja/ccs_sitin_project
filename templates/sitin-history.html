@@ -1,0 +1,395 @@
+{% extends 'dashboard.html' %} {% block content %}
+<div class="mb-8">
+  <h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900 mb-4">
+    Sit-in History
+  </h1>
+  <p class="text-lg font-switzer text-gray-600">
+    View your past sit-in sessions and provide feedback
+  </p>
+</div>
+
+<!-- Search Controls -->
+<div class="bg-white rounded-lg shadow-md p-6 mb-6">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div>
+      <label
+        for="date-filter"
+        class="block text-sm font-medium text-gray-700 mb-2"
+        >Date Range</label
+      >
+      <select
+        id="date-filter"
+        class="cursor-pointer w-full py-1.5 px-2 border-gray-300 rounded-md shadow-sm focus:border-violet-500 focus:ring-violet-500"
+      >
+        <option value="all">All Time</option>
+        <option value="today">Today</option>
+        <option value="this_week">This Week</option>
+        <option value="this_month">This Month</option>
+      </select>
+    </div>
+    <div>
+      <label
+        for="lab-filter"
+        class="block text-sm font-medium text-gray-700 mb-2"
+        >Lab Room</label
+      >
+      <select
+        id="lab-filter"
+        class="cursor-pointer w-full py-1.5 px-2 border-gray-300 rounded-md shadow-sm focus:border-violet-500 focus:ring-violet-500"
+      >
+        <option value="">All Labs</option>
+        <option value="524">524</option>
+        <option value="526">526</option>
+        <option value="530">530</option>
+        <option value="544">544</option>
+        <option value="517">517</option>
+      </select>
+    </div>
+    <div class="flex items-end">
+      <button
+        type="button"
+        id="apply-filters-btn"
+        class="cursor-pointer w-full bg-violet-800 text-white py-2 px-4 rounded-md hover:bg-violet-700"
+      >
+        Apply Filters
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Records Table -->
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+  <div
+    class="px-6 py-4 border-b border-gray-200 flex justify-between items-center"
+  >
+    <h2 class="font-khand tracking-widest text-xl text-gray-800">
+      Sit-in Records
+    </h2>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead>
+        <tr>
+          <th
+            class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Sit-in number
+          </th>
+          <th
+            class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Sit-in Purpose
+          </th>
+          <th
+            class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Lab
+          </th>
+          <th
+            class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Date
+          </th>
+          <th
+            class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Time In
+          </th>
+          <th
+            class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Time Out
+          </th>
+          <th
+            class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Action
+          </th>
+        </tr>
+      </thead>
+      <tbody id="records-table-body" class="bg-white divide-y divide-gray-200">
+        <!-- Records will be loaded dynamically or display sample data -->
+        {% if sit_in_records %} {% for record in sit_in_records %}
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            {{ record.id }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ record.purpose }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ record.lab }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ record.date }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ record.start_time }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ record.end_time }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            {% if not record.has_feedback %}
+            <button
+              type="button"
+              onclick="openFeedbackModal('{{ record.id }}')"
+              class="text-violet-600 hover:text-violet-900 cursor-pointer"
+            >
+              Give Feedback
+            </button>
+            {% else %}
+            <span
+              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+            >
+              Feedback Submitted
+            </span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %} {% else %}
+        <tr>
+          <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+            No sit-in records found.
+          </td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div
+    class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
+  >
+    <div class="flex-1 flex justify-between sm:hidden">
+      <a
+        href="#"
+        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+      >
+        Previous
+      </a>
+      <a
+        href="#"
+        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+      >
+        Next
+      </a>
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+      <div>
+        <p id="records-count" class="text-sm text-gray-700">
+          Showing <span class="font-medium">1</span> to
+          <span class="font-medium">10</span> of
+          <span class="font-medium"
+            >{{ total_records if total_records else '0' }}</span
+          >
+          results
+        </p>
+      </div>
+      <div>
+        <nav
+          id="pagination-container"
+          class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+          aria-label="Pagination"
+        >
+          <!-- Pagination will be added here -->
+          <a
+            href="#"
+            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+          >
+            <span class="sr-only">Previous</span>
+            <svg
+              class="h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </a>
+          <a
+            href="#"
+            aria-current="page"
+            class="z-10 bg-violet-50 border-violet-500 text-violet-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+          >
+            1
+          </a>
+          <a
+            href="#"
+            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+          >
+            <span class="sr-only">Next</span>
+            <svg
+              class="h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Feedback Modal -->
+<div
+  id="feedback-modal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50"
+>
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+    <div
+      class="px-6 py-4 border-b border-gray-200 flex justify-between items-center"
+    >
+      <h3 class="text-lg font-semibold font-khand tracking-wide text-gray-900">
+        Submit Feedback
+      </h3>
+      <button
+        onclick="closeFeedbackModal()"
+        class="text-gray-400 hover:text-gray-500"
+      >
+        <svg
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <form
+      id="feedback-form"
+      action="{{ url_for('submit_feedback') }}"
+      method="POST"
+    >
+      <input type="hidden" id="session-id" name="session_id" value="" />
+
+      <div class="px-6 py-4">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Rate your experience:</label
+          >
+          <div class="flex items-center">
+            <div class="flex space-x-2">
+              {% for i in range(1, 6) %}
+              <label class="flex flex-col items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="rating"
+                  value="{{ i }}"
+                  class="hidden peer"
+                  required
+                />
+                <div
+                  class="h-10 w-10 rounded-full flex items-center justify-center border-2 border-gray-200 text-gray-400 peer-checked:border-violet-500 peer-checked:bg-violet-50 peer-checked:text-violet-700"
+                >
+                  {{ i }}
+                </div>
+                <span class="text-xs mt-1 text-gray-500">
+                  {% if i == 1 %}Poor{% elif i == 2 %}Fair{% elif i == 3
+                  %}Good{% elif i == 4 %}Very Good{% else %}Excellent{% endif %}
+                </span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label
+            for="feedback-comments"
+            class="block text-sm font-medium text-gray-700 mb-2"
+            >Comments:</label
+          >
+          <textarea
+            id="feedback-comments"
+            name="comments"
+            rows="4"
+            class="w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500"
+            placeholder="Please share your experience or any suggestions..."
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="px-6 py-3 bg-gray-50 text-right rounded-b-lg">
+        <button
+          type="button"
+          onclick="closeFeedbackModal()"
+          class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 mr-2"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-violet-800 hover:bg-violet-700"
+        >
+          Submit Feedback
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Function to open the feedback modal
+  function openFeedbackModal(sessionId) {
+    document.getElementById("session-id").value = sessionId;
+    document.getElementById("feedback-modal").classList.remove("hidden");
+    document.getElementById("feedback-modal").classList.add("flex");
+  }
+
+  // Function to close the feedback modal
+  function closeFeedbackModal() {
+    document.getElementById("feedback-modal").classList.add("hidden");
+    document.getElementById("feedback-modal").classList.remove("flex");
+    // Reset the form
+    document.getElementById("feedback-form").reset();
+  }
+
+  // Close modal if user clicks outside the modal content
+  document
+    .getElementById("feedback-modal")
+    .addEventListener("click", function (event) {
+      if (event.target === this) {
+        closeFeedbackModal();
+      }
+    });
+
+  // Apply filters button functionality
+  document
+    .getElementById("apply-filters-btn")
+    .addEventListener("click", function () {
+      const dateFilter = document.getElementById("date-filter").value;
+      const labFilter = document.getElementById("lab-filter").value;
+
+      // Construct URL with query parameters
+      let url = "{{ url_for('sitin_history') }}?";
+      if (dateFilter) url += "date_filter=" + dateFilter + "&";
+      if (labFilter) url += "lab_filter=" + labFilter + "&";
+
+      // Remove trailing '&' and navigate
+      window.location.href = url.endsWith("&") ? url.slice(0, -1) : url;
+    });
+</script>
+{% endblock %}

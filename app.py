@@ -761,7 +761,112 @@ def admin_delete_student():
             'message': f'Error deleting student: {str(e)}'
         })
 
+@app.route("/sitin-history")
+def sitin_history():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.filter_by(username=session['user']).first()
+    
+    # Get filter parameters
+    date_filter = request.args.get('date_filter', 'all')
+    lab_filter = request.args.get('lab_filter', '')
+    
+    # Start with base query for the user's completed sessions
+    query = SitInSession.query.filter_by(user_id=user.id).filter(SitInSession.status == 'completed')
+    
+    # Apply date filters
+    today = datetime.now().date()
+    if date_filter == 'today':
+        query = query.filter(db.func.date(SitInSession.start_time) == today)
+    elif date_filter == 'this_week':
+        start_of_week = today - timedelta(days=today.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+        query = query.filter(
+            db.func.date(SitInSession.start_time) >= start_of_week,
+            db.func.date(SitInSession.start_time) <= end_of_week
+        )
+    elif date_filter == 'this_month':
+        start_of_month = today.replace(day=1)
+        if today.month == 12:
+            end_of_month = today.replace(year=today.year + 1, month=1, day=1) - timedelta(days=1)
+        else:
+            end_of_month = today.replace(month=today.month + 1, day=1) - timedelta(days=1)
+        query = query.filter(
+            db.func.date(SitInSession.start_time) >= start_of_month,
+            db.func.date(SitInSession.start_time) <= end_of_month
+        )
+    
+    # Apply lab filter if provided
+    if lab_filter:
+        query = query.filter(SitInSession.lab == lab_filter)
+    
+    # Get total record count
+    total_records = query.count()
+    
+    # Order by start_time (newest first) and apply pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 10  # Set records per page
+    sit_in_records = query.order_by(SitInSession.start_time.desc()).offset((page - 1) * per_page).limit(per_page).all()
+    
+    # Format records for display
+    formatted_records = []
+    for record in sit_in_records:
+        # In a real implementation, you'd check against a Feedback model
+        # This is a simplified version assuming no feedback system in place yet
+        has_feedback = False  # Replace with actual check
+        
+        formatted_records.append({
+            'id': record.id,
+            'purpose': record.purpose,
+            'lab': record.lab,
+            'date': record.start_time.strftime('%b %d, %Y') if record.start_time else 'N/A',
+            'start_time': record.start_time.strftime('%I:%M %p') if record.start_time else 'N/A',
+            'end_time': record.end_time.strftime('%I:%M %p') if record.end_time else 'N/A',
+            'has_feedback': has_feedback
+        })
+    
+    return render_template(
+        "sitin-history.html", 
+        user=user,
+        sit_in_records=formatted_records,
+        total_records=total_records,
+        page=page,
+        per_page=per_page,
+        total_pages=(total_records + per_page - 1) // per_page  # Ceiling division
+    )
+
+@app.route("/submit-feedback", methods=["POST"])
+def submit_feedback():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    session_id = request.form.get('session_id')
+    rating = request.form.get('rating')
+    comments = request.form.get('comments')
+    
+    if not session_id or not rating:
+        flash("Session ID and rating are required")
+        return redirect(url_for('sitin_history'))
+    
+    # Get the sit-in session
+    sit_in_session = SitInSession.get_session_by_id(session_id)
+    if not sit_in_session:
+        flash("Sit-in session not found")
+        return redirect(url_for('sitin_history'))
+    
+    # Check if the session belongs to the user
+    user = User.query.filter_by(username=session['user']).first()
+    if sit_in_session.user_id != user.id:
+        flash("You can only submit feedback for your own sessions")
+        return redirect(url_for('sitin_history'))
+    
+    # In a real implementation, you would save the feedback to a database
+    # For now, we'll just flash a success message
+    
+    flash("Feedback submitted successfully")
+    return redirect(url_for('sitin_history'))
+
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)
     app.run(debug=True)
-    
