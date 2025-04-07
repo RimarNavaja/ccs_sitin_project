@@ -1037,6 +1037,45 @@ def submit_feedback():
     
     return redirect(url_for('sitin_history'))
 
+@app.route("/admin/reset-session", methods=["POST"])
+def admin_reset_session():
+    if 'admin' not in session:
+        return jsonify({'success': False, 'message': 'Not authorized'})
+    
+    student_id = request.form.get('student_id')
+    if not student_id:
+        return jsonify({'success': False, 'message': 'Student ID is required'})
+    
+    user = User.query.filter_by(idno=student_id).first()
+    if not user:
+        return jsonify({'success': False, 'message': 'Student not found'})
+    
+    try:
+        User.reset_session_count(user.id)
+        return jsonify({
+            'success': True,
+            'message': f'Sessions reset successfully for student {user.firstname} {user.lastname}'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route("/admin/reset-all-sessions", methods=["POST"])
+def admin_reset_all_sessions():
+    if 'admin' not in session:
+        return jsonify({'success': False, 'message': 'Not authorized'})
+    
+    try:
+        users = User.query.all()
+        for user in users:
+            User.reset_session_count(user.id)
+        
+        return jsonify({
+            'success': True,
+            'message': 'All student sessions have been reset successfully'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)
     app.run(debug=True)

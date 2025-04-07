@@ -96,6 +96,32 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Add event listener for reset all sessions button
+  document
+    .getElementById("reset-all-sessions-btn")
+    .addEventListener("click", function () {
+      if (
+        confirm("Are you sure you want to reset sessions for all students?")
+      ) {
+        fetch("/admin/reset-all-sessions", {
+          method: "POST",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert(data.message);
+              fetchStudents(); // Refresh the list
+            } else {
+              alert("Error: " + data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error resetting sessions:", error);
+            alert("An error occurred while resetting sessions");
+          });
+      }
+    });
+
   // Functions
   function fetchStudents() {
     const loader = `<tr><td colspan="7" class="text-center py-4">Loading students...</td></tr>`;
@@ -156,11 +182,14 @@ document.addEventListener("DOMContentLoaded", function () {
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
             <div class="flex  space-x-2">
-              <a href="/admin/sit-in-form?student=${student.idno}" class="text-green-600 hover:text-green-900">
+              <a href="/admin/sit-in-form?student=${student.idno}" class="bg-green-500 text-white hover:bg-green-400 cursor-pointer rounded-md px-2 py-0.5">
                 New Sit-in
               </a>
-              <button class="cursor-pointer text-red-600 hover:text-red-900 delete-student-btn" data-id="${student.idno}" data-name="${student.name}">
+              <button class="cursor-pointer bg-red-600 text-white font-switzer hover:bg-red-500 rounded-md px-2 py-0.5 delete-student-btn" data-id="${student.idno}" data-name="${student.name}">
                 Remove
+              </button>
+              <button class="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white font-switzer rounded-md px-2 py-0.5 reset-session-btn" data-id="${student.idno}" data-name="${student.name}">
+                Reset Session
               </button>
             </div>
           </td>
@@ -180,6 +209,41 @@ document.addEventListener("DOMContentLoaded", function () {
         deleteStudentName.textContent = studentName;
 
         showModal("delete-student-modal");
+      });
+    });
+
+    // Add event listeners for reset session buttons
+    document.querySelectorAll(".reset-session-btn").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const studentId = this.getAttribute("data-id");
+        const studentName = this.getAttribute("data-name");
+
+        if (
+          confirm(
+            `Are you sure you want to reset sessions for student: ${studentName}?`
+          )
+        ) {
+          const formData = new FormData();
+          formData.append("student_id", studentId); // Fix: Create FormData correctly
+
+          fetch("/admin/reset-session", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                alert(data.message);
+                fetchStudents(); // Refresh the list
+              } else {
+                alert("Error: " + data.message);
+              }
+            })
+            .catch((error) => {
+              console.error("Error resetting session:", error);
+              alert("An error occurred while resetting session");
+            });
+        }
       });
     });
   }
