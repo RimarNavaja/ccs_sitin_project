@@ -1237,12 +1237,28 @@ def admin_export_report(format):
 
     # --- EXPORT FORMAT LOGIC (Keep the CSV, Excel, PDF generation as is) ---
 
+    # First, add utility functions to generate header texts
+    def get_report_header_lines():
+        """Returns list of header lines for reports"""
+        return [
+            "University of Cebu - Main Campus",
+            "College of Computer Studies",
+            "Computer Laboratory Sit-in Monitoring System", 
+            f"Sit-in Report ({datetime.now().strftime('%B %d, %Y')})"
+        ]
+
+    # For CSV format section, update the code:
     if format.lower() == 'csv':
-        # Generate CSV (No style changes)
         output = StringIO()
         writer = csv.writer(output)
+        
+        # Write report header
+        for header_line in get_report_header_lines():
+            writer.writerow([header_line])
+        writer.writerow([])  # Empty row for spacing
+        
+        # Write data headers and content
         writer.writerow(headers)
-        # Only write data if there is any
         if data:
             writer.writerows(data)
 
@@ -1251,63 +1267,67 @@ def admin_export_report(format):
             mimetype='text/csv',
             headers={
                 'Content-Disposition': f'attachment; filename=sit_in_report_{datetime.now().strftime("%Y%m%d")}.csv',
-                'Cache-Control': 'no-cache' # Prevent caching if needed
+                'Cache-Control': 'no-cache'
             }
         )
 
+    # For Excel format section, update the worksheet writing:
     elif format.lower() == 'excel':
-        # Generate Excel with improved styling
         output = BytesIO()
         workbook = xlsxwriter.Workbook(output, {'options': {'strings_to_numbers': True}})
         worksheet = workbook.add_worksheet('Sit-in Report')
 
-        # --- Define Formats (Keep existing format definitions) ---
+        # Define all formats
+        title_format = workbook.add_format({
+            'bold': True,
+            'font_size': 14,
+            'align': 'center',
+            'font_name': 'Arial'
+        })
+        
         header_format = workbook.add_format({
-            'bold': True, 'bg_color': COLOR_PURPLE_900, 'font_color': COLOR_WHITE,
-            'border': 1, 'border_color': COLOR_GRAY_500, 'align': 'center',
-            'valign': 'vcenter', 'font_name': 'Arial', 'font_size': 11, 'text_wrap': True,
+            'bold': True,
+            'font_size': 11,
+            'align': 'center',
+            'bg_color': COLOR_YELLOW_300,
+            'border': 1
         })
+
         data_format = workbook.add_format({
-            'border': 1, 'border_color': COLOR_GRAY_500, 'align': 'left',
-            'valign': 'vcenter', 'font_name': 'Arial', 'font_size': 10,
+            'font_size': 10,
+            'align': 'left',
+            'border': 1
         })
+
         data_format_center = workbook.add_format({
-            'border': 1, 'border_color': COLOR_GRAY_500, 'align': 'center',
-            'valign': 'vcenter', 'font_name': 'Arial', 'font_size': 10,
+            'font_size': 10,
+            'align': 'center',
+            'border': 1
         })
 
-        # --- Write Headers ---
-        worksheet.set_row(0, 20)
-        for col, header in enumerate(headers):
-            worksheet.write(0, col, header, header_format)
+        # Define which columns should be center-aligned (0-based index)
+        center_aligned_cols = [0, 1, 3, 5, 6, 7, 8]  # Sit-in #, ID, Course, Lab, Date, Time In, Time Out
+        
+        # Write report header
+        current_row = 0
+        for header_line in get_report_header_lines():
+            worksheet.merge_range(current_row, 0, current_row, len(headers)-1, header_line, title_format)
+            current_row += 1
+        
+        current_row += 1  # Add empty row for spacing
 
-        # --- Write Data ---
-        center_aligned_cols = [0, 1, 6, 7, 8] # Adjust if needed
-        if data: # Only write data if there is any
-            for row_idx, row_data in enumerate(data, start=1):
-                current_data_format = data_format
-                current_center_format = data_format_center
+        # Write headers with header format
+        for col, header in enumerate(headers):
+            worksheet.write(current_row, col, header, header_format)
+
+        # Update data writing to account for header offset
+        if data:
+            for row_idx, row_data in enumerate(data, start=current_row+1):
                 for col_idx, value in enumerate(row_data):
                     if col_idx in center_aligned_cols:
-                        worksheet.write(row_idx, col_idx, value, current_center_format)
+                        worksheet.write(row_idx, col_idx, value, data_format_center)
                     else:
-                        worksheet.write(row_idx, col_idx, value, current_data_format)
-        else: # Add a message if no data
-             worksheet.merge_range(1, 0, 1, len(headers)-1, 'No data found for the selected filters.', data_format_center)
-
-
-        # --- Adjust Column Widths (Keep existing adjustments) ---
-        worksheet.set_column('A:A', 10)
-        worksheet.set_column('B:B', 15)
-        worksheet.set_column('C:C', 25)
-        worksheet.set_column('D:D', 15)
-        worksheet.set_column('E:E', 20)
-        worksheet.set_column('F:F', 10)
-        worksheet.set_column('G:G', 12)
-        worksheet.set_column('H:I', 12)
-
-        workbook.close()
-        output.seek(0)
+                        worksheet.write(row_idx, col_idx, value, data_format)
 
         return send_file(
             output,
