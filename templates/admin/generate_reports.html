@@ -1,0 +1,225 @@
+{% extends 'admin/admin_layout.html' %} {% block content %}
+<div class="px-4 py-6">
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900 mb-4">
+      Generate Reports
+    </h1>
+    <p class="text-lg font-switzer text-gray-600">
+      Filter sit-in records and export reports.
+    </p>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <form
+      id="filter-form"
+      method="GET"
+      action="{{ url_for('admin_fetch_report_data') }}"
+    >
+      {# Updated action later for AJAX #}
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label
+            for="lab-filter"
+            class="block text-sm font-medium text-gray-700 mb-2"
+            >Lab</label
+          >
+          <select
+            id="lab-filter"
+            name="lab"
+            class="cursor-pointer w-full py-1.5 px-2 border-gray-300 rounded-md shadow-sm focus:border-violet-500 focus:ring-violet-500"
+          >
+            <option value="">All Labs</option>
+            {% for lab in labs %}
+            <option value="{{ lab }}">{{ lab }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label
+            for="purpose-filter"
+            class="block text-sm font-medium text-gray-700 mb-2"
+            >Purpose</label
+          >
+          <select
+            id="purpose-filter"
+            name="purpose"
+            class="cursor-pointer w-full py-1.5 px-2 border-gray-300 rounded-md shadow-sm focus:border-violet-500 focus:ring-violet-500"
+          >
+            <option value="">All Purposes</option>
+            {% for purpose in purposes %}
+            <option value="{{ purpose }}">{{ purpose }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="md:col-span-2 flex items-end space-x-2">
+          <button
+            type="button"
+            id="apply-filters-btn"
+            class="cursor-pointer flex-1 bg-violet-800 text-white py-2 px-4 rounded-md hover:bg-violet-700"
+          >
+            Apply Filters
+          </button>
+          <button
+            type="button"
+            id="reset-filters-btn"
+            class="cursor-pointer flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div
+    id="results-container"
+    class="bg-white rounded-lg shadow-md overflow-hidden {% if not results %}hidden{% endif %}"
+  >
+    {# Hide initially #}
+    <div
+      class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center"
+    >
+      <h2 class="font-khand tracking-widest text-xl text-gray-800 mb-2 sm:mb-0">
+        Report Results
+      </h2>
+      <div
+        class="flex space-x-2 flex-wrap justify-center sm:justify-end font-switzer"
+      >
+        <button
+          type="button"
+          id="print-btn"
+          class="cursor-pointer bg-gray-200 text-gray-700 py-1 px-3 rounded-md hover:bg-gray-300 text-sm mb-2 sm:mb-0"
+        >
+          Print Reports
+        </button>
+        <button
+          type="button"
+          id="export-pdf-btn"
+          class="bg-red-100 cursor-pointer text-red-700 py-1 px-3 rounded-md hover:bg-red-200 text-sm mb-2 sm:mb-0"
+        >
+          Export PDF
+        </button>
+        <button
+          type="button"
+          id="export-excel-btn"
+          class="bg-green-100 cursor-pointer text-green-700 py-1 px-3 rounded-md hover:bg-green-200 text-sm mb-2 sm:mb-0"
+        >
+          Export Excel
+        </button>
+        <button
+          type="button"
+          id="export-csv-btn"
+          class="bg-blue-100 cursor-pointer text-blue-700 py-1 px-3 rounded-md hover:bg-blue-200 text-sm mb-2 sm:mb-0"
+        >
+          Export CSV
+        </button>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Sit-in #
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              ID Number
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Student
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Course
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Purpose
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Lab
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Date
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Time In
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Time Out
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          id="results-table-body"
+          class="bg-white divide-y divide-gray-200"
+        >
+          {% for record in results %}
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ record.id }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ record.idno }}
+            </td>
+            <td
+              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+            >
+              {{ record.student_name }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ record.course }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ record.purpose }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ record.lab }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ record.date }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ record.time_in }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ record.time_out }}
+            </td>
+          </tr>
+          {% else %} {# Show initially or when no results #}
+          <tr id="no-results-row">
+            <td colspan="9" class="px-6 py-10 text-center text-gray-500 italic">
+              Apply filters to generate a report.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {# Add Pagination if needed later #}
+  </div>
+</div>
+
+{# Link to a new JS file for this page's logic #}
+<script src="{{ url_for('static', filename='js/generate-reports.js') }}"></script>
+
+{% endblock %}
