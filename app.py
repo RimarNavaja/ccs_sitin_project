@@ -298,12 +298,32 @@ def admin_dashboard():
     # Counts the active announcements
     active_announcements = Announcement.query.filter_by(is_active=True).count()
 
+    # get total students
+    total_students = User.query.count()
+
+    # get total active sit-ins
+    active_sitins = SitInSession.query.filter_by(status='active').count()
+
+    # Get today's date at midnight (start of day)
+    today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    # Get end of today
+    today_end = today_start + timedelta(days=1)
+
+    # Count total sit-ins for today (both active and completed)
+    today_sitins = SitInSession.query.filter(
+        SitInSession.start_time >= today_start,
+        SitInSession.start_time < today_end
+    ).count()
+
     return render_template(
         "admin/dashboard.html",
-        announcement_stats={
+        dashboard_stats={
             'total': total_announcements,
-            'active': active_announcements
-        }
+            'active': active_announcements,
+            'students': total_students,
+            'activeSitins': active_sitins,
+            'todaySitins': today_sitins
+        },  
     )
 
 @app.route("/admin/sit-in-records")
