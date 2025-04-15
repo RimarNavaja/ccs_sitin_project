@@ -398,18 +398,32 @@ def admin_delete_sit_in_record(record_id):
     if 'admin' not in session:
         return jsonify({'success': False, 'message': 'Not authorized'})
 
-    record = SitInSession.get_session_by_id(record_id)
-    if not record:
-        return jsonify({'success': False, 'message': 'Record not found'})
+    try:
+        record = SitInSession.get_session_by_id(record_id)
+        if not record:
+            return jsonify({'success': False, 'message': 'Record not found'})
 
-    # Delete the record
-    db.session.delete(record)
-    db.session.commit()
+        # First delete associated feedback if it exists
+        feedback = Feedback.query.filter_by(session_id=record_id).first()
+        if feedback:
+            db.session.delete(feedback)
+            
+        # Then delete the sit-in session record
+        db.session.delete(record)
+        db.session.commit()
 
-    return jsonify({
-        'success': True,
-        'message': 'Record deleted successfully'
-    })
+        return jsonify({
+            'success': True,
+            'message': 'Record deleted successfully'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting record: {str(e)}")
+        return jsonify({
+            'success': False, 
+            'message': f'Error deleting record: {str(e)}'
+        })
 
 @app.route("/admin/sit-in-reports")
 def admin_sit_in_reports():
@@ -418,7 +432,7 @@ def admin_sit_in_reports():
     return render_template("admin/sit-in-reports.html")
 
 
-# <<< START: New Generate Reports Route >>>
+
 @app.route("/admin/generate-reports", methods=["GET"])
 def admin_generate_reports():
     if 'admin' not in session:
@@ -437,9 +451,9 @@ def admin_generate_reports():
                            labs=labs,
                            purposes=purposes,
                            results=[])
-# <<< END: New Generate Reports Route >>>
 
-# <<< START: Add Route for Fetching Report Data >>>
+
+
 @app.route("/admin/fetch-report-data", methods=["GET"])
 def admin_fetch_report_data():
     if 'admin' not in session:
@@ -483,7 +497,7 @@ def admin_fetch_report_data():
         })
 
     return jsonify({'success': True, 'results': formatted_results})
-# <<< END: Add Route for Fetching Report Data >>>
+
 
 @app.route("/admin/feedback-reports")
 def admin_feedback_reports():
