@@ -1,35 +1,34 @@
 from flask import (
-    Flask,
-    render_template,
-    request,
-    redirect,
-    url_for,
+    Flask, # Core Flask application class
+    render_template, # Renders HTML templates
+    request,  # Handles HTTP requests
+    redirect,  # Redirects to different routes
+    url_for,  # Generates URLs for routes
     flash,
-    session,
-    url_for,
-    jsonify,
+    session, # Handles user sessions  
+    jsonify,# Converts data to JSON response
     Response, # Added for CSV export
-    send_file
+    send_file # Sends files to client
 )
-from werkzeug.utils import secure_filename
-import os
-from dbhelper import db, User, Announcement
-from datetime import timedelta, datetime
-from models.sit_in_session import SitInSession
-from models.feedback import Feedback
+from werkzeug.utils import secure_filename # Secures uploaded filenames
+import os  # Operating system operations
+from dbhelper import db, User, Announcement # Custom database models
+from datetime import timedelta, datetime  # Date and time operations
+from models.sit_in_session import SitInSession  # Sit-in session model
+from models.feedback import Feedback  # Feedback model
 from sqlalchemy import text, or_ # Added or_ for searching
 import csv # Added for CSV export
 from io import StringIO # Added for CSV export
 from reportlab.lib.enums import TA_CENTER, TA_LEFT # Import TA_CENTER for alignment
 from reportlab.lib.colors import HexColor # Import HexColor
-import pandas as pd
+import pandas as pd # Data manipulation library
 from io import BytesIO
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image, Spacer
 from reportlab.lib.styles import getSampleStyleSheet,  ParagraphStyle
 from reportlab.platypus import Paragraph
-import xlsxwriter
+import xlsxwriter # Excel file creation
 
 # --- Define Colors based on HTML ---
 COLOR_PURPLE_900 = '#4C1D95' # Tailwind purple-900
@@ -42,7 +41,7 @@ COLOR_BLACK = '#000000'
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1010@localhost/ccs_sitin_project'
-# username - root password - 1010/@Rimar097851 database - ccs_sitin_project/csssitinproject
+# username - root password - 1010/@Rimar097851 database - ccs_sitin_project
 app.secret_key = 'supersecretkey'
 app.config['UPLOAD_FOLDER'] = './static/src/images/userphotos'
 db.init_app(app)

@@ -1,0 +1,8 @@
+flask 
+sqlalchemy
+flask-sqlalchemy
+mysqlclient
+xlsxwriter
+pandas
+reportlab
+werkzeug
