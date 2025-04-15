@@ -72,3 +72,13 @@ class SitInSession(db.Model):
         """Check if feedback exists for a session"""
         from models.feedback import Feedback
         return Feedback.query.filter_by(session_id=session_id).first() is not None
+
+    @staticmethod
+    def get_recent_activities(limit=3):
+        """Get recent sit-in activities (both active and completed)"""
+        return SitInSession.query.filter(
+            SitInSession.status.in_(['active', 'completed'])
+        ).order_by(
+            SitInSession.start_time.desc()
+        ).limit(limit).all()
+

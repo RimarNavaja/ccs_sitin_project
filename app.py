@@ -295,25 +295,33 @@ def admin_dashboard():
 
     # Get announcement stats
     total_announcements = Announcement.query.count()
-    # Counts the active announcements
     active_announcements = Announcement.query.filter_by(is_active=True).count()
 
-    # get total students
+    # Get total students and active sit-ins
     total_students = User.query.count()
-
-    # get total active sit-ins
     active_sitins = SitInSession.query.filter_by(status='active').count()
 
-    # Get today's date at midnight (start of day)
+    # Get today's sit-ins
     today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    # Get end of today
     today_end = today_start + timedelta(days=1)
-
-    # Count total sit-ins for today (both active and completed)
     today_sitins = SitInSession.query.filter(
         SitInSession.start_time >= today_start,
         SitInSession.start_time < today_end
     ).count()
+
+    # Get recent activities
+    recent_activities = []
+    activities = SitInSession.get_recent_activities(limit=3)
+    
+    for activity in activities:
+        user = User.query.get(activity.user_id)
+        recent_activities.append({
+            'student_name': f"{user.firstname.capitalize()} {user.lastname.capitalize()}",
+            'start_time': activity.start_time.strftime('%I:%M %p') if activity.start_time else '-',
+            'end_time': activity.end_time.strftime('%I:%M %p') if activity.end_time else '-',
+            'session_count': user.student_session,
+            'status': activity.status
+        })
 
     return render_template(
         "admin/dashboard.html",
@@ -323,7 +331,8 @@ def admin_dashboard():
             'students': total_students,
             'activeSitins': active_sitins,
             'todaySitins': today_sitins
-        },  
+        },
+        recent_activities=recent_activities
     )
 
 @app.route("/admin/sit-in-records")

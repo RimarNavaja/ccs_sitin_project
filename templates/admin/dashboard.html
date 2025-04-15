@@ -152,7 +152,7 @@
 
   <!-- Dashboard Content -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Recent Activity -->
+    <!-- Recent Sit-in Activity -->
     <div class="lg:col-span-2 bg-white rounded-lg shadow-md">
       <div class="px-6 py-4 border-b border-gray-200">
         <h2 class="font-khand tracking-widest text-xl text-gray-800">
@@ -193,82 +193,45 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <!-- Sample data rows -->
+              {% if recent_activities %} {% for activity in recent_activities %}
               <tr>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="text-sm font-medium text-gray-900">
-                      Eldrin Labe
+                      {{ activity.student_name }}
                     </div>
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">10:30 AM</div>
+                  <div class="text-sm text-gray-900">
+                    {{ activity.start_time }}
+                  </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">11:00 AM</div>
+                  <div class="text-sm text-gray-900">
+                    {{ activity.end_time }}
+                  </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">30</div>
+                  <div class="text-sm text-gray-900">
+                    {{ activity.session_count }}
+                  </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if activity.status == 'active' %} bg-yellow-100 text-yellow-800 {% else %} bg-green-100 text-green-800 {% endif %}"
                   >
-                    Completed
+                    {{ activity.status|capitalize }}
                   </span>
                 </td>
               </tr>
+              {% endfor %} {% else %}
               <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="text-sm font-medium text-gray-900">
-                      Eldrin Pardillo
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">09:15 AM</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">09:45 AM</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">30</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-                  >
-                    Completed
-                  </span>
+                <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                  No recent activities found
                 </td>
               </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <div class="text-sm font-medium text-gray-900">
-                      Eldrin Abcede
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">11:45 AM</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">-</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">30</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
-                  >
-                    Active
-                  </span>
-                </td>
-              </tr>
+              {% endif %}
             </tbody>
           </table>
         </div>
