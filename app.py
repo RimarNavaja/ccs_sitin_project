@@ -1166,60 +1166,42 @@ def admin_reset_all_sessions():
 def admin_export_report(format):
     # --- Authentication Check ---
     if 'admin' not in session:
-        # Return an appropriate response for unauthorized access during export
-        # Option 1: Redirect to login (might be confusing for file download)
-        # return redirect(url_for('admin_login'))
-        # Option 2: Return an error response
         flash("Not authorized to export reports.")
-        # It might be better to handle this on the frontend by disabling export if not logged in,
-        # but a backend check is crucial. A simple message might suffice if the JS prevents clicks.
-        # For API-like behavior:
         return jsonify({'success': False, 'message': 'Not authorized'}), 401
 
     # --- Get Filters from Request Arguments ---
     lab_filter = request.args.get('lab', '')
     purpose_filter = request.args.get('purpose', '')
 
-    # --- Database Query (using the same logic as admin_fetch_report_data) ---
+    # --- Database Query ---
     try:
         query = db.session.query(
             SitInSession,
             User
         ).join(
             User, SitInSession.user_id == User.id
-        ).filter(SitInSession.status == 'completed') # Only completed sessions for reports
+        ).filter(SitInSession.status == 'completed')
 
         if lab_filter:
             query = query.filter(SitInSession.lab == lab_filter)
         if purpose_filter:
             query = query.filter(SitInSession.purpose == purpose_filter)
 
-        # Order results
         query = query.order_by(SitInSession.start_time.desc())
-
-        # Fetch results from the database
         results = query.all()
 
     except Exception as e:
-        # Log the error for debugging
         print(f"Error fetching report data for export: {e}")
-        # Return an error message to the user (or handle appropriately)
-        # Depending on the format, returning JSON might not work if the browser expects a file.
-        # Flashing a message and redirecting or returning a simple text error might be better.
         flash(f"Error generating report data: {e}")
-        # Redirect back to the generate reports page might be the cleanest user experience
         return redirect(url_for('admin_generate_reports'))
 
-
-    # --- Prepare Data for Export ---
+    # --- Prepare Data ---
     data = []
     headers = ['Sit-in #', 'ID Number', 'Student Name', 'Course', 'Purpose',
                'Lab', 'Date', 'Time In', 'Time Out']
 
-    # Check if results were fetched successfully before processing
-    if results is None: # This case shouldn't happen with .all() unless an exception occurred earlier
-         flash("Failed to retrieve report data.")
-         return redirect(url_for('admin_generate_reports'))
+    # Check results (results will be an empty list if none found, not None)
+    # No need for 'if results is None:' check here
 
     for sit_in, user in results:
         data.append([
@@ -1234,32 +1216,31 @@ def admin_export_report(format):
             sit_in.end_time.strftime('%I:%M %p') if sit_in.end_time else 'N/A'
         ])
 
-    # --- EXPORT FORMAT LOGIC (Keep the CSV, Excel, PDF generation as is) ---
-
-    # First, add utility functions to generate header texts
+    # --- Report Header Utility Function ---
     def get_report_header_lines():
-        """Returns list of header lines for reports"""
         return [
             "University of Cebu - Main Campus",
             "College of Computer Studies",
-            "Computer Laboratory Sit-in Monitoring System", 
+            "Computer Laboratory Sit-in Monitoring System",
             f"Sit-in Report ({datetime.now().strftime('%B %d, %Y')})"
         ]
 
-    # For CSV format section, update the code:
+    # --- EXPORT FORMAT LOGIC ---
+
     if format.lower() == 'csv':
         output = StringIO()
         writer = csv.writer(output)
-        
+
         # Write report header
         for header_line in get_report_header_lines():
             writer.writerow([header_line])
         writer.writerow([])  # Empty row for spacing
-        
-        # Write data headers and content
+
         writer.writerow(headers)
         if data:
             writer.writerows(data)
+        else:
+            writer.writerow(["No data found for the selected filters."]) # Indicate no data
 
         return Response(
             output.getvalue(),
@@ -1270,63 +1251,75 @@ def admin_export_report(format):
             }
         )
 
-    # For Excel format section, update the worksheet writing:
     elif format.lower() == 'excel':
         output = BytesIO()
-        workbook = xlsxwriter.Workbook(output, {'options': {'strings_to_numbers': True}})
+        # Use 'in_memory' option which is generally recommended with BytesIO
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True, 'strings_to_numbers': True})
         worksheet = workbook.add_worksheet('Sit-in Report')
 
-        # Define all formats
+        # --- Define Formats ---
+        # Using COLOR_PURPLE_900 for main header background again to match PDF/original request
         title_format = workbook.add_format({
-            'bold': True,
-            'font_size': 14,
-            'align': 'center',
-            'font_name': 'Arial'
+            'bold': True, 'font_size': 14, 'align': 'center',
+            'font_name': 'Arial', 'valign': 'vcenter'
         })
-        
+        # Reverting header format color to purple
         header_format = workbook.add_format({
-            'bold': True,
-            'font_size': 11,
-            'align': 'center',
-            'bg_color': COLOR_YELLOW_300,
-            'border': 1
+            'bold': True, 'bg_color': COLOR_PURPLE_900, 'font_color': COLOR_WHITE,
+            'border': 1, 'border_color': COLOR_GRAY_500, 'align': 'center',
+            'valign': 'vcenter', 'font_name': 'Arial', 'font_size': 11, 'text_wrap': True,
         })
-
         data_format = workbook.add_format({
-            'font_size': 10,
-            'align': 'left',
-            'border': 1
+            'border': 1, 'border_color': COLOR_GRAY_500, 'align': 'left',
+            'valign': 'vcenter', 'font_name': 'Arial', 'font_size': 10,
         })
-
         data_format_center = workbook.add_format({
-            'font_size': 10,
-            'align': 'center',
-            'border': 1
+            'border': 1, 'border_color': COLOR_GRAY_500, 'align': 'center',
+            'valign': 'vcenter', 'font_name': 'Arial', 'font_size': 10,
         })
 
-        # Define which columns should be center-aligned (0-based index)
-        center_aligned_cols = [0, 1, 3, 5, 6, 7, 8]  # Sit-in #, ID, Course, Lab, Date, Time In, Time Out
-        
-        # Write report header
+        # Define which columns should be center-aligned
+        center_aligned_cols = [0, 1, 5, 6, 7, 8] # Sit-in #, ID, Lab, Date, Time In, Time Out (Adjusted)
+
+        # --- Write Report Header ---
         current_row = 0
         for header_line in get_report_header_lines():
             worksheet.merge_range(current_row, 0, current_row, len(headers)-1, header_line, title_format)
+            worksheet.set_row(current_row, 18) # Set row height for titles
             current_row += 1
-        
         current_row += 1  # Add empty row for spacing
 
-        # Write headers with header format
+        # --- Write Data Headers ---
+        worksheet.set_row(current_row, 20) # Set header row height
         for col, header in enumerate(headers):
             worksheet.write(current_row, col, header, header_format)
+        data_start_row = current_row + 1 # Where actual data begins
 
-        # Update data writing to account for header offset
+        # --- Write Data ---
         if data:
-            for row_idx, row_data in enumerate(data, start=current_row+1):
+            for row_idx, row_data in enumerate(data):
+                # Calculate the actual worksheet row index
+                worksheet_row = data_start_row + row_idx
                 for col_idx, value in enumerate(row_data):
-                    if col_idx in center_aligned_cols:
-                        worksheet.write(row_idx, col_idx, value, data_format_center)
-                    else:
-                        worksheet.write(row_idx, col_idx, value, data_format)
+                    chosen_format = data_format_center if col_idx in center_aligned_cols else data_format
+                    worksheet.write(worksheet_row, col_idx, value, chosen_format)
+        else: # Add a message if no data
+             worksheet.merge_range(data_start_row, 0, data_start_row, len(headers)-1,
+                                   'No data found for the selected filters.', data_format_center)
+
+        # --- Adjust Column Widths --- *RE-ADDED*
+        worksheet.set_column('A:A', 10)  # Sit-in #
+        worksheet.set_column('B:B', 15)  # ID Number
+        worksheet.set_column('C:C', 25)  # Student Name
+        worksheet.set_column('D:D', 15)  # Course
+        worksheet.set_column('E:E', 20)  # Purpose
+        worksheet.set_column('F:F', 10)  # Lab
+        worksheet.set_column('G:G', 12)  # Date
+        worksheet.set_column('H:I', 12)  # Time In, Time Out
+
+        # --- Finalize and Send --- *FIXED*
+        workbook.close()  # Essential: Finalizes the workbook structure
+        output.seek(0)    # Essential: Rewinds the buffer to the beginning
 
         return send_file(
             output,
@@ -1336,7 +1329,7 @@ def admin_export_report(format):
         )
 
     elif format.lower() == 'pdf':
-        # Generate PDF with improved styling
+        # --- PDF Generation (Keep as is, but ensure header color matches Excel if desired) ---
         buffer = BytesIO()
         doc = SimpleDocTemplate(
             buffer, pagesize=landscape(letter),
@@ -1345,16 +1338,13 @@ def admin_export_report(format):
         elements = []
         styles = getSampleStyleSheet()
 
-        # --- Define Custom Styles (Keep existing style definitions) ---
+        # Define Custom Styles
         styles.add(ParagraphStyle(name='Center', parent=styles['Normal'], alignment=TA_CENTER))
-        styles.add(ParagraphStyle(name='MainTitle', parent=styles['h1'], alignment=TA_CENTER,
-                                  fontName='Helvetica-Bold', fontSize=14, spaceAfter=2))
-        styles.add(ParagraphStyle(name='SubTitle', parent=styles['h2'], alignment=TA_CENTER,
-                                  fontName='Helvetica-Bold', fontSize=12, spaceAfter=2))
-        styles.add(ParagraphStyle(name='ReportTitle', parent=styles['h3'], alignment=TA_CENTER,
-                                  fontName='Helvetica', fontSize=11, spaceAfter=10))
+        styles.add(ParagraphStyle(name='MainTitle', parent=styles['h1'], alignment=TA_CENTER, fontName='Helvetica-Bold', fontSize=14, spaceAfter=2))
+        styles.add(ParagraphStyle(name='SubTitle', parent=styles['h2'], alignment=TA_CENTER, fontName='Helvetica-Bold', fontSize=12, spaceAfter=2))
+        styles.add(ParagraphStyle(name='ReportTitle', parent=styles['h3'], alignment=TA_CENTER, fontName='Helvetica', fontSize=11, spaceAfter=10))
 
-        # --- Build PDF Header (Keep existing header logic) ---
+        # Build PDF Header
         logo_ccs = "static/src/images/logos/CCS_LOGO.png"
         logo_uc = "static/src/images/logos/UC_LOGO.png"
         try: img_ccs = Image(logo_ccs, width=50, height=50)
@@ -1362,11 +1352,13 @@ def admin_export_report(format):
         try: img_uc = Image(logo_uc, width=50, height=50)
         except Exception: img_uc = Paragraph("(UC Logo Missing)", styles['Center'])
 
+        # Use the same header lines function
+        header_lines_for_pdf = get_report_header_lines()
         header_data = [
-            [img_uc, Paragraph("University of Cebu - Main Campus", styles['MainTitle']), img_ccs],
-            ['', Paragraph("College of Computer Studies", styles['SubTitle']), ''],
-            ['', Paragraph("Computer Laboratory Sit-in Monitoring System", styles['SubTitle']), ''],
-            ['', Paragraph(f"Sit-in Report ({datetime.now().strftime('%B %d, %Y')})", styles['ReportTitle']), '']
+            [img_uc, Paragraph(header_lines_for_pdf[0], styles['MainTitle']), img_ccs],
+            ['', Paragraph(header_lines_for_pdf[1], styles['SubTitle']), ''],
+            ['', Paragraph(header_lines_for_pdf[2], styles['SubTitle']), ''],
+            ['', Paragraph(header_lines_for_pdf[3], styles['ReportTitle']), '']
         ]
         header_table = Table(header_data, colWidths=[80, '70%', 80])
         header_table.setStyle(TableStyle([
@@ -1377,15 +1369,15 @@ def admin_export_report(format):
         ]))
         elements.append(header_table)
 
-        # --- Prepare Data Table ---
-        if data: # Check if there's data
+        # Prepare Data Table
+        if data:
             table_data = [headers] + data
-            col_widths = [50, 80, 140, 80, 110, 50, 70, 70, 70] # Adjust if needed
+            col_widths = [50, 80, 140, 80, 110, 50, 70, 70, 70]
             table = Table(table_data, colWidths=col_widths)
-            # Apply existing TableStyle
             table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), HexColor(COLOR_YELLOW_300)),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                 # Reverting PDF header to purple to match Excel/original request
+                ('BACKGROUND', (0, 0), (-1, 0), HexColor(COLOR_PURPLE_900)),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white), # White text on purple
                 ('ALIGN', (0, 0), (-1, 0), 'CENTER'), ('VALIGN', (0, 0), (-1, 0), 'MIDDLE'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'), ('FONTSIZE', (0, 0), (-1, 0), 10),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 8), ('TOPPADDING', (0, 0), (-1, 0), 8),
@@ -1398,10 +1390,9 @@ def admin_export_report(format):
                 ('GRID', (0, 0), (-1, -1), 0.5, HexColor(COLOR_GRAY_500)),
             ]))
             elements.append(table)
-        else: # If no data, add a paragraph indicating this
-            elements.append(Spacer(1, 20)) # Add some space
+        else:
+            elements.append(Spacer(1, 20))
             elements.append(Paragraph("No data found for the selected filters.", styles['Center']))
-
 
         doc.build(elements)
         buffer.seek(0)
@@ -1414,7 +1405,6 @@ def admin_export_report(format):
         )
 
     # --- Fallback for Invalid Format ---
-    # Return JSON error for invalid format requests
     return jsonify({'success': False, 'message': 'Invalid export format requested'}), 400
 
 if __name__ == "__main__":
