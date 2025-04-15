@@ -23,6 +23,9 @@ document.addEventListener("DOMContentLoaded", function () {
   exportExcelBtn.addEventListener("click", () => exportReport("excel"));
   exportCsvBtn.addEventListener("click", () => exportReport("csv"));
 
+  // Fetch data immediately when page loads
+  fetchDataAndPopulateTable();
+
   // --- Functions ---
 
   // Function to fetch data based on filters and update the table

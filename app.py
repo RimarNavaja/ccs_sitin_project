@@ -1375,8 +1375,8 @@ def admin_export_report(format):
             col_widths = [50, 80, 140, 80, 110, 50, 70, 70, 70]
             table = Table(table_data, colWidths=col_widths)
             table.setStyle(TableStyle([
-                 # Reverting PDF header to purple to match Excel/original request
-                ('BACKGROUND', (0, 0), (-1, 0), HexColor(COLOR_PURPLE_900)),
+                 
+                ('BACKGROUND', (0, 0), (-1, 0), HexColor(COLOR_YELLOW_300)),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.white), # White text on purple
                 ('ALIGN', (0, 0), (-1, 0), 'CENTER'), ('VALIGN', (0, 0), (-1, 0), 'MIDDLE'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'), ('FONTSIZE', (0, 0), (-1, 0), 10),

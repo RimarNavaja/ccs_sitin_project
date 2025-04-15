@@ -75,7 +75,7 @@
 
   <div
     id="results-container"
-    class="bg-white rounded-lg shadow-md overflow-hidden {% if not results %}hidden{% endif %}"
+    class="bg-white rounded-lg shadow-md overflow-hidden"
   >
     {# Hide initially #}
     <div
@@ -87,13 +87,13 @@
       <div
         class="flex space-x-2 flex-wrap justify-center sm:justify-end font-switzer"
       >
-        <button
+        <!-- <button
           type="button"
           id="print-btn"
           class="cursor-pointer bg-gray-200 text-gray-700 py-1 px-3 rounded-md hover:bg-gray-300 text-sm mb-2 sm:mb-0"
         >
           Print Reports
-        </button>
+        </button> -->
         <button
           type="button"
           id="export-pdf-btn"
@@ -173,45 +173,11 @@
           id="results-table-body"
           class="bg-white divide-y divide-gray-200"
         >
-          {% for record in results %}
-          <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ record.id }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {{ record.idno }}
-            </td>
-            <td
-              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-            >
-              {{ record.student_name }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ record.course }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ record.purpose }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ record.lab }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ record.date }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ record.time_in }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ record.time_out }}
-            </td>
-          </tr>
-          {% else %} {# Show initially or when no results #}
           <tr id="no-results-row">
             <td colspan="9" class="px-6 py-10 text-center text-gray-500 italic">
-              Apply filters to generate a report.
+              Loading report data...
             </td>
           </tr>
-          {% endfor %}
         </tbody>
       </table>
     </div>
