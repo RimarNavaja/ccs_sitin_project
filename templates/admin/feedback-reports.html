@@ -60,8 +60,7 @@
             ></div>
           </div>
           <span class="text-sm font-medium w-1/6"
-            >{{ feedback_stats.rating_distribution[i] }} ({{
-            "%.1f"|format(percent) }}%)</span
+            >{{ feedback_stats.rating_distribution[i] }} ({{ "%.1f"|format(percent) }}%)</span
           >
         </div>
         {% endfor %}
@@ -206,14 +205,16 @@
               </div>
             </td>
             <td class="px-6 py-4">
-              <div class="text-sm text-gray-900 max-w-xs truncate">
+              <div class="text-sm font-light max-w-xs truncate font-switzer">
                 {% if feedback.comments %} {{ feedback.comments }} {% else %}
                 <span class="text-gray-400 italic">No comments provided</span>
                 {% endif %}
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">{{ feedback.purpose }}</div>
+              <div class="text-sm font-switzer text-gray-900">
+                {{ feedback.purpose }}
+              </div>
               <div class="text-xs text-gray-500">
                 Lab: {{ feedback.lab }} | {{ feedback.date }}
               </div>
