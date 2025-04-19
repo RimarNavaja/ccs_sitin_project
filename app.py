@@ -1513,7 +1513,70 @@ def admin_export_report(format):
     # --- Fallback for Invalid Format ---
     return jsonify({'success': False, 'message': 'Invalid export format requested'}), 400
 
+# --- Lab Usage Points Admin Panel ---
+@app.route("/admin/lab-usage-points")
+def admin_lab_usage_points():
+    search = request.args.get('search', '').strip()
+    page = int(request.args.get('page', 1))
+    per_page = 15
 
+    query = SitInSession.query.join(User).order_by(SitInSession.id.desc())
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            (User.idno.like(search_term)) |
+            (User.firstname.like(search_term)) |
+            (User.lastname.like(search_term))
+        )
+    total = query.count()
+    sessions = query.offset((page - 1) * per_page).limit(per_page).all()
+
+    session_data = []
+    for s in sessions:
+        session_data.append({
+            'sit_in_id': s.id,
+            'student_id': s.user.idno,
+            'student_name': f"{s.user.firstname} {s.user.lastname}",
+            'course': s.user.course,
+            'purpose': s.purpose,
+            'lab': s.lab,
+            'lab_points': getattr(s.user, 'lab_points', 0),
+            'student_session': s.user.student_session,
+        })
+
+    return render_template(
+        "admin/lab-usage-points.html",
+        sessions=session_data,
+        page=page,
+        per_page=per_page,
+        total=total,
+        search=search,
+        total_pages=(total // per_page) + (1 if total % per_page else 0)
+    )
+
+@app.route("/admin/lab-usage-points/add-point", methods=["POST"])
+def admin_lab_usage_points_add_point():
+    session_id = request.form.get("session_id")
+    session = SitInSession.query.get(session_id)
+    if not session:
+        return jsonify({'success': False, 'message': 'Session not found'})
+    user = session.user
+    # Add 1 point
+    user.lab_points = (user.lab_points or 0) + 1
+    # Convert points to session if >= 3
+    converted = False
+    while user.lab_points >= 3:
+        user.lab_points -= 3
+        user.student_session += 1
+        converted = True
+  
+    db.session.commit()
+    return jsonify({
+        'success': True,
+        'lab_points': user.lab_points,
+        'student_session': user.student_session,
+        'converted': converted
+    })
 
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)

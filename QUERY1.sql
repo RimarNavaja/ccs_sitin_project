@@ -24,6 +24,8 @@ ADD COLUMN photo_url VARCHAR(200);
 ALTER TABLE users
 MODIFY COLUMN midname VARCHAR(50) NULL;
 
+-- Add lab_points column for rewards system
+ALTER TABLE users ADD COLUMN lab_points INT DEFAULT 0;
 
 -- add student_session column
 ALTER TABLE users 
@@ -71,9 +73,6 @@ ADD COLUMN lab VARCHAR(10) AFTER purpose;
 -- Sample announcement data
 INSERT INTO announcements (title, content, priority) VALUES
 ('Lab Hours Update', 'Please note that the computer lab will be closed', 2);
-
-
-
 
 SELECT * FROM users;
 SELECT * FROM announcements;
