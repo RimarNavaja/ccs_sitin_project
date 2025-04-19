@@ -23,6 +23,7 @@
     --color-yellow-300: oklch(0.905 0.182 98.111);
     --color-yellow-400: oklch(0.852 0.199 91.936);
     --color-yellow-500: oklch(0.795 0.184 86.047);
+    --color-yellow-600: oklch(0.681 0.162 75.834);
     --color-yellow-700: oklch(0.554 0.135 66.442);
     --color-yellow-800: oklch(0.476 0.114 61.907);
     --color-green-100: oklch(0.962 0.044 156.743);
@@ -51,6 +52,7 @@
     --color-violet-700: oklch(0.491 0.27 292.581);
     --color-violet-800: oklch(0.432 0.232 292.759);
     --color-violet-900: oklch(0.38 0.189 293.745);
+    --color-purple-200: oklch(0.902 0.063 306.703);
     --color-purple-500: oklch(0.627 0.265 303.9);
     --color-purple-800: oklch(0.438 0.218 303.724);
     --color-purple-900: oklch(0.381 0.176 304.987);
@@ -893,6 +895,9 @@
     border-left-style: var(--tw-border-style);
     border-left-width: 4px;
   }
+  .border-gray-100 {
+    border-color: var(--color-gray-100);
+  }
   .border-gray-200 {
     border-color: var(--color-gray-200);
   }
@@ -968,6 +973,9 @@
   .bg-green-600 {
     background-color: var(--color-green-600);
   }
+  .bg-purple-200 {
+    background-color: var(--color-purple-200);
+  }
   .bg-red-50 {
     background-color: var(--color-red-50);
   }
@@ -1001,6 +1009,9 @@
   .bg-violet-300\/10 {
     background-color: color-mix(in oklab, var(--color-violet-300) 10%, transparent);
   }
+  .bg-violet-400 {
+    background-color: var(--color-violet-400);
+  }
   .bg-violet-600 {
     background-color: var(--color-violet-600);
   }
@@ -1021,6 +1032,18 @@
   }
   .bg-yellow-100\/30 {
     background-color: color-mix(in oklab, var(--color-yellow-100) 30%, transparent);
+  }
+  .bg-yellow-200 {
+    background-color: var(--color-yellow-200);
+  }
+  .bg-yellow-200\/55 {
+    background-color: color-mix(in oklab, var(--color-yellow-200) 55%, transparent);
+  }
+  .bg-yellow-200\/70 {
+    background-color: color-mix(in oklab, var(--color-yellow-200) 70%, transparent);
+  }
+  .bg-yellow-200\/80 {
+    background-color: color-mix(in oklab, var(--color-yellow-200) 80%, transparent);
   }
   .bg-yellow-400 {
     background-color: var(--color-yellow-400);
@@ -1306,6 +1329,9 @@
   .text-black {
     color: var(--color-black);
   }
+  .text-blue-500 {
+    color: var(--color-blue-500);
+  }
   .text-blue-700 {
     color: var(--color-blue-700);
   }
@@ -1389,6 +1415,9 @@
   }
   .text-yellow-500 {
     color: var(--color-yellow-500);
+  }
+  .text-yellow-600 {
+    color: var(--color-yellow-600);
   }
   .text-yellow-700 {
     color: var(--color-yellow-700);

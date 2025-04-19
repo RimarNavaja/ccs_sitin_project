@@ -16,7 +16,7 @@ from dbhelper import db, User, Announcement # Custom database models
 from datetime import timedelta, datetime  # Date and time operations
 from models.sit_in_session import SitInSession  # Sit-in session model
 from models.feedback import Feedback  # Feedback model
-from sqlalchemy import text, or_ # Added or_ for searching
+from sqlalchemy import text, or_, func, desc # Added or_ for searching, func and desc for leaderboard query
 import csv # Added for CSV export
 from io import StringIO # Added for CSV export
 from reportlab.lib.enums import TA_CENTER, TA_LEFT # Import TA_CENTER for alignment
@@ -1577,6 +1577,45 @@ def admin_lab_usage_points_add_point():
         'student_session': user.student_session,
         'converted': converted
     })
+
+@app.route("/admin/leaderboard")
+def admin_leaderboard():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+
+    # Query to get leaderboard data (e.g., top 10 students by session count)
+    leaderboard_data = db.session.query(
+        User.idno,
+        User.firstname,
+        User.lastname,
+        User.course,
+        func.count(SitInSession.id).label('session_count'),
+        func.sum(func.timestampdiff(text('MINUTE'), SitInSession.start_time, SitInSession.end_time)).label('total_duration_minutes')
+    ).join(SitInSession, User.id == SitInSession.user_id)\
+     .filter(SitInSession.status == 'completed')\
+     .group_by(User.id)\
+     .order_by(desc('session_count'), desc('total_duration_minutes'))\
+     .limit(10)\
+     .all()
+
+    formatted_leaderboard = []
+    for rank, student in enumerate(leaderboard_data, 1):
+        total_minutes = student.total_duration_minutes or 0
+        hours = total_minutes // 60
+        minutes = total_minutes % 60
+        duration_str = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
+
+        formatted_leaderboard.append({
+            'rank': rank,
+            'idno': student.idno,
+            'name': f"{student.firstname.capitalize()} {student.lastname.capitalize()}",
+            'course': student.course,
+            'session_count': student.session_count,
+            'total_duration': duration_str
+        })
+
+    return render_template("admin/leaderboard.html", leaderboard=formatted_leaderboard)
+
 
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)
