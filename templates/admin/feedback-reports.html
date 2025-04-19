@@ -60,7 +60,8 @@
             ></div>
           </div>
           <span class="text-sm font-medium w-1/6"
-            >{{ feedback_stats.rating_distribution[i] }} ({{ "%.1f"|format(percent) }}%)</span
+            >{{ feedback_stats.rating_distribution[i] }} ({{
+            "%.1f"|format(percent) }}%)</span
           >
         </div>
         {% endfor %}
@@ -76,13 +77,13 @@
       <h2 class="font-khand tracking-widest text-xl text-gray-800">
         Feedbacks
       </h2>
-      <div class="flex space-x-2">
+      <div>
         <button
           type="button"
-          class="bg-gray-200 text-gray-700 py-1 px-3 rounded-md hover:bg-gray-300 text-sm"
-          onclick="exportToCSV()"
+          class="bg-red-200 cursor-pointer font-switzer text-red-700 py-1 px-3 rounded-md hover:bg-red-300 text-sm"
+          onclick="exportToPDF();"
         >
-          Export Report
+          Export as PDF
         </button>
       </div>
     </div>
@@ -376,17 +377,25 @@
     }
   });
 
-  // Export to CSV functionality
-  function exportToCSV() {
-    // Current filter parameters
-    const urlParams = new URLSearchParams(window.location.search);
+  // Export dropdown toggle
+  document
+    .getElementById("exportDropdownBtn")
+    .addEventListener("click", function (e) {
+      e.stopPropagation();
+      const dropdown = document.getElementById("exportDropdown");
+      dropdown.classList.toggle("hidden");
+    });
+  // Hide dropdown when clicking outside
+  document.addEventListener("click", function () {
+    document.getElementById("exportDropdown").classList.add("hidden");
+  });
 
-    // Construct export URL with current filters
-    let url = '{{ url_for("admin_export_feedback") }}?';
+  // Export to PDF functionality
+  function exportToPDF() {    
+    const urlParams = new URLSearchParams(window.location.search);
+    let url = '{{ url_for("admin_export_feedback_pdf") }}?';
     if (urlParams.has("search")) url += `search=${urlParams.get("search")}&`;
     if (urlParams.has("rating")) url += `rating=${urlParams.get("rating")}&`;
-
-    // Remove trailing '&' and navigate to download
     window.location.href = url.endsWith("&") ? url.slice(0, -1) : url;
   }
 </script>

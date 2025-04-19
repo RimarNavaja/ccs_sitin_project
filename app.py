@@ -612,8 +612,8 @@ def admin_feedback_reports():
         rating=rating
     )
 
-@app.route("/admin/export-feedback")
-def admin_export_feedback():
+@app.route("/admin/export-feedback-pdf")
+def admin_export_feedback_pdf():
     if 'admin' not in session:
         return redirect(url_for('admin_login'))
 
@@ -636,7 +636,7 @@ def admin_export_feedback():
     if search:
         search_term = f"%{search}%"
         query = query.filter(
-            or_( # Use or_ here
+            or_(
                 User.firstname.like(search_term),
                 User.lastname.like(search_term),
                 Feedback.comments.like(search_term)
@@ -650,19 +650,11 @@ def admin_export_feedback():
     # Get all matching records
     results = query.order_by(Feedback.created_at.desc()).all()
 
-    # Generate CSV content
-    output = StringIO()
-    writer = csv.writer(output)
-
-    # Write header row
-    writer.writerow([
-        'Student ID', 'Student Name', 'Rating', 'Comments',
-        'Purpose', 'Lab', 'Date', 'Submission Time'
-    ])
-
-    # Write data rows
+    # --- Prepare Data ---
+    headers = ['Student ID', 'Student Name', 'Rating', 'Comments', 'Purpose', 'Lab', 'Date', 'Submission Time']
+    data = []
     for feedback, sit_in, user in results:
-        writer.writerow([
+        data.append([
             user.idno,
             f"{user.firstname.capitalize()} {user.lastname.capitalize()}",
             feedback.rating,
@@ -670,20 +662,91 @@ def admin_export_feedback():
             sit_in.purpose,
             sit_in.lab,
             sit_in.start_time.strftime('%b %d, %Y') if sit_in.start_time else 'N/A',
-            feedback.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            feedback.created_at.strftime('%Y-%m-%d %I:%M %p')
         ])
 
-    # Create response
-    response = Response(
-        output.getvalue(),
-        mimetype='text/csv',
-        headers={
-            'Content-Disposition': f'attachment; filename=feedback_report_{datetime.now().strftime("%Y%m%d")}.csv',
-            'Cache-Control': 'no-cache'
-        }
-    )
+    # --- Report Header Utility Function ---
+    def get_report_header_lines():
+        return [
+            "University of Cebu - Main Campus",
+            "College of Computer Studies",
+            "Sit-in Feedback Report",
+            f"Feedback Report ({datetime.now().strftime('%B %d, %Y')})"
+        ]
 
-    return response
+    # --- PDF Generation ---
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer, pagesize=landscape(letter),
+        rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30
+    )
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Define Custom Styles
+    styles.add(ParagraphStyle(name='Center', parent=styles['Normal'], alignment=TA_CENTER))
+    styles.add(ParagraphStyle(name='MainTitle', parent=styles['h1'], alignment=TA_CENTER, fontName='Helvetica-Bold', fontSize=14, spaceAfter=2))
+    styles.add(ParagraphStyle(name='SubTitle', parent=styles['h2'], alignment=TA_CENTER, fontName='Helvetica-Bold', fontSize=12, spaceAfter=2))
+    styles.add(ParagraphStyle(name='ReportTitle', parent=styles['h3'], alignment=TA_CENTER, fontName='Helvetica', fontSize=11, spaceAfter=10))
+
+    # Build PDF Header
+    logo_ccs = "static/src/images/logos/CCS_LOGO.png"
+    logo_uc = "static/src/images/logos/UC_LOGO.png"
+    try: img_ccs = Image(logo_ccs, width=50, height=50)
+    except Exception: img_ccs = Paragraph("(CCS Logo Missing)", styles['Center'])
+    try: img_uc = Image(logo_uc, width=50, height=50)
+    except Exception: img_uc = Paragraph("(UC Logo Missing)", styles['Center'])
+
+    header_lines_for_pdf = get_report_header_lines()
+    header_data = [
+        [img_uc, Paragraph(header_lines_for_pdf[0], styles['MainTitle']), img_ccs],
+        ['', Paragraph(header_lines_for_pdf[1], styles['SubTitle']), ''],
+        ['', Paragraph(header_lines_for_pdf[2], styles['SubTitle']), ''],
+        ['', Paragraph(header_lines_for_pdf[3], styles['ReportTitle']), '']
+    ]
+    header_table = Table(header_data, colWidths=[80, '70%', 80])
+    header_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'), ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('SPAN', (1, 0), (1, 0)), ('SPAN', (1, 1), (1, 1)),
+        ('SPAN', (1, 2), (1, 2)), ('SPAN', (1, 3), (1, 3)),
+        ('BOTTOMPADDING', (0, 3), (-1, 3), 12),
+    ]))
+    elements.append(header_table)
+
+    # Prepare Data Table
+    if data:
+        table_data = [headers] + data
+        col_widths = [60, 120, 40, 180, 80, 40, 70,100]
+        table = Table(table_data, colWidths=col_widths)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), HexColor(COLOR_YELLOW_300)),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('ALIGN', (0, 0), (-1, 0), 'CENTER'), ('VALIGN', (0, 0), (-1, 0), 'MIDDLE'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'), ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8), ('TOPPADDING', (0, 0), (-1, 0), 8),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white), ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'), ('FONTSIZE', (0, 1), (-1, -1), 9),
+            ('ALIGN', (0, 1), (-1, -1), 'CENTER'), ('ALIGN', (1, 1), (1, -1), 'LEFT'), # Student Name
+            ('ALIGN', (3, 1), (3, -1), 'LEFT'),    # Comments
+            ('ALIGN', (4, 1), (4, -1), 'LEFT'),    # Purpose
+            ('VALIGN', (0, 1), (-1, -1), 'MIDDLE'),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 5), ('TOPPADDING', (0, 1), (-1, -1), 5),
+            ('GRID', (0, 0), (-1, -1), 0.5, HexColor(COLOR_GRAY_500)),
+        ]))
+        elements.append(table)
+    else:
+        elements.append(Spacer(1, 20))
+        elements.append(Paragraph("No feedback found for the selected filters.", styles['Center']))
+
+    doc.build(elements)
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=f'feedback_report_{datetime.now().strftime("%Y%m%d")}.pdf'
+    )
 
 @app.route("/admin/student-list")
 def admin_student_list():
@@ -1449,6 +1512,8 @@ def admin_export_report(format):
 
     # --- Fallback for Invalid Format ---
     return jsonify({'success': False, 'message': 'Invalid export format requested'}), 400
+
+
 
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)
