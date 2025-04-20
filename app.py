@@ -1597,7 +1597,7 @@ def admin_leaderboard():
      .order_by(desc('session_count'), desc('total_duration_minutes'))\
      .limit(10)\
      .all()
-
+    
     formatted_leaderboard = []
     for rank, student in enumerate(leaderboard_data, 1):
         total_minutes = student.total_duration_minutes or 0

@@ -51,6 +51,11 @@
                   class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
                   >RESERVATION</a
                 >
+                <!-- <a
+                  href="{{ url_for('admin_leaderboard') }}"
+                  class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
+                  >LEADERBOARD</a
+                > -->
               </div>
             </div>
           </div>
@@ -141,7 +146,7 @@
           </div>
         </div>
       </div>
-
+      <!-- mobile responsive-->
       <div class="md:hidden" id="mobile-menu">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <h2
@@ -180,10 +185,15 @@
             class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
             >Sit-in Records</a
           >
-          <a
+          <!-- <a
             href="{{ url_for('admin_sit_in_reports') }}"
             class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
             >Sit-in Reports</a
+          > -->
+          <a
+            href="{{ url_for('admin_lab_usage_points') }}"
+            class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+            >Lab Usage Points</a
           >
           <a
             href="{{ url_for('admin_generate_reports') }}"
@@ -194,6 +204,11 @@
             href="{{ url_for('admin_feedback_reports') }}"
             class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
             >Feedback Reports</a
+          >
+          <a
+            href="{{ url_for('admin_leaderboard') }}"
+            class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+            >Leaderboard</a
           >
         </div>
         <div class="border-t border-gray-700 pt-4 pb-3">
@@ -317,7 +332,7 @@
                   <span class="font-switzer">View Sit-in Records</span>
                 </a>
               </li>
-              <li>
+              <!-- <li>
                 <a
                   href="{{ url_for('admin_sit_in_reports') }}"
                   class="flex items-center py-2 px-4 rounded-md hover:text-yellow-300 text-white duration-200 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
@@ -338,7 +353,7 @@
                   </svg>
                   <span class="font-switzer">Sit-in Reports</span>
                 </a>
-              </li>
+              </li> -->
               <li>
                 <a
                   href="{{ url_for('admin_generate_reports') }}"
@@ -389,17 +404,33 @@
                   class="cursor-pointer flex items-center w-full px-4 py-2 rounded-md font-switzer hover:text-yellow-300 text-white duration-300 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
                 >
                   <svg
-                    class="w-5 h-5 mr-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    class="w-7 h-7 mr-3"
                   >
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.539 1.118l-3.975-2.888a1 1 0 00-1.176 0l-3.975 2.888c-.783.57-1.838-.197-1.539-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      d="M6 9.75h4v5.5H6v-5.5Z"
+                    ></path>
+                    <path
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      d="M10 4.75h4v10.5h-4V4.75Z"
+                    ></path>
+                    <path
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      d="M14 9.75h4v5.5h-4v-5.5Z"
+                    ></path>
+                    <path
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      d="M5 18.25h14"
                     ></path>
                   </svg>
                   Leaderboard

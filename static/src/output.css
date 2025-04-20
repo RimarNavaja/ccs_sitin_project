@@ -52,7 +52,6 @@
     --color-violet-700: oklch(0.491 0.27 292.581);
     --color-violet-800: oklch(0.432 0.232 292.759);
     --color-violet-900: oklch(0.38 0.189 293.745);
-    --color-purple-200: oklch(0.902 0.063 306.703);
     --color-purple-500: oklch(0.627 0.265 303.9);
     --color-purple-800: oklch(0.438 0.218 303.724);
     --color-purple-900: oklch(0.381 0.176 304.987);
@@ -74,7 +73,6 @@
     --container-sm: 24rem;
     --container-md: 28rem;
     --container-lg: 32rem;
-    --container-2xl: 42rem;
     --container-4xl: 56rem;
     --container-7xl: 80rem;
     --text-xs: 0.75rem;
@@ -409,17 +407,20 @@
   .-mr-2 {
     margin-right: calc(var(--spacing) * -2);
   }
+  .mr-1 {
+    margin-right: calc(var(--spacing) * 1);
+  }
   .mr-2 {
     margin-right: calc(var(--spacing) * 2);
-  }
-  .mr-2\.5 {
-    margin-right: calc(var(--spacing) * 2.5);
   }
   .mr-3 {
     margin-right: calc(var(--spacing) * 3);
   }
   .mr-4 {
     margin-right: calc(var(--spacing) * 4);
+  }
+  .mr-5 {
+    margin-right: calc(var(--spacing) * 5);
   }
   .mb-1 {
     margin-bottom: calc(var(--spacing) * 1);
@@ -525,6 +526,12 @@
   .h-6 {
     height: calc(var(--spacing) * 6);
   }
+  .h-6\.5 {
+    height: calc(var(--spacing) * 6.5);
+  }
+  .h-7 {
+    height: calc(var(--spacing) * 7);
+  }
   .h-8 {
     height: calc(var(--spacing) * 8);
   }
@@ -536,6 +543,9 @@
   }
   .h-16 {
     height: calc(var(--spacing) * 16);
+  }
+  .h-20 {
+    height: calc(var(--spacing) * 20);
   }
   .h-24 {
     height: calc(var(--spacing) * 24);
@@ -570,9 +580,6 @@
   .w-1\/6 {
     width: calc(1/6 * 100%);
   }
-  .w-2xl {
-    width: var(--container-2xl);
-  }
   .w-4 {
     width: calc(var(--spacing) * 4);
   }
@@ -584,6 +591,9 @@
   }
   .w-6 {
     width: calc(var(--spacing) * 6);
+  }
+  .w-6\.5 {
+    width: calc(var(--spacing) * 6.5);
   }
   .w-7 {
     width: calc(var(--spacing) * 7);
@@ -597,11 +607,11 @@
   .w-16 {
     width: calc(var(--spacing) * 16);
   }
+  .w-20 {
+    width: calc(var(--spacing) * 20);
+  }
   .w-24 {
     width: calc(var(--spacing) * 24);
-  }
-  .w-36 {
-    width: calc(var(--spacing) * 36);
   }
   .w-48 {
     width: calc(var(--spacing) * 48);
@@ -614,12 +624,6 @@
   }
   .w-full {
     width: 100%;
-  }
-  .w-lg {
-    width: var(--container-lg);
-  }
-  .w-md {
-    width: var(--container-md);
   }
   .w-sm {
     width: var(--container-sm);
@@ -656,9 +660,6 @@
   }
   .shrink-0 {
     flex-shrink: 0;
-  }
-  .flex-grow {
-    flex-grow: 1;
   }
   .border-collapse {
     border-collapse: collapse;
@@ -743,6 +744,9 @@
   }
   .justify-end {
     justify-content: flex-end;
+  }
+  .justify-normal {
+    justify-content: normal;
   }
   .gap-1 {
     gap: calc(var(--spacing) * 1);
@@ -895,9 +899,6 @@
     border-left-style: var(--tw-border-style);
     border-left-width: 4px;
   }
-  .border-gray-100 {
-    border-color: var(--color-gray-100);
-  }
   .border-gray-200 {
     border-color: var(--color-gray-200);
   }
@@ -973,9 +974,6 @@
   .bg-green-600 {
     background-color: var(--color-green-600);
   }
-  .bg-purple-200 {
-    background-color: var(--color-purple-200);
-  }
   .bg-red-50 {
     background-color: var(--color-red-50);
   }
@@ -1009,9 +1007,6 @@
   .bg-violet-300\/10 {
     background-color: color-mix(in oklab, var(--color-violet-300) 10%, transparent);
   }
-  .bg-violet-400 {
-    background-color: var(--color-violet-400);
-  }
   .bg-violet-600 {
     background-color: var(--color-violet-600);
   }
@@ -1036,14 +1031,8 @@
   .bg-yellow-200 {
     background-color: var(--color-yellow-200);
   }
-  .bg-yellow-200\/55 {
-    background-color: color-mix(in oklab, var(--color-yellow-200) 55%, transparent);
-  }
   .bg-yellow-200\/70 {
     background-color: color-mix(in oklab, var(--color-yellow-200) 70%, transparent);
-  }
-  .bg-yellow-200\/80 {
-    background-color: color-mix(in oklab, var(--color-yellow-200) 80%, transparent);
   }
   .bg-yellow-400 {
     background-color: var(--color-yellow-400);
@@ -1082,6 +1071,9 @@
   }
   .bg-clip-text {
     background-clip: text;
+  }
+  .fill-current {
+    fill: currentColor;
   }
   .object-contain {
     object-fit: contain;
@@ -1329,9 +1321,6 @@
   .text-black {
     color: var(--color-black);
   }
-  .text-blue-500 {
-    color: var(--color-blue-500);
-  }
   .text-blue-700 {
     color: var(--color-blue-700);
   }
@@ -1466,10 +1455,6 @@
     --tw-shadow: 0 1px 2px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.05));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
-  .ring {
-    --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentColor);
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
   .ring-1 {
     --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentColor);
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
@@ -1491,9 +1476,6 @@
   }
   .shadow-violet-800\/30 {
     --tw-shadow-color: color-mix(in oklab, var(--color-violet-800) 30%, transparent);
-  }
-  .ring-black {
-    --tw-ring-color: var(--color-black);
   }
   .ring-violet-700 {
     --tw-ring-color: var(--color-violet-700);
@@ -1824,13 +1806,6 @@
       }
     }
   }
-  .hover\:bg-violet-100 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-violet-100);
-      }
-    }
-  }
   .hover\:bg-violet-300 {
     &:hover {
       @media (hover: hover) {
@@ -1877,13 +1852,6 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-yellow-300);
-      }
-    }
-  }
-  .hover\:font-switzer {
-    &:hover {
-      @media (hover: hover) {
-        font-family: var(--font-switzer);
       }
     }
   }
@@ -2183,11 +2151,6 @@
   .sm\:w-20 {
     @media (width >= 40rem) {
       width: calc(var(--spacing) * 20);
-    }
-  }
-  .sm\:w-64 {
-    @media (width >= 40rem) {
-      width: calc(var(--spacing) * 64);
     }
   }
   .sm\:w-auto {
