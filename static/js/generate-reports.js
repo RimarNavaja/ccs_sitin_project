@@ -13,6 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const exportExcelBtn = document.getElementById("export-excel-btn");
   const exportCsvBtn = document.getElementById("export-csv-btn");
 
+  const optionsMenuButton = document.getElementById("options-menu-button");
+  const optionsMenu = document.getElementById("options-menu");
+
   // --- Event Listeners ---
   applyFiltersBtn.addEventListener("click", fetchDataAndPopulateTable);
   resetFiltersBtn.addEventListener("click", resetFiltersAndTable);
@@ -22,6 +25,27 @@ document.addEventListener("DOMContentLoaded", function () {
   exportPdfBtn.addEventListener("click", () => exportReport("pdf"));
   exportExcelBtn.addEventListener("click", () => exportReport("excel"));
   exportCsvBtn.addEventListener("click", () => exportReport("csv"));
+
+  // Listener for the export options dropdown
+  optionsMenuButton.addEventListener("click", () => {
+    optionsMenu.classList.toggle("hidden");
+    // Update aria-expanded attribute
+    const isExpanded =
+      optionsMenuButton.getAttribute("aria-expanded") === "true";
+    optionsMenuButton.setAttribute("aria-expanded", !isExpanded);
+  });
+
+  // Optional: Close dropdown if clicked outside
+  document.addEventListener("click", (event) => {
+    if (
+      !optionsMenu.contains(event.target) &&
+      !optionsMenuButton.contains(event.target) &&
+      !optionsMenu.classList.contains("hidden")
+    ) {
+      optionsMenu.classList.add("hidden");
+      optionsMenuButton.setAttribute("aria-expanded", "false");
+    }
+  });
 
   // Fetch data immediately when page loads
   fetchDataAndPopulateTable();
