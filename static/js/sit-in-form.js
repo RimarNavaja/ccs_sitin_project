@@ -266,18 +266,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div class="flex space-x-2">
-                    <form action="/admin/end-sit-in/${
-                      session.id
-                    }" method="POST">
-                      <button type="submit" class="bg-red-500 text-white rounded-md p-1 px-2 cursor-pointer hover:bg-red-600">
-                        End Session
-                      </button>
-                    </form>
                     <form action="/admin/reward-sit-in/${
                       session.id
                     }" method="POST">
-                      <button type="submit" class="bg-green-500 text-white rounded-md p-1 px-2 cursor-pointer hover:bg-green-600">
+                      <button title="Reward student 1 point and end sit-in session." type="submit" class="bg-green-500 text-white rounded-md p-1 px-2 cursor-pointer hover:bg-green-600">
                         Reward
+                      </button>
+                    </form>
+                    <form action="/admin/end-sit-in/${
+                      session.id
+                    }" method="POST">
+                      <button title="End sit-in session with no reward." type="submit" class="bg-red-500 text-white rounded-md p-1 px-2 cursor-pointer hover:bg-red-600">
+                        End Session
                       </button>
                     </form>
                   </div>

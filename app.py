@@ -1267,13 +1267,36 @@ def admin_reset_session():
         return jsonify({'success': False, 'message': 'Student not found'})
 
     try:
-        User.reset_session_count(user.id)
+        # Find completed sessions for the user
+        completed_sessions = SitInSession.query.filter_by(user_id=user.id, status='completed').all()
+        session_ids = [s.id for s in completed_sessions]
+
+        # Delete associated feedback first if sessions exist
+        if session_ids:
+            Feedback.query.filter(Feedback.session_id.in_(session_ids)).delete(synchronize_session=False)
+
+        # Now delete the completed sit-in sessions
+        if session_ids:
+             SitInSession.query.filter_by(user_id=user.id, status='completed').delete(synchronize_session=False)
+
+        # Reset available session count and lab points
+        # Assuming User.reset_session_count does NOT commit internally
+        if user.course in ['BSIT', 'BSCS', 'BSIS']:
+             user.student_session = 30
+        else:
+             user.student_session = 15
+        user.lab_points = 0 # Reset lab points
+
+        db.session.commit() # Commit all changes (deletions and updates)
+
         return jsonify({
             'success': True,
-            'message': f'Sessions reset successfully for student {user.firstname} {user.lastname}'
+            'message': f'Sessions, points, and completed session history (including feedback) reset successfully for student {user.firstname} {user.lastname}'
         })
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)})
+        db.session.rollback() # Rollback in case of error
+        print(f"Error resetting session for {student_id}: {str(e)}") # Add logging
+        return jsonify({'success': False, 'message': f'An error occurred: {str(e)}'})
 
 @app.route("/admin/reset-all-sessions", methods=["POST"])
 def admin_reset_all_sessions():
@@ -1283,15 +1306,36 @@ def admin_reset_all_sessions():
     try:
         users = User.query.all()
         for user in users:
-            User.reset_session_count(user.id)
+            # Find completed sessions for the current user
+            completed_sessions = SitInSession.query.filter_by(user_id=user.id, status='completed').all()
+            session_ids = [s.id for s in completed_sessions]
+
+            # Delete associated feedback first if sessions exist
+            if session_ids:
+                Feedback.query.filter(Feedback.session_id.in_(session_ids)).delete(synchronize_session=False)
+
+            # Now delete the completed sit-in sessions
+            if session_ids:
+                SitInSession.query.filter_by(user_id=user.id, status='completed').delete(synchronize_session=False)
+
+            # Reset available session count and lab points for each user
+            # Assuming User.reset_session_count does NOT commit internally
+            if user.course in ['BSIT', 'BSCS', 'BSIS']:
+                 user.student_session = 30
+            else:
+                 user.student_session = 15
+            user.lab_points = 0 # Reset lab points for each user
+
+        db.session.commit() # Commit all changes after the loop
 
         return jsonify({
             'success': True,
-            'message': 'All student sessions have been reset successfully'
+            'message': 'All student sessions, points, and completed session history (including feedback) have been reset successfully'
         })
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)})
-
+        db.session.rollback() # Rollback in case of error
+        print(f"Error resetting all sessions: {str(e)}") # Add logging
+        return jsonify({'success': False, 'message': f'An error occurred: {str(e)}'})
 
 @app.route("/admin/export/<format>")
 def admin_export_report(format):
@@ -1537,47 +1581,6 @@ def admin_export_report(format):
 
     # --- Fallback for Invalid Format ---
     return jsonify({'success': False, 'message': 'Invalid export format requested'}), 400
-
-# --- Lab Usage Points Admin Panel ---
-@app.route("/admin/lab-usage-points")
-def admin_lab_usage_points():
-    search = request.args.get('search', '').strip()
-    page = int(request.args.get('page', 1))
-    per_page = 15
-
-    query = SitInSession.query.join(User).order_by(SitInSession.id.desc())
-    if search:
-        search_term = f"%{search}%"
-        query = query.filter(
-            (User.idno.like(search_term)) |
-            (User.firstname.like(search_term)) |
-            (User.lastname.like(search_term))
-        )
-    total = query.count()
-    sessions = query.offset((page - 1) * per_page).limit(per_page).all()
-
-    session_data = []
-    for s in sessions:
-        session_data.append({
-            'sit_in_id': s.id,
-            'student_id': s.user.idno,
-            'student_name': f"{s.user.firstname} {s.user.lastname}",
-            'course': s.user.course,
-            'purpose': s.purpose,
-            'lab': s.lab,
-            'lab_points': getattr(s.user, 'lab_points', 0),
-            'student_session': s.user.student_session,
-        })
-
-    return render_template(
-        "admin/lab-usage-points.html",
-        sessions=session_data,
-        page=page,
-        per_page=per_page,
-        total=total,
-        search=search,
-        total_pages=(total // per_page) + (1 if total % per_page else 0)
-    )
 
 
 

@@ -44,18 +44,17 @@ class User(db.Model):
     # reset student sessions and points
     @staticmethod
     def reset_session_count(user_id):
-        """Reset session count for a user"""
+        """Reset session count for a user (DOES NOT COMMIT)"""
         user = User.query.get(user_id)
         if user:
             if user.course in ['BSIT', 'BSCS', 'BSIS']:
                 user.student_session = 30
-                user.lab_points = 0
             else:
                 user.student_session = 15
-                user.lab_points = 0
-            db.session.commit()
+         # REMOVED COMMIT
         else:
-            abort(404, description="User not found")
+         # Consider raising an error instead of aborting if called within a larger transaction
+            raise ValueError(f"User not found with ID: {user_id}")
     
     def deduct_session(self):
         """Deduct one session from the user's available sessions"""
