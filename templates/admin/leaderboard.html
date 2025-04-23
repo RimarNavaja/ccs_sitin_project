@@ -7,8 +7,7 @@
       Sit-in Leaderboard
     </h1>
     <p class="text-lg font-switzer text-gray-600">
-      Top 10 most active sit-in participants based on session count and
-      duration.
+      Top 5 most active sit-in participants based on session count and duration.
     </p>
   </div>
 
@@ -361,7 +360,7 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          {% for student in leaderboard %}
+          {% for student in leaderboard[:5] %}
           <tr>
             <td
               class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-center font-bold text-gray-900 flex items-center justify-center"
@@ -376,7 +375,7 @@
                   height="20"
                   viewBox="0 0 256 256"
                   xml:space="preserve"
-                  class="mr-1 fill-current"
+                  class="mr-1 fill-current motion-safe:animate-bounce"
                 >
                   <g
                     style="

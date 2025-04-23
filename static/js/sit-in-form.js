@@ -291,6 +291,12 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
+  // --- NEW: Helper to get query parameter ---
+  function getQueryParam(name) {
+    const url = new URL(window.location.href);
+    return url.searchParams.get(name);
+  }
+
   // Event listeners
   searchButton.addEventListener("click", searchStudent);
   searchInput.addEventListener("keyup", function (event) {
@@ -303,6 +309,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Load active sessions on page load
   loadActiveSessions();
+
+  //  Auto-select student if ?student=IDNO is present ---
+  async function autoSelectStudentFromQuery() {
+    const studentIdno = getQueryParam("student");
+    if (studentIdno) {
+      // Clear previous results
+      searchResults.innerHTML = "";
+      searchResults.classList.add("hidden");
+
+      // Search for the student by ID number
+      const response = await fetch("/admin/search-student", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `student_search=${encodeURIComponent(studentIdno)}`,
+      });
+      const data = await response.json();
+      if (data.success && data.students.length > 0) {
+        // Find exact match by idno (in case multiple results)
+        const student =
+          data.students.find((s) => s.idno === studentIdno) || data.students[0];
+        selectStudent(student);
+      } else {
+        // Show error message
+        searchResults.classList.remove("hidden");
+        searchResults.innerHTML = `
+          <div class="bg-red-50 p-4 rounded-md">
+            <p class="text-red-700">Student not found for ID: ${studentIdno}</p>
+          </div>
+        `;
+      }
+    }
+  }
+
+  //  Auto-select student if query param is present 
+  autoSelectStudentFromQuery();
 
   // Refresh active sessions every 30 seconds
   setInterval(loadActiveSessions, 30000);

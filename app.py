@@ -268,8 +268,7 @@ def admin_login() -> None:
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
-        # In a real implementation, check against admin credentials
-        # For now, we'll use placeholder credentials
+        # temporary admin credentials
         if username == "admin" and password == "admin123!":
             # Set session
             session['admin'] = username
@@ -1002,6 +1001,8 @@ def admin_get_active_sessions():
         'success': True,
         'sessions': formatted_sessions
     })
+
+
 
 @app.route("/admin/get-students", methods=["GET"])
 def admin_get_students():
