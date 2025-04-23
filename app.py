@@ -1564,10 +1564,10 @@ def admin_lab_usage_points_add_point():
     user = session.user
     # Add 1 point
     user.lab_points = (user.lab_points or 0) + 1
-    # Convert points to session if >= 3
+    
+    # Convert points to session if >= 3 but keep the points
     converted = False
-    while user.lab_points >= 3:
-        user.lab_points -= 3
+    if user.lab_points >= 3 and user.lab_points % 3 == 0:
         user.student_session += 1
         converted = True
   
@@ -1584,8 +1584,40 @@ def admin_leaderboard():
     if 'admin' not in session:
         return redirect(url_for('admin_login'))
 
-    # Query to get leaderboard data (e.g., top 10 students by session count)
+    # Query to get leaderboard data (top 10 students by session count)
     leaderboard_data = db.session.query(
+        User.idno,
+        User.firstname,
+        User.lastname,
+        User.course,
+        func.count(SitInSession.id).label('session_count'),
+        User.lab_points
+    ).join(SitInSession, User.id == SitInSession.user_id)\
+     .filter(SitInSession.status == 'completed')\
+     .group_by(User.id)\
+     .order_by(desc('session_count'), desc(User.lab_points))\
+     .limit(10)\
+     .all()
+
+    # Format leaderboard
+    formatted_leaderboard = []
+    for rank, student in enumerate(leaderboard_data, 1):
+        formatted_leaderboard.append({
+            'rank': rank,
+            'idno': student.idno,
+            'name': f"{student.firstname.capitalize()} {student.lastname.capitalize()}",
+            'course': student.course,
+            'session_count': student.session_count,
+            'total_points': student.lab_points or 0
+        })
+
+    return render_template("admin/leaderboard.html", leaderboard=formatted_leaderboard)
+
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+
+    # Query for sessions leaderboard
+    sessions_leaderboard = db.session.query(
         User.idno,
         User.firstname,
         User.lastname,
@@ -1599,14 +1631,27 @@ def admin_leaderboard():
      .limit(10)\
      .all()
     
-    formatted_leaderboard = []
-    for rank, student in enumerate(leaderboard_data, 1):
+    # Query for lab points leaderboard
+    points_leaderboard = db.session.query(
+        User.idno,
+        User.firstname,
+        User.lastname,
+        User.course,
+        User.lab_points
+    ).filter(User.lab_points > 0)\
+     .order_by(desc(User.lab_points))\
+     .limit(5)\
+     .all()
+
+    # Format sessions leaderboard
+    formatted_sessions = []
+    for rank, student in enumerate(sessions_leaderboard, 1):
         total_minutes = student.total_duration_minutes or 0
         hours = total_minutes // 60
         minutes = total_minutes % 60
         duration_str = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
 
-        formatted_leaderboard.append({
+        formatted_sessions.append({
             'rank': rank,
             'idno': student.idno,
             'name': f"{student.firstname.capitalize()} {student.lastname.capitalize()}",
@@ -1615,9 +1660,22 @@ def admin_leaderboard():
             'total_duration': duration_str
         })
 
-    return render_template("admin/leaderboard.html", leaderboard=formatted_leaderboard)
+    # Format points leaderboard
+    formatted_points = []
+    for rank, student in enumerate(points_leaderboard, 1):
+        formatted_points.append({
+            'rank': rank,
+            'idno': student.idno,
+            'name': f"{student.firstname.capitalize()} {student.lastname.capitalize()}",
+            'course': student.course,
+            'points': student.lab_points
+        })
 
-
+    return render_template(
+        "admin/leaderboard.html",
+        sessions_leaderboard=formatted_sessions,
+        points_leaderboard=formatted_points
+    )
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)
     app.run(debug=True)

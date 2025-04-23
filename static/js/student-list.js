@@ -182,13 +182,13 @@ document.addEventListener("DOMContentLoaded", function () {
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
             <div class="flex  space-x-2">
-              <a href="/admin/sit-in-form?student=${student.idno}" class="bg-green-500 text-white hover:bg-green-400 cursor-pointer rounded-md px-2 py-0.5">
+              <a title="Immediately proceed to sit-in form." href="/admin/sit-in-form?student=${student.idno}" class="bg-green-500 text-white hover:bg-green-400 cursor-pointer rounded-md px-2 py-0.5">
                 New Sit-in
               </a>
-              <button class="cursor-pointer bg-red-600 text-white font-switzer hover:bg-red-500 rounded-md px-2 py-0.5 delete-student-btn" data-id="${student.idno}" data-name="${student.name}">
+              <button title="Remove student permanently." class="cursor-pointer bg-red-600 text-white font-switzer hover:bg-red-500 rounded-md px-2 py-0.5 delete-student-btn" data-id="${student.idno}" data-name="${student.name}">
                 Remove
               </button>
-              <button class="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white font-switzer rounded-md px-2 py-0.5 reset-session-btn" data-id="${student.idno}" data-name="${student.name}">
+              <button title="Reset student sessions and points." class="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white font-switzer rounded-md px-2 py-0.5 reset-session-btn" data-id="${student.idno}" data-name="${student.name}">
                 Reset Session
               </button>
             </div>

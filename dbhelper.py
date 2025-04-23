@@ -41,6 +41,7 @@ class User(db.Model):
         else:
             abort(404, description="User not found")
     
+    # reset student sessions and points
     @staticmethod
     def reset_session_count(user_id):
         """Reset session count for a user"""
@@ -48,8 +49,10 @@ class User(db.Model):
         if user:
             if user.course in ['BSIT', 'BSCS', 'BSIS']:
                 user.student_session = 30
+                user.lab_points = 0
             else:
                 user.student_session = 15
+                user.lab_points = 0
             db.session.commit()
         else:
             abort(404, description="User not found")
