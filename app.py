@@ -197,8 +197,11 @@ def dashboard():
     if 'user' not in session:
         return redirect(url_for('login'))
     user = User.query.filter_by(username=session['user']).first()
+    sitinsession = SitInSession.query.filter_by( status='active').first()
     announcements = Announcement.get_active_announcements()
-    return render_template("dashboard.html", user=user, announcements=announcements)
+    coloractive = "bg-green-200 text-green-700"
+    colorinactive = "bg-gray-300"
+    return render_template("dashboard.html", user=user, announcements=announcements, sitinsession=sitinsession, coloractive=coloractive, colorinactive=colorinactive)
 
 @app.route("/lab_rules")
 def lab_rules():
@@ -783,11 +786,7 @@ def admin_reward_sit_in(session_id):
     flash('Session ended and point awarded successfully!', 'success')
     return redirect(url_for('admin_sit_in_form'))
 
-@app.route("/admin/reservation")
-def admin_reservation():
-    if 'admin' not in session:
-        return redirect(url_for('admin_login'))
-    return render_template("admin/reservation.html")
+
 
 # Admin announcements routes
 @app.route("/admin/announcements")

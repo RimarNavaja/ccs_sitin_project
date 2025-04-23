@@ -383,6 +383,30 @@
                     {{ user.student_session }}
                   </p>
                 </div>
+                <div>
+                  <label
+                    class="block text-md font-switzer font-semibold text-gray-900 tracking-wide"
+                    >Points Earned</label
+                  >
+                  <p class="flex items-center mt-1 text-sm font-switzer">
+                    {{ user.lab_points }}
+                    <span class="ml-2 text-xs italic text-gray-400"
+                      >For every 3 points = +1 sit-in session</span
+                    >
+                  </p>
+                </div>
+                <div>
+                  <label
+                    class="block text-md font-switzer font-semibold text-gray-900 tracking-wide"
+                    >Sit-in Status</label
+                  >
+                  <button
+                    class="mt-1 text-sm font-switzer capitalize rounded-full py-1 px-2 {% if sitinsession.status == Null %} {{colorinactive}} {% else %} {{coloractive}} {% endif %} "
+                  >
+                    {% if sitinsession.status == Null %} inactive {% endif %} {{
+                    sitinsession.status }}
+                  </button>
+                </div>
               </div>
             </div>
 

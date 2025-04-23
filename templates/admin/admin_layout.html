@@ -46,16 +46,6 @@
                   class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
                   >SIT-IN</a
                 >
-                <a
-                  href="{{ url_for('admin_reservation') }}"
-                  class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
-                  >RESERVATION</a
-                >
-                <!-- <a
-                  href="{{ url_for('admin_leaderboard') }}"
-                  class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-gray-700 hover:text-white"
-                  >LEADERBOARD</a
-                > -->
               </div>
             </div>
           </div>
@@ -168,13 +158,9 @@
           <a
             href="{{ url_for('admin_sit_in_form') }}"
             class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-            >Sit-in Form</a
+            >Sit-in</a
           >
-          <a
-            href="{{ url_for('admin_reservation') }}"
-            class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-            >Reservation</a
-          >
+
           <a
             href="{{ url_for('admin_announcements') }}"
             class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -287,7 +273,7 @@
                   <span class="font-switzer">Announcements</span>
                 </a>
               </li>
-            
+
               <li>
                 <a
                   href="{{ url_for('admin_sit_in_records') }}"
@@ -464,47 +450,45 @@
 
           <div class="max-w-7xl mx-auto">{% block content %}{% endblock %}</div>
         </div>
-
-        <footer class="bg-gray-100 mt-auto">
-          <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <div class="sm:flex sm:justify-between sm:items-center">
-              <div class="flex justify-center items-center sm:justify-start">
-                <div class="flex flex-row space-x-4">
-                  <div class="shrink-0">
-                    <img
-                      class="size-8"
-                      src="/static/src/images/logos/UC_LOGO.png"
-                      alt="University of Cebu"
-                    />
-                  </div>
-
-                  <div class="shrink-0">
-                    <img
-                      class="size-8"
-                      src="/static/src/images/logos/CCS_LOGO.png"
-                      alt="College of Computer Studies"
-                    />
-                  </div>
-                </div>
-                <p class="ml-5 font-khand text-xl font-semibold">
-                  College of Computer Studies
-                </p>
-              </div>
-
-              <p
-                class="flex flex-col mt-4 text-center text-sm text-gray-500 sm:mt-0 lg:text-right"
-              >
-                Copyright &copy; 2025. All rights reserved.
-                <span
-                  class="ml-4 font-light font-khand text-black tracking-widest"
-                  >SYSARCH</span
-                >
-              </p>
-            </div>
-          </div>
-        </footer>
       </div>
     </div>
+    <footer class="bg-gray-100 mt-auto">
+      <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div class="sm:flex sm:justify-between sm:items-center">
+          <div class="flex justify-center items-center sm:justify-start">
+            <div class="flex flex-row space-x-4">
+              <div class="shrink-0">
+                <img
+                  class="size-8"
+                  src="/static/src/images/logos/UC_LOGO.png"
+                  alt="University of Cebu"
+                />
+              </div>
+
+              <div class="shrink-0">
+                <img
+                  class="size-8"
+                  src="/static/src/images/logos/CCS_LOGO.png"
+                  alt="College of Computer Studies"
+                />
+              </div>
+            </div>
+            <p class="ml-5 font-khand text-xl font-semibold">
+              College of Computer Studies
+            </p>
+          </div>
+
+          <p
+            class="flex flex-col mt-4 text-center text-sm text-gray-500 sm:mt-0 lg:text-right"
+          >
+            Copyright &copy; 2025. All rights reserved.
+            <span class="ml-4 font-light font-khand text-black tracking-widest"
+              >SYSARCH</span
+            >
+          </p>
+        </div>
+      </div>
+    </footer>
 
     <script src="/static/js/script.js"></script>
   </body>
