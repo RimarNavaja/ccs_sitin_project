@@ -759,6 +759,30 @@ def admin_sit_in_form():
         return redirect(url_for('admin_login'))
     return render_template("admin/sit-in-form.html")
 
+@app.route('/admin/reward-sit-in/<int:session_id>', methods=['POST'])
+def admin_reward_sit_in(session_id):
+    # Get the session
+    session = SitInSession.query.get_or_404(session_id)
+    user = User.query.get(session.student_id)
+    
+    # Add 1 point
+    user.lab_points = (user.lab_points or 0) + 1
+    
+    # Convert points to session if >= 3 but keep the points
+    converted = False
+    if user.lab_points >= 3 and user.lab_points % 3 == 0:
+        user.student_session += 1
+        converted = True
+    
+    # End the session
+    session.end_time = datetime.now()
+    session.status = 'completed'
+    
+    db.session.commit()
+    
+    flash('Session ended and point awarded successfully!', 'success')
+    return redirect(url_for('admin_sit_in_form'))
+
 @app.route("/admin/reservation")
 def admin_reservation():
     if 'admin' not in session:
@@ -1555,36 +1579,14 @@ def admin_lab_usage_points():
         total_pages=(total // per_page) + (1 if total % per_page else 0)
     )
 
-@app.route("/admin/lab-usage-points/add-point", methods=["POST"])
-def admin_lab_usage_points_add_point():
-    session_id = request.form.get("session_id")
-    session = SitInSession.query.get(session_id)
-    if not session:
-        return jsonify({'success': False, 'message': 'Session not found'})
-    user = session.user
-    # Add 1 point
-    user.lab_points = (user.lab_points or 0) + 1
-    
-    # Convert points to session if >= 3 but keep the points
-    converted = False
-    if user.lab_points >= 3 and user.lab_points % 3 == 0:
-        user.student_session += 1
-        converted = True
-  
-    db.session.commit()
-    return jsonify({
-        'success': True,
-        'lab_points': user.lab_points,
-        'student_session': user.student_session,
-        'converted': converted
-    })
+
 
 @app.route("/admin/leaderboard")
 def admin_leaderboard():
     if 'admin' not in session:
         return redirect(url_for('admin_login'))
 
-    # Query to get leaderboard data (top 10 students by session count)
+    # Query to get leaderboard data (top 5 students by session count and points)
     leaderboard_data = db.session.query(
         User.idno,
         User.firstname,
@@ -1596,7 +1598,7 @@ def admin_leaderboard():
      .filter(SitInSession.status == 'completed')\
      .group_by(User.id)\
      .order_by(desc('session_count'), desc(User.lab_points))\
-     .limit(10)\
+     .limit(5)\
      .all()
 
     # Format leaderboard
@@ -1613,69 +1615,6 @@ def admin_leaderboard():
 
     return render_template("admin/leaderboard.html", leaderboard=formatted_leaderboard)
 
-    if 'admin' not in session:
-        return redirect(url_for('admin_login'))
-
-    # Query for sessions leaderboard
-    sessions_leaderboard = db.session.query(
-        User.idno,
-        User.firstname,
-        User.lastname,
-        User.course,
-        func.count(SitInSession.id).label('session_count'),
-        func.sum(func.timestampdiff(text('MINUTE'), SitInSession.start_time, SitInSession.end_time)).label('total_duration_minutes')
-    ).join(SitInSession, User.id == SitInSession.user_id)\
-     .filter(SitInSession.status == 'completed')\
-     .group_by(User.id)\
-     .order_by(desc('session_count'), desc('total_duration_minutes'))\
-     .limit(10)\
-     .all()
-    
-    # Query for lab points leaderboard
-    points_leaderboard = db.session.query(
-        User.idno,
-        User.firstname,
-        User.lastname,
-        User.course,
-        User.lab_points
-    ).filter(User.lab_points > 0)\
-     .order_by(desc(User.lab_points))\
-     .limit(5)\
-     .all()
-
-    # Format sessions leaderboard
-    formatted_sessions = []
-    for rank, student in enumerate(sessions_leaderboard, 1):
-        total_minutes = student.total_duration_minutes or 0
-        hours = total_minutes // 60
-        minutes = total_minutes % 60
-        duration_str = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
-
-        formatted_sessions.append({
-            'rank': rank,
-            'idno': student.idno,
-            'name': f"{student.firstname.capitalize()} {student.lastname.capitalize()}",
-            'course': student.course,
-            'session_count': student.session_count,
-            'total_duration': duration_str
-        })
-
-    # Format points leaderboard
-    formatted_points = []
-    for rank, student in enumerate(points_leaderboard, 1):
-        formatted_points.append({
-            'rank': rank,
-            'idno': student.idno,
-            'name': f"{student.firstname.capitalize()} {student.lastname.capitalize()}",
-            'course': student.course,
-            'points': student.lab_points
-        })
-
-    return render_template(
-        "admin/leaderboard.html",
-        sessions_leaderboard=formatted_sessions,
-        points_leaderboard=formatted_points
-    )
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)
     app.run(debug=True)

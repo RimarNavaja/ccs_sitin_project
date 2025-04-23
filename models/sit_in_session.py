@@ -34,6 +34,11 @@ class SitInSession(db.Model):
         """Cancel this sit-in session"""
         self.status = 'cancelled'
         
+    @property
+    def student_id(self):
+        """Alias for user_id to support code expecting student_id."""
+        return self.user_id
+
     @staticmethod
     def get_session_by_id(session_id):
         """Get a sit-in session by ID"""

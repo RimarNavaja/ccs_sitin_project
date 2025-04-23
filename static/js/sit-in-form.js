@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((data) => {
         if (data.success && data.sessions.length > 0) {
           return data.sessions.some(
-            (session) => session.student_id === studentId
+            (session) => session.user_id === studentId // Changed from student_id to user_id
           );
         }
         return false;
@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         session.student_name
                       }</div>
                       <div class="text-sm text-gray-500">${
-                        session.student_id
+                        session.student_id // Changed from student_id to user_id
                       }</div>
                     </div>
                   </div>
@@ -265,11 +265,22 @@ document.addEventListener("DOMContentLoaded", function () {
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <form action="/admin/end-sit-in/${session.id}" method="POST">
-                    <button type="submit" class="bg-red-500 text-white rounded-md p-1 px-2 cursor-pointer hover:bg-red-600">
-                      End Session
-                    </button>
-                  </form>
+                  <div class="flex space-x-2">
+                    <form action="/admin/end-sit-in/${
+                      session.id
+                    }" method="POST">
+                      <button type="submit" class="bg-red-500 text-white rounded-md p-1 px-2 cursor-pointer hover:bg-red-600">
+                        End Session
+                      </button>
+                    </form>
+                    <form action="/admin/reward-sit-in/${
+                      session.id
+                    }" method="POST">
+                      <button type="submit" class="bg-green-500 text-white rounded-md p-1 px-2 cursor-pointer hover:bg-green-600">
+                        Reward
+                      </button>
+                    </form>
+                  </div>
                 </td>
               `;
 
@@ -344,7 +355,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  //  Auto-select student if query param is present 
+  //  Auto-select student if query param is present
   autoSelectStudentFromQuery();
 
   // Refresh active sessions every 30 seconds
