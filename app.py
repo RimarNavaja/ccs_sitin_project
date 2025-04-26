@@ -12,7 +12,7 @@ from flask import (
 )
 from werkzeug.utils import secure_filename # Secures uploaded filenames
 import os  # Operating system operations
-from dbhelper import db, User, Announcement # Custom database models
+from dbhelper import db, User, Announcement, ComputerStatus # Custom database models
 from datetime import timedelta, datetime  # Date and time operations
 from models.sit_in_session import SitInSession  # Sit-in session model
 from models.feedback import Feedback  # Feedback model
@@ -303,36 +303,44 @@ def admin_dashboard():
     total_students = User.query.count()
     active_sitins = SitInSession.query.filter_by(status='active').count()
 
-    # Get today's sit-ins
+    # Get today's sit-ins (including active and completed today)
     today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = today_start + timedelta(days=1)
-    today_sitins = SitInSession.query.filter(
+    today_sitins_count = SitInSession.query.filter(
         SitInSession.start_time >= today_start,
-        SitInSession.start_time < today_end
+        SitInSession.start_time < today_end,
+        or_(SitInSession.status == 'active', SitInSession.status == 'completed')
     ).count()
 
-    # Get recent activities
+    # Get pending reservations count
+    pending_reservations_count = SitInSession.query.filter_by(status='pending').count()
+
+    # Get recent activities (limit 3, including pending, approved, active, completed, disapproved)
     recent_activities = []
-    activities = SitInSession.get_recent_activities(limit=3)
-    
+    activities = SitInSession.query.join(User)\
+                                   .order_by(desc(SitInSession.start_time))\
+                                   .limit(5)\
+                                   .all() # Fetch more to show variety
+
     for activity in activities:
-        user = User.query.get(activity.user_id)
+        user = activity.user # Access user directly via relationship
         recent_activities.append({
             'student_name': f"{user.firstname.capitalize()} {user.lastname.capitalize()}",
-            'start_time': activity.start_time.strftime('%I:%M %p') if activity.start_time else '-',
-            'end_time': activity.end_time.strftime('%I:%M %p') if activity.end_time else '-',
-            'session_count': user.student_session,
+            'start_time': activity.start_time.strftime('%b %d, %I:%M %p') if activity.start_time else '-',
+            'end_time': activity.end_time.strftime('%I:%M %p') if activity.end_time else '-', # Shows processed time for pending
+            'session_count': user.student_session, # Current remaining sessions
             'status': activity.status
         })
 
     return render_template(
         "admin/dashboard.html",
         dashboard_stats={
-            'total': total_announcements,
-            'active': active_announcements,
-            'students': total_students,
-            'activeSitins': active_sitins,
-            'todaySitins': today_sitins
+            'total_announcements': total_announcements,
+            'active_announcements': active_announcements,
+            'total_students': total_students,
+            'active_sitins': active_sitins,
+            'today_sitins': today_sitins_count,
+            'pending_reservations': pending_reservations_count # Pass pending count
         },
         recent_activities=recent_activities
     )
@@ -1628,62 +1636,115 @@ def reservation():
         lab = request.form.get("lab")
         time_in = request.form.get("time_in")
         date = request.form.get("date")
-        # Validate required fields
-        if not all([purpose, lab, time_in, date]):
+        pc_id = request.form.get("pc_id")
+
+        # --- Validation ---
+        if not all([purpose, lab, time_in, date, pc_id]):
             flash("All fields are required.", "error")
             return render_template("reservation.html", user=user)
-        # Check if user has remaining sessions
+
+        try:
+            # Combine date and time, check if it's in the past
+            requested_datetime_str = f"{date} {time_in}"
+            requested_datetime = datetime.strptime(requested_datetime_str, "%Y-%m-%d %H:%M")
+            # Allow reservations for the current time or future
+            if requested_datetime < datetime.now() - timedelta(minutes=1): # Allow a small buffer
+                 flash("Cannot reserve a time in the past.", "error")
+                 return render_template("reservation.html", user=user, form_data=request.form)
+        except ValueError:
+             flash("Invalid date or time format.", "error")
+             return render_template("reservation.html", user=user, form_data=request.form)
+
+
         if user.student_session <= 0:
             flash("No remaining sit-in sessions.", "error")
-            return render_template("reservation.html", user=user)
-        # Check if user already has an active session
-        if SitInSession.user_has_active_session(user.id):
-            flash("You already have an active sit-in session.", "error")
-            return render_template("reservation.html", user=user)
-        # Create new sit-in session (status: pending)
-        start_datetime = datetime.strptime(f"{date} {time_in}", "%Y-%m-%d %H:%M")
+            return render_template("reservation.html", user=user, form_data=request.form)
+
+        # Check if user already has an active or pending session
+        existing_session = SitInSession.query.filter(
+            SitInSession.user_id == user.id,
+            or_(SitInSession.status == 'active', SitInSession.status == 'pending')
+        ).first()
+        if existing_session:
+            flash(f"You already have an {existing_session.status} sit-in session or reservation.", "error")
+            return render_template("reservation.html", user=user, form_data=request.form)
+
+        # --- Create Reservation ---
         new_session = SitInSession(
             user_id=user.id,
             purpose=purpose,
             lab=lab,
-            start_time=start_datetime,
-            status="pending"
+            start_time=requested_datetime, # Store the requested start time
+            status="pending" # Initial status is pending approval
         )
         db.session.add(new_session)
         db.session.commit()
-        flash("Reservation submitted successfully! Please wait for approval.", "success")
+        flash("Reservation submitted successfully! Please wait for admin approval.", "success")
         return redirect(url_for('dashboard'))
+
+    # GET request
     return render_template("reservation.html", user=user)
 
 @app.route("/admin/computer-control")
 def admin_computer_control():
     if 'admin' not in session:
         return redirect(url_for('admin_login'))
-    # Fetch distinct labs for the filter
-    # Assuming labs might be stored elsewhere or derived from sessions
-    # For now, let's get them from existing sessions or define a static list
-    distinct_labs = db.session.query(SitInSession.lab).distinct().filter(SitInSession.lab != None).order_by(SitInSession.lab).all()
-    labs = [lab[0] for lab in distinct_labs]
-    # If no labs found in sessions, provide a default list
-    if not labs:
-        labs = ["Lab 1", "Lab 2", "Lab 3", "Lab 4"] # Default labs
 
-    return render_template("admin/computer_control.html", labs=labs)
+    # Fetch computer statuses grouped by lab
+    labs_data = ComputerStatus.get_computers_by_lab()
+    lab_names = sorted(labs_data.keys()) # Get sorted list of lab names for the filter
+
+    return render_template("admin/computer_control.html", labs_data=labs_data, lab_names=lab_names)
+
+@app.route("/admin/update-computer-status", methods=["POST"])
+def admin_update_computer_status():
+    if 'admin' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'message': 'Invalid request data'}), 400
+
+    computer_ids = data.get('computer_ids')
+    new_status = data.get('status')
+
+    if not computer_ids or not new_status:
+        return jsonify({'success': False, 'message': 'Missing computer IDs or status'}), 400
+
+    valid_statuses = ['available', 'used', 'maintenance']
+    if new_status not in valid_statuses:
+        return jsonify({'success': False, 'message': 'Invalid status provided'}), 400
+
+    try:
+        # Convert IDs to integers
+        computer_ids_int = [int(id) for id in computer_ids]
+        updated_count = ComputerStatus.update_status_bulk(computer_ids_int, new_status)
+        return jsonify({
+            'success': True,
+            'message': f'{updated_count} computer(s) updated to {new_status}.'
+        })
+    except ValueError as ve:
+         # Handle case where IDs are not integers
+         return jsonify({'success': False, 'message': f'Invalid computer ID format: {ve}'}), 400
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating computer status: {e}") # Log the error server-side
+        return jsonify({'success': False, 'message': f'An error occurred: {str(e)}'}), 500
 
 @app.route("/admin/reservation")
 def admin_reservation():
     if 'admin' not in session:
         return redirect(url_for('admin_login'))
 
-    # Fetch pending reservations
-    pending_reservations = SitInSession.query.filter_by(status='pending')\
-                                             .join(User)\
+    # Fetch pending reservations with user data eagerly loaded
+    pending_reservations = SitInSession.query.options(db.joinedload(SitInSession.user))\
+                                             .filter(SitInSession.status == 'pending')\
                                              .order_by(SitInSession.start_time.asc())\
                                              .all()
 
-    # Fetch processed reservations (approved or disapproved)
-    processed_reservations = SitInSession.query.filter(or_(SitInSession.status == 'approved', SitInSession.status == 'disapproved'))\
-                                               .join(User)\
+    # Fetch processed reservations (approved or disapproved) with user data
+    processed_reservations = SitInSession.query.options(db.joinedload(SitInSession.user))\
+                                               .filter(or_(SitInSession.status == 'approved', SitInSession.status == 'disapproved'))\
                                                .order_by(SitInSession.end_time.desc())\
                                                .limit(50)\
                                                .all() # Limit logs for performance
@@ -1699,37 +1760,49 @@ def admin_approve_reservation(session_id):
         return redirect(url_for('admin_login'))
 
     reservation = SitInSession.query.get(session_id)
-    if reservation and reservation.status == 'pending':
-        user = User.query.get(reservation.user_id)
-        # Check if user has sessions left before approving
-        if user and user.student_session > 0:
-            # Check if user already has an active session (approved or active)
-            active_session = SitInSession.query.filter(
-                SitInSession.user_id == user.id,
-                or_(SitInSession.status == 'active', SitInSession.status == 'approved')
-            ).first()
-
-            if active_session and active_session.id != reservation.id:
-                 flash(f"Student {user.firstname.capitalize()} {user.lastname.capitalize()} already has an active or approved session.", "error")
-                 return redirect(url_for('admin_reservation'))
-
-            reservation.status = 'approved' # Mark as approved, admin needs to manually start it via Sit-in form
-            reservation.end_time = datetime.now() # Use end_time to mark processing time
-            # Do NOT deduct session here. Session is deducted when admin starts the sit-in via the form.
-            db.session.commit()
-            flash(f"Reservation for {user.firstname.capitalize()} {user.lastname.capitalize()} approved. Please start the session manually.", "success")
-        elif user and user.student_session <= 0:
-             flash(f"Cannot approve: Student {user.firstname.capitalize()} {user.lastname.capitalize()} has no remaining sessions.", "error")
-             # Optionally disapprove it automatically
-             reservation.status = 'disapproved'
-             reservation.end_time = datetime.now()
-             db.session.commit()
-        else:
-            flash("Reservation or User not found.", "error")
-    elif reservation:
-        flash("Reservation is not pending.", "error")
-    else:
+    if not reservation:
         flash("Reservation not found.", "error")
+        return redirect(url_for('admin_reservation'))
+
+    if reservation.status != 'pending':
+        flash("Reservation is not pending.", "error")
+        return redirect(url_for('admin_reservation'))
+
+    user = User.query.get(reservation.user_id)
+    if not user:
+        flash("Associated user not found.", "error")
+        # Clean up orphan reservation?
+        reservation.status = 'disapproved' # Mark as disapproved if user is gone
+        reservation.end_time = datetime.now()
+        db.session.commit()
+        return redirect(url_for('admin_reservation'))
+
+    # Check if user has sessions left before approving
+    if user.student_session <= 0:
+        flash(f"Cannot approve: Student {user.firstname.capitalize()} {user.lastname.capitalize()} has no remaining sessions.", "error")
+        reservation.status = 'disapproved'
+        reservation.end_time = datetime.now()
+        db.session.commit()
+        return redirect(url_for('admin_reservation'))
+
+    # Check if user already has another active/approved session
+    # Exclude the current reservation being approved
+    existing_active_session = SitInSession.query.filter(
+        SitInSession.user_id == user.id,
+        SitInSession.id != reservation.id, # Exclude self
+        or_(SitInSession.status == 'active', SitInSession.status == 'approved')
+    ).first()
+
+    if existing_active_session:
+        flash(f"Student {user.firstname.capitalize()} {user.lastname.capitalize()} already has another active or approved session.", "error")
+        return redirect(url_for('admin_reservation'))
+
+    # --- Approve the reservation ---
+    reservation.status = 'approved' # Status indicates admin approved it
+    reservation.end_time = datetime.now() # Use end_time to mark processing time
+    # Session count is deducted ONLY when the admin manually starts the session via the Sit-in Form
+    db.session.commit()
+    flash(f"Reservation for {user.firstname.capitalize()} {user.lastname.capitalize()} approved. Admin must start the session manually via the Sit-in form.", "success")
 
     return redirect(url_for('admin_reservation'))
 
@@ -1741,19 +1814,31 @@ def admin_disapprove_reservation(session_id):
         return redirect(url_for('admin_login'))
 
     reservation = SitInSession.query.get(session_id)
-    if reservation and reservation.status == 'pending':
-        reservation.status = 'disapproved'
-        reservation.end_time = datetime.now() # Use end_time to mark processing time
-        db.session.commit()
-        user = User.query.get(reservation.user_id)
-        flash(f"Reservation for {user.firstname.capitalize()} {user.lastname.capitalize()} disapproved.", "success")
-    elif reservation:
-        flash("Reservation is not pending.", "error")
-    else:
+    if not reservation:
         flash("Reservation not found.", "error")
+        return redirect(url_for('admin_reservation'))
+
+    if reservation.status != 'pending':
+        flash("Reservation is not pending.", "error")
+        return redirect(url_for('admin_reservation'))
+
+    # --- Disapprove the reservation ---
+    reservation.status = 'disapproved'
+    reservation.end_time = datetime.now() # Use end_time to mark processing time
+    db.session.commit()
+
+    user = User.query.get(reservation.user_id)
+    user_name = f"{user.firstname.capitalize()} {user.lastname.capitalize()}" if user else "Unknown User"
+    flash(f"Reservation for {user_name} disapproved.", "success")
 
     return redirect(url_for('admin_reservation'))
 
+@app.route("/api/available-pcs/<lab_name>")
+def api_available_pcs(lab_name):
+    # Return available PCs for the given lab as JSON
+    pcs = ComputerStatus.query.filter_by(lab_name=lab_name, status='available').order_by(ComputerStatus.pc_number).all()
+    pc_list = [{"id": pc.id, "pc_number": pc.pc_number} for pc in pcs]
+    return jsonify({"pcs": pc_list})
 
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)

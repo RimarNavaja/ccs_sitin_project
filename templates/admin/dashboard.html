@@ -33,7 +33,7 @@
         <div>
           <p class="text-sm font-switzer text-gray-500">Total Students</p>
           <p class="text-2xl font-bold font-khand text-gray-700">
-            {{dashboard_stats.students}}
+            {{dashboard_stats.total_students}}
           </p>
         </div>
       </div>
@@ -61,7 +61,7 @@
         <div>
           <p class="text-sm font-switzer text-gray-500">Active Sit-ins</p>
           <p class="text-2xl font-bold font-khand text-gray-700">
-            {{dashboard_stats.activeSitins}}
+            {{dashboard_stats.active_sitins}}
           </p>
         </div>
       </div>
@@ -89,7 +89,7 @@
         <div>
           <p class="text-sm font-switzer text-gray-500">Today's Sit-ins</p>
           <p class="text-2xl font-bold font-khand text-gray-700">
-            {{dashboard_stats.todaySitins}}
+            {{dashboard_stats.today_sitins}}
           </p>
         </div>
       </div>
@@ -110,13 +110,15 @@
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
             ></path>
           </svg>
         </div>
         <div>
           <p class="text-sm font-switzer text-gray-500">Pending Reservations</p>
-          <p class="text-2xl font-bold font-khand text-gray-700">8</p>
+          <p class="text-2xl font-bold font-khand text-gray-700">
+            {{ dashboard_stats.pending_reservations }}
+          </p>
         </div>
       </div>
     </div>
@@ -143,7 +145,7 @@
         <div>
           <p class="text-sm font-switzer text-gray-500">Active Announcements</p>
           <p class="text-2xl font-bold font-khand text-gray-700">
-            {{ dashboard_stats.active }}
+            {{ dashboard_stats.active_announcements }}
           </p>
         </div>
       </div>
@@ -219,9 +221,9 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if activity.status == 'active' %} bg-yellow-100 text-yellow-800 {% else %} bg-green-100 text-green-800 {% endif %}"
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize {% if activity.status == 'active' %} bg-blue-100 text-blue-800 {% elif activity.status == 'completed' %} bg-green-100 text-green-800 {% elif activity.status == 'pending' %} bg-yellow-100 text-yellow-800 {% elif activity.status == 'approved' %} bg-teal-100 text-teal-800 {% elif activity.status == 'disapproved' %} bg-red-100 text-red-800 {% else %} bg-gray-100 text-gray-800 {% endif %}"
                   >
-                    {{ activity.status|capitalize }}
+                    {{ activity.status }}
                   </span>
                 </td>
               </tr>
@@ -262,9 +264,9 @@
           </a>
           <a
             href="{{ url_for('admin_reservation') }}"
-            class="block w-full py-3 px-4 bg-yellow-400 text-gray-900 font-switzer text-center rounded-md hover:bg-yellow-300 transition duration-200"
+            class="block w-full py-3 px-4 bg-orange-400 text-white font-switzer text-center rounded-md hover:bg-orange-500 transition duration-200"
           >
-            Reservations
+            Manage Reservations
           </a>
           <a
             href="{{ url_for('admin_announcements') }}"

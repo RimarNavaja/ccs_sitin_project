@@ -4,7 +4,7 @@ setTimeout(function () {
   if (flashMessages) {
     flashMessages.style.display = "none";
   }
-}, 3000);
+}, 5000);
 
 //toggle dropdown desktop - renamed to toggleProfileDropdown
 function toggleProfileDropdown() {

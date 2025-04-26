@@ -1,17 +1,17 @@
 {% extends "admin/admin_layout.html" %} {% block content %}
-<h1
-  class="text-3xl sm:text-4xl font-bold font-khand tracking-wide text-gray-900 mb-2"
->
+<h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900 mb-4">
   Computer Control
 </h1>
-<p class="text-sm sm:text-lg font-switzer text-gray-600 mb-3">
-  Manage PCs' in different labs
+<p class="text-lg font-switzer text-gray-600 mb-3">
+  Manage PCs in different labs.
 </p>
 
-<!-- Lab Filter (Placeholder - Needs dynamic data) -->
+<!-- Lab Filter -->
 <div class="mb-4 bg-white rounded-lg shadow-md p-6">
   <div class="max-w-sm">
-    <label for="lab-filter" class="block text-sm font-medium text-gray-700"
+    <label
+      for="lab-filter"
+      class="block text-sm font-medium text-gray-700 font-switzer"
       >Filter by Lab:</label
     >
     <select
@@ -20,8 +20,8 @@
       class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md font-switzer"
     >
       <option value="all">All Labs</option>
-      {% for lab in labs %}
-      <option value="{{ lab }}">{{ lab }}</option>
+      {% for lab_name in lab_names %}
+      <option value="{{ lab_name }}">{{ lab_name }}</option>
       {% endfor %}
     </select>
   </div>
@@ -29,105 +29,187 @@
 
 <!-- Lab Cards Container -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-  {% for lab in labs %}
+  {% for lab_name, computers in labs_data.items() %}
   <div
     class="bg-white shadow-lg rounded-lg overflow-hidden lab-card"
-    data-lab="{{ lab }}"
+    data-lab="{{ lab_name }}"
   >
     <div
-      class="flex items-center justify-between bg-violet-700 text-white px-4 py-2 font-khand text-lg"
+      class="bg-violet-700 text-white px-4 py-2 font-khand text-lg flex justify-between items-center"
     >
-      {{ lab }}
-
-      <!-- Toggle Mark All Button -->
-      <div class="flex items-center">
-        <button
-          type="button"
-          class="inline-flex items-center px-3 py-1 cursor-pointer border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-switzer"
-          onclick="toggleMarkAll(this, '{{ lab }}')"
-          data-checked="false"
-        >
-          Mark All
-        </button>
-      </div>
+      <span>{{ lab_name }}</span>
+      <label class="flex items-center text-xs font-switzer cursor-pointer">
+        <input
+          type="checkbox"
+          class="h-4 w-4 text-indigo-300 border-gray-400 rounded focus:ring-indigo-400 mr-1 select-all-lab"
+          data-lab="{{ lab_name }}"
+        />
+        Select All
+      </label>
     </div>
-
     <div class="p-4">
-      <form>
-        <h3 class="font-switzer font-bold mb-4 text-center text-xl">
-          Computers
-        </h3>
-        <div class="grid grid-cols-7 gap-4">
-          <!-- 7 columns for 50 PCs, numbered down each column -->
-          {% for col in range(1, 8) %}
-          <div class="flex flex-col space-y-2">
-            {% for row in range(0, 8) %} {% set pc_num = col + row * 7 %} {% if
-            pc_num <= 50 %}
-            <div class="flex items-center">
-              <input
-                id="{{ lab }}-pc-{{ pc_num }}"
-                name="{{ lab }}-pc-{{ pc_num }}"
-                type="checkbox"
-                class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 pc-checkbox-{{ lab }}"
-              />
-              <label
-                for="{{ lab }}-pc-{{ pc_num }}"
-                class="ml-2 block text-sm text-gray-900 font-switzer"
+      <form class="computer-status-form" data-lab="{{ lab_name }}">
+        <div class="grid grid-cols-5 gap-4">
+          <!-- 5 columns for 50 PCs -->
+          {% for comp in computers %}
+          <div class="flex items-center">
+            <input
+              id="pc-{{ comp.id }}"
+              name="computer_ids"
+              value="{{ comp.id }}"
+              type="checkbox"
+              class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 pc-checkbox"
+              data-lab="{{ lab_name }}"
+            />
+            <label
+              for="pc-{{ comp.id }}"
+              class="ml-2 block text-sm text-gray-900 font-switzer"
+            >
+              PC {{ comp.pc_number }}
+              <span
+                class="block text-xs {% if comp.status == 'available' %}text-green-600 {% elif comp.status == 'used' %}text-red-600 {% elif comp.status == 'maintenance' %}text-yellow-600 {% else %}text-gray-500{% endif %}"
               >
-                {{ pc_num }}
-              </label>
-            </div>
-            {% endif %} {% endfor %}
+                ({{ comp.status }})
+              </span>
+            </label>
           </div>
           {% endfor %}
         </div>
         <div class="mt-6 flex justify-end space-x-3">
           <button
             type="button"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-switzer"
+            data-status="available"
+            class="update-status-btn inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-switzer"
           >
             Mark Available
           </button>
           <button
             type="button"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 font-switzer"
+            data-status="used"
+            class="update-status-btn inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 font-switzer"
           >
             Mark Used
+          </button>
+          <button
+            type="button"
+            data-status="maintenance"
+            class="update-status-btn inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 font-switzer"
+          >
+            Mark Maintenance
           </button>
         </div>
       </form>
     </div>
   </div>
   {% else %}
-  <p class="text-gray-500 italic">No labs found.</p>
+  <p class="text-gray-500 italic md:col-span-2">
+    No computer status data found. Please ensure the 'computer_status' table is
+    populated.
+  </p>
   {% endfor %}
 </div>
 
 <script>
-  // Simple client-side filtering for labs
-  document.getElementById("lab-filter").addEventListener("change", function () {
-    const selectedLab = this.value;
-    const labCards = document.querySelectorAll(".lab-card");
-    labCards.forEach((card) => {
-      if (
-        selectedLab === "all" ||
-        card.getAttribute("data-lab") === selectedLab
-      ) {
-        card.style.display = "";
-      } else {
-        card.style.display = "none";
-      }
+  document.addEventListener("DOMContentLoaded", function () {
+    // Lab Filter Logic
+    const labFilter = document.getElementById("lab-filter");
+    if (labFilter) {
+      labFilter.addEventListener("change", function () {
+        const selectedLab = this.value;
+        const labCards = document.querySelectorAll(".lab-card");
+        labCards.forEach((card) => {
+          if (
+            selectedLab === "all" ||
+            card.getAttribute("data-lab") === selectedLab
+          ) {
+            card.style.display = "";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      });
+    }
+
+    // Select All Checkbox Logic
+    const selectAllCheckboxes = document.querySelectorAll(".select-all-lab");
+    selectAllCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", function () {
+        const targetLab = this.getAttribute("data-lab");
+        const pcCheckboxes = document.querySelectorAll(
+          `.pc-checkbox[data-lab="${targetLab}"]`
+        );
+        pcCheckboxes.forEach((pcCheckbox) => {
+          pcCheckbox.checked = this.checked;
+        });
+      });
+    });
+
+    // Update Status Button Logic
+    const updateButtons = document.querySelectorAll(".update-status-btn");
+    updateButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        const newStatus = this.getAttribute("data-status");
+        const form = this.closest(".computer-status-form");
+        const labName = form.getAttribute("data-lab");
+        const selectedCheckboxes = form.querySelectorAll(
+          'input[name="computer_ids"]:checked'
+        );
+
+        const computerIds = Array.from(selectedCheckboxes).map(
+          (cb) => cb.value
+        );
+
+        if (computerIds.length === 0) {
+          alert("Please select at least one computer to update.");
+          return;
+        }
+
+        // Confirmation dialog
+        const pcNumbers = Array.from(selectedCheckboxes)
+          .map((cb) =>
+            cb
+              .closest("div")
+              .querySelector("label")
+              .innerText.split("\n")[0]
+              .trim()
+          )
+          .join(", ");
+        if (
+          !confirm(
+            `Are you sure you want to mark ${pcNumbers} in ${labName} as '${newStatus}'?`
+          )
+        ) {
+          return; // Stop if user cancels
+        }
+
+        fetch("/admin/update-computer-status", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Add CSRF token header if needed
+          },
+          body: JSON.stringify({
+            computer_ids: computerIds,
+            status: newStatus,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert(data.message);
+              // Optionally reload the page or update the UI dynamically
+              window.location.reload();
+            } else {
+              alert("Error: " + data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred while updating computer status.");
+          });
+      });
     });
   });
-
-  function toggleMarkAll(btn, lab) {
-    const labKey = lab.replace(/[^a-zA-Z0-9_-]/g, "");
-    const checkboxes = document.querySelectorAll(".pc-checkbox-" + labKey);
-    const checked = btn.getAttribute("data-checked") === "true";
-    checkboxes.forEach((cb) => (cb.checked = !checked));
-    btn.setAttribute("data-checked", (!checked).toString());
-    btn.textContent = !checked ? "Unmark All" : "Mark All";
-  }
 </script>
 
 {% endblock %}

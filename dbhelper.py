@@ -125,3 +125,60 @@ class Announcement(db.Model):
             'is_active': self.is_active,
             'priority': self.priority
         }
+
+class ComputerStatus(db.Model):
+    __tablename__ = 'computer_status'
+    id = db.Column(db.Integer, primary_key=True)
+    lab_name = db.Column(db.String(50), nullable=False)
+    pc_number = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='available') # 'available', 'used', 'maintenance'
+    current_session_id = db.Column(db.Integer, db.ForeignKey('sit_in_sessions.id', ondelete='SET NULL'), nullable=True)
+    last_updated = db.Column(db.TIMESTAMP, server_default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    # Define the relationship (optional but good practice)
+    current_session = db.relationship('SitInSession', backref='computer_used', foreign_keys=[current_session_id])
+
+    __table_args__ = (db.UniqueConstraint('lab_name', 'pc_number', name='unique_lab_pc'),)
+
+    def __repr__(self):
+        return f'<ComputerStatus Lab: {self.lab_name} PC: {self.pc_number} Status: {self.status}>'
+
+    @staticmethod
+    def get_computers_by_lab():
+        """Fetches all computers grouped by lab."""
+        computers = ComputerStatus.query.order_by(ComputerStatus.lab_name, ComputerStatus.pc_number).all()
+        labs_data = {}
+        for comp in computers:
+            if comp.lab_name not in labs_data:
+                labs_data[comp.lab_name] = []
+            labs_data[comp.lab_name].append(comp)
+        return labs_data
+
+    @staticmethod
+    def update_status_bulk(computer_ids, new_status):
+        """Updates the status for a list of computer IDs."""
+        if not computer_ids:
+            return 0
+        # Validate status
+        valid_statuses = ['available', 'used', 'maintenance']
+        if new_status not in valid_statuses:
+            raise ValueError("Invalid status provided.")
+
+        # Update logic
+        query = ComputerStatus.query.filter(ComputerStatus.id.in_(computer_ids))
+
+        # When marking as 'available', clear the session ID
+        if new_status == 'available':
+            updated_count = query.update({
+                ComputerStatus.status: new_status,
+                ComputerStatus.current_session_id: None
+            }, synchronize_session=False)
+        else:
+            # For 'used' or 'maintenance', just update status.
+            # Linking to session_id should happen when a session starts.
+            updated_count = query.update({
+                ComputerStatus.status: new_status
+            }, synchronize_session=False)
+
+        db.session.commit()
+        return updated_count
