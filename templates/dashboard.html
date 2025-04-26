@@ -31,11 +31,12 @@
             <div class="flex items-center">
               <!-- CCS logo -->
               <div class="shrink-0">
-                <img
-                  class="size-8"
-                  src="./static/src/images/logos/CCS_LOGO.png"
-                  alt="College of Computer Studies"
-                />
+                <a href="{{ url_for('dashboard') }}"
+                  ><img
+                    class="size-8 cursor-pointer"
+                    src="./static/src/images/logos/CCS_LOGO.png"
+                    alt="College of Computer Studies"
+                /></a>
               </div>
               <div class="hidden md:block">
                 <div class="ml-10 flex items-baseline space-x-4">
@@ -57,7 +58,7 @@
                     >Sit-in History</a
                   >
                   <a
-                    href="#"
+                    href="{{ url_for('reservation') }}"
                     class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-violet-700 hover:text-white"
                     >Reservation</a
                   >
@@ -238,7 +239,7 @@
               >Sit-in History</a
             >
             <a
-              href="#"
+              href="{{ url_for('reservation') }}"
               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
               >Reservation</a
             >
@@ -386,7 +387,7 @@
                 <div>
                   <label
                     class="block text-md font-switzer font-semibold text-gray-900 tracking-wide"
-                    >Points Earned</label
+                    >Points Earned:</label
                   >
                   <p class="flex items-center mt-1 text-sm font-switzer">
                     <span
@@ -401,7 +402,7 @@
                 <div>
                   <label
                     class="block text-md font-switzer font-semibold text-gray-900 tracking-wide"
-                    >Sit-in Status</label
+                    >Sit-in Status:</label
                   >
                   <button
                     class="mt-1 text-sm font-switzer capitalize rounded-full py-1 px-2 {% if sitinsession.status == Null %} {{colorinactive}} {% else %} {{coloractive}} {% endif %} "

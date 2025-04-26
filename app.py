@@ -1617,6 +1617,44 @@ def admin_leaderboard():
 
     return render_template("admin/leaderboard.html", leaderboard=formatted_leaderboard)
 
+# Student module - reservation
+@app.route("/reservation", methods=["GET", "POST"])
+def reservation():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    user = User.query.filter_by(username=session['user']).first()
+    if request.method == "POST":
+        purpose = request.form.get("purpose")
+        lab = request.form.get("lab")
+        time_in = request.form.get("time_in")
+        date = request.form.get("date")
+        # Validate required fields
+        if not all([purpose, lab, time_in, date]):
+            flash("All fields are required.", "error")
+            return render_template("reservation.html", user=user)
+        # Check if user has remaining sessions
+        if user.student_session <= 0:
+            flash("No remaining sit-in sessions.", "error")
+            return render_template("reservation.html", user=user)
+        # Check if user already has an active session
+        if SitInSession.user_has_active_session(user.id):
+            flash("You already have an active sit-in session.", "error")
+            return render_template("reservation.html", user=user)
+        # Create new sit-in session (status: pending)
+        start_datetime = datetime.strptime(f"{date} {time_in}", "%Y-%m-%d %H:%M")
+        new_session = SitInSession(
+            user_id=user.id,
+            purpose=purpose,
+            lab=lab,
+            start_time=start_datetime,
+            status="pending"
+        )
+        db.session.add(new_session)
+        db.session.commit()
+        flash("Reservation submitted successfully! Please wait for approval.", "success")
+        return redirect(url_for('dashboard'))
+    return render_template("reservation.html", user=user)
+
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)
     app.run(debug=True)

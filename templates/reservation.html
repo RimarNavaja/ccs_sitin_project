@@ -1,0 +1,204 @@
+{% extends 'dashboard.html' %} {% block content %}
+
+<div class="mx-auto max-w-2xl px-4 py-8">
+  <h2
+    class="text-center text-4xl font-bold font-khand tracking-wide text-gray-900 mb-4"
+  >
+    Reserve a Sit-in Session
+  </h2>
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %}
+  <ul class="mb-4">
+    {% for category, message in messages %}
+    <li
+      class="px-4 py-2 rounded text-center {% if category == 'success' %}bg-green-100 text-green-700{% else %}bg-yellow-100 text-yellow-700{% endif %}"
+    >
+      {{ message }}
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %} {% endwith %}
+  <form method="POST" class="bg-white rounded-lg shadow-lg p-6 space-y-4">
+    <div>
+      <label class="block text-sm font-switzer font-semibold text-gray-700"
+        >ID Number</label
+      >
+      <input
+        type="text"
+        name="idno"
+        value="{{ user.idno }}"
+        readonly
+        class="mt-1 py-1.5 pl-2 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm font-switzer"
+      />
+    </div>
+    <div>
+      <label class="block text-sm font-switzer font-semibold text-gray-700"
+        >Student Name</label
+      >
+      <input
+        type="text"
+        name="student_name"
+        value="{{ user.firstname.capitalize() }} {{ user.midname.capitalize() }} {{ user.lastname.capitalize() }}"
+        readonly
+        class="mt-1 py-1.5 pl-2 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm font-switzer"
+      />
+    </div>
+    <div>
+      <label class="block text-sm font-switzer font-semibold text-gray-700"
+        >Purpose</label
+      >
+      <select
+        name="purpose"
+        required
+        class="mt-1 py-1.5 pl-2 block w-full rounded-md border-gray-300 shadow-sm font-switzer"
+      >
+        <option
+          value=""
+          disabled
+          selected
+          class="text-violet-700 font-switzer font-semibold"
+        >
+          Select purpose
+        </option>
+        <option value="C#">C#</option>
+        <option value="C programming">C programming</option>
+        <option value="Java programming">Java programming</option>
+        <option value="ASP.Net">ASP.Net</option>
+        <option value="Php">Php</option>
+        <option value="Python">Python</option>
+        <option value="Database">Database</option>
+        <option value="Digital Login & Desgin">Digital Login & Desgin</option>
+        <option value="Embedded Systems & IOT">Embedded Systems & IOT</option>
+        <option value="System Integration & Architecture">
+          System Integration & Architecture
+        </option>
+        <option value="Computer Application">Computer Application</option>
+        <option value="Project Management">Project Management</option>
+        <option value="IT Trends">IT Trends</option>
+        <option value="Technopreneurship">Technopreneurship</option>
+        <option value="Capstone">Capstone</option>
+        <option value="Others">Others</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-switzer font-semibold text-gray-700"
+        >Labs</label
+      >
+      <div class="flex flex-wrap gap-2 mt-1">
+        <button
+          type="button"
+          class="lab-btn cursor-pointer bg-violet-100 hover:bg-violet-300 text-violet-800 font-switzer font-semibold px-4 py-2 rounded"
+          data-lab="524"
+        >
+          524
+        </button>
+        <button
+          type="button"
+          class="lab-btn cursor-pointer bg-violet-100 hover:bg-violet-300 text-violet-800 font-switzer font-semibold px-4 py-2 rounded"
+          data-lab="526"
+        >
+          526
+        </button>
+        <button
+          type="button"
+          class="lab-btn cursor-pointer bg-violet-100 hover:bg-violet-300 text-violet-800 font-switzer font-semibold px-4 py-2 rounded"
+          data-lab="528"
+        >
+          528
+        </button>
+        <button
+          type="button"
+          class="lab-btn cursor-pointer bg-violet-100 hover:bg-violet-300 text-violet-800 font-switzer font-semibold px-4 py-2 rounded"
+          data-lab="530"
+        >
+          530
+        </button>
+        <button
+          type="button"
+          class="lab-btn cursor-pointer bg-violet-100 hover:bg-violet-300 text-violet-800 font-switzer font-semibold px-4 py-2 rounded"
+          data-lab="542"
+        >
+          542
+        </button>
+        <button
+          type="button"
+          class="lab-btn cursor-pointer bg-violet-100 hover:bg-violet-300 text-violet-800 font-switzer font-semibold px-4 py-2 rounded"
+          data-lab="544"
+        >
+          544
+        </button>
+        <button
+          type="button"
+          class="lab-btn cursor-pointer bg-violet-100 hover:bg-violet-300 text-violet-800 font-switzer font-semibold px-4 py-2 rounded"
+          data-lab="517"
+        >
+          517
+        </button>
+      </div>
+      <input type="hidden" name="lab" id="selectedLab" required />
+      <div id="available-pcs" class="mt-3"></div>
+      <script>
+        document.querySelectorAll(".lab-btn").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            document.getElementById("selectedLab").value = this.dataset.lab;
+            document
+              .querySelectorAll(".lab-btn")
+              .forEach((b) =>
+                b.classList.remove("bg-violet-400", "text-yellow-300")
+              );
+            this.classList.add("bg-violet-400", "text-yellow-300");
+            // TODO: Fetch and display available PCs for the selected lab
+            document.getElementById("available-pcs").innerHTML =
+              "Available PCs for Lab " +
+              this.dataset.lab +
+              " will appear here.";
+          });
+        });
+      </script>
+    </div>
+    <div>
+      <label class="block text-sm font-switzer font-semibold text-gray-700"
+        >Time-In</label
+      >
+      <input
+        type="time"
+        name="time_in"
+        required
+        class="mt-1 block py-1.5 pl-2 w-full rounded-md border-gray-300 shadow-sm font-switzer"
+      />
+    </div>
+    <div>
+      <label class="block text-sm font-switzer font-semibold text-gray-700"
+        >Date</label
+      >
+      <input
+        type="date"
+        name="date"
+        required
+        class="mt-1 block w-full py-1.5 pl-2 rounded-md border-gray-300 shadow-sm font-switzer"
+      />
+    </div>
+    <div>
+      <label class="block text-sm font-switzer font-semibold text-gray-700"
+        >Remaining Session</label
+      >
+      <input
+        type="text"
+        name="remaining_session"
+        value="{{ user.student_session }}"
+        readonly
+        class="mt-1 block w-full py-1.5 pl-2 rounded-md border-gray-300 bg-gray-100 shadow-sm font-switzer"
+      />
+    </div>
+    <div class="flex justify-center">
+      <button
+        type="submit"
+        class="bg-violet-800 cursor-pointer hover:bg-violet-900 text-white active:text-yellow-300 font-switzer px-6 py-2 rounded-lg shadow transition"
+      >
+        Reserve
+      </button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}
