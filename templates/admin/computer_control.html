@@ -1,24 +1,30 @@
 {% extends "admin/admin_layout.html" %} {% block content %}
-<h1 class="text-2xl font-khand text-violet-800 mb-4">Computer Control</h1>
+<h1
+  class="text-3xl sm:text-4xl font-bold font-khand tracking-wide text-gray-900 mb-2"
+>
+  Computer Control
+</h1>
+<p class="text-sm sm:text-lg font-switzer text-gray-600 mb-3">
+  Manage PCs' in different labs
+</p>
 
 <!-- Lab Filter (Placeholder - Needs dynamic data) -->
-<div class="mb-4">
-  <label
-    for="lab-filter"
-    class="block text-sm font-medium text-gray-700 font-switzer"
-    >Filter by Lab:</label
-  >
-  <select
-    id="lab-filter"
-    name="lab-filter"
-    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md font-switzer"
-  >
-    <option value="all">All Labs</option>
-    {% for lab in labs %}
-    <option value="{{ lab }}">{{ lab }}</option>
-    {% endfor %}
-    <!-- Add more labs as needed -->
-  </select>
+<div class="mb-4 bg-white rounded-lg shadow-md p-6">
+  <div class="max-w-sm">
+    <label for="lab-filter" class="block text-sm font-medium text-gray-700"
+      >Filter by Lab:</label
+    >
+    <select
+      id="lab-filter"
+      name="lab-filter"
+      class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md font-switzer"
+    >
+      <option value="all">All Labs</option>
+      {% for lab in labs %}
+      <option value="{{ lab }}">{{ lab }}</option>
+      {% endfor %}
+    </select>
+  </div>
 </div>
 
 <!-- Lab Cards Container -->
@@ -28,28 +34,50 @@
     class="bg-white shadow-lg rounded-lg overflow-hidden lab-card"
     data-lab="{{ lab }}"
   >
-    <div class="bg-violet-700 text-white px-4 py-2 font-khand text-lg">
+    <div
+      class="flex items-center justify-between bg-violet-700 text-white px-4 py-2 font-khand text-lg"
+    >
       {{ lab }}
+
+      <!-- Toggle Mark All Button -->
+      <div class="flex items-center">
+        <button
+          type="button"
+          class="inline-flex items-center px-3 py-1 cursor-pointer border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-switzer"
+          onclick="toggleMarkAll(this, '{{ lab }}')"
+          data-checked="false"
+        >
+          Mark All
+        </button>
+      </div>
     </div>
+
     <div class="p-4">
       <form>
-        <!-- Add form tags if needed for button actions -->
-        <div class="grid grid-cols-5 gap-4">
-          <!-- 5 columns for 50 PCs -->
-          {% for i in range(1, 51) %}
-          <div class="flex items-center">
-            <input
-              id="{{ lab }}-pc-{{ i }}"
-              name="{{ lab }}-pc-{{ i }}"
-              type="checkbox"
-              class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-            />
-            <label
-              for="{{ lab }}-pc-{{ i }}"
-              class="ml-2 block text-sm text-gray-900 font-switzer"
-            >
-              PC {{ i }}
-            </label>
+        <h3 class="font-switzer font-bold mb-4 text-center text-xl">
+          Computers
+        </h3>
+        <div class="grid grid-cols-7 gap-4">
+          <!-- 7 columns for 50 PCs, numbered down each column -->
+          {% for col in range(1, 8) %}
+          <div class="flex flex-col space-y-2">
+            {% for row in range(0, 8) %} {% set pc_num = col + row * 7 %} {% if
+            pc_num <= 50 %}
+            <div class="flex items-center">
+              <input
+                id="{{ lab }}-pc-{{ pc_num }}"
+                name="{{ lab }}-pc-{{ pc_num }}"
+                type="checkbox"
+                class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 pc-checkbox-{{ lab }}"
+              />
+              <label
+                for="{{ lab }}-pc-{{ pc_num }}"
+                class="ml-2 block text-sm text-gray-900 font-switzer"
+              >
+                {{ pc_num }}
+              </label>
+            </div>
+            {% endif %} {% endfor %}
           </div>
           {% endfor %}
         </div>
@@ -91,6 +119,15 @@
       }
     });
   });
+
+  function toggleMarkAll(btn, lab) {
+    const labKey = lab.replace(/[^a-zA-Z0-9_-]/g, "");
+    const checkboxes = document.querySelectorAll(".pc-checkbox-" + labKey);
+    const checked = btn.getAttribute("data-checked") === "true";
+    checkboxes.forEach((cb) => (cb.checked = !checked));
+    btn.setAttribute("data-checked", (!checked).toString());
+    btn.textContent = !checked ? "Unmark All" : "Mark All";
+  }
 </script>
 
 {% endblock %}
