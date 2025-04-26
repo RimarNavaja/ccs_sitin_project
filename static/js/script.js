@@ -61,22 +61,6 @@ function toggleDropdown(contentId) {
 
 // Admin dashboard specific functions
 
-// Function to open reservation modal
-function openReservationModal() {
-  const modal = document.getElementById("reservationModal");
-  if (modal) {
-    modal.classList.remove("hidden");
-  }
-}
-
-// Function to close reservation modal
-function closeReservationModal() {
-  const modal = document.getElementById("reservationModal");
-  if (modal) {
-    modal.classList.add("hidden");
-  }
-}
-
 // Announcement management functions
 function openAnnouncementModal() {
   const modal = document.getElementById("announcementModal");
