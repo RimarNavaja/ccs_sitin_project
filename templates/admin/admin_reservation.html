@@ -1,0 +1,110 @@
+{% extends "admin/admin_layout.html" %} {% block content %}
+<h1 class="text-2xl font-khand text-violet-800 mb-6">Reservation Management</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <!-- Pending Reservations Column -->
+  <div>
+    <h2 class="text-xl font-khand text-yellow-600 mb-4 border-b pb-2">
+      Pending Reservations
+    </h2>
+    <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+      {% if pending_reservations %} {% for res in pending_reservations %}
+      <div class="bg-white shadow-md rounded-lg p-4 border border-gray-200">
+        <p class="font-switzer text-sm">
+          <span class="font-semibold">Student:</span> {{
+          res.user.firstname.capitalize() }} {{ res.user.lastname.capitalize()
+          }} ({{ res.user.idno }})
+        </p>
+        <p class="font-switzer text-sm">
+          <span class="font-semibold">Purpose:</span> {{ res.purpose }}
+        </p>
+        <p class="font-switzer text-sm">
+          <span class="font-semibold">Lab:</span> {{ res.lab }}
+        </p>
+        <p class="font-switzer text-sm">
+          <span class="font-semibold">Requested Time:</span> {{
+          res.start_time.strftime('%b %d, %Y at %I:%M %p') if res.start_time
+          else 'N/A' }}
+        </p>
+        <div class="mt-3 flex justify-end space-x-2">
+          <form
+            action="{{ url_for('admin_approve_reservation', session_id=res.id) }}"
+            method="POST"
+            class="inline"
+          >
+            <button
+              type="submit"
+              class="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded hover:bg-green-600 transition duration-150"
+            >
+              Approve
+            </button>
+          </form>
+          <form
+            action="{{ url_for('admin_disapprove_reservation', session_id=res.id) }}"
+            method="POST"
+            class="inline"
+          >
+            <button
+              type="submit"
+              class="px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded hover:bg-red-600 transition duration-150"
+            >
+              Disapprove
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endfor %} {% else %}
+      <p class="text-gray-500 italic font-switzer">No pending reservations.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Reservation Logs Column -->
+  <div>
+    <h2 class="text-xl font-khand text-gray-700 mb-4 border-b pb-2">
+      Reservation Logs
+    </h2>
+    <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+      {% if processed_reservations %} {% for res in processed_reservations %}
+      <div class="bg-white shadow-sm rounded-lg p-4 border border-gray-100">
+        <p class="font-switzer text-sm">
+          <span class="font-semibold">Student:</span> {{
+          res.user.firstname.capitalize() }} {{ res.user.lastname.capitalize()
+          }} ({{ res.user.idno }})
+        </p>
+        <p class="font-switzer text-sm">
+          <span class="font-semibold">Purpose:</span> {{ res.purpose }}
+        </p>
+        <p class="font-switzer text-sm">
+          <span class="font-semibold">Lab:</span> {{ res.lab }}
+        </p>
+        <p class="font-switzer text-sm">
+          <span class="font-semibold">Requested Time:</span> {{
+          res.start_time.strftime('%b %d, %Y at %I:%M %p') if res.start_time
+          else 'N/A' }}
+        </p>
+        <p class="font-switzer text-sm capitalize">
+          <span class="font-semibold">Status:</span>
+          <span
+            class="{% if res.status == 'approved' %}text-green-600{% elif res.status == 'disapproved' %}text-red-600{% else %}text-gray-600{% endif %} font-medium"
+          >
+            {{ res.status }}
+          </span>
+        </p>
+        {% if res.end_time %}
+        <!-- Assuming end_time is set when approved/disapproved -->
+        <p class="font-switzer text-xs text-gray-500 mt-1">
+          <span class="font-semibold">Processed:</span> {{
+          res.end_time.strftime('%b %d, %Y at %I:%M %p') }}
+        </p>
+        {% endif %}
+      </div>
+      {% endfor %} {% else %}
+      <p class="text-gray-500 italic font-switzer">
+        No reservation logs found.
+      </p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

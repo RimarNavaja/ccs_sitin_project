@@ -16,7 +16,7 @@ from dbhelper import db, User, Announcement # Custom database models
 from datetime import timedelta, datetime  # Date and time operations
 from models.sit_in_session import SitInSession  # Sit-in session model
 from models.feedback import Feedback  # Feedback model
-from sqlalchemy import text, or_, func, desc # Added or_ for searching, func and desc for leaderboard query
+from sqlalchemy import text, or_, func, desc, not_ # Added or_ for searching, func and desc for leaderboard query
 import csv # Added for CSV export
 from io import StringIO # Added for CSV export
 from reportlab.lib.enums import TA_CENTER, TA_LEFT # Import TA_CENTER for alignment
@@ -1654,6 +1654,106 @@ def reservation():
         flash("Reservation submitted successfully! Please wait for approval.", "success")
         return redirect(url_for('dashboard'))
     return render_template("reservation.html", user=user)
+
+@app.route("/admin/computer-control")
+def admin_computer_control():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+    # Fetch distinct labs for the filter
+    # Assuming labs might be stored elsewhere or derived from sessions
+    # For now, let's get them from existing sessions or define a static list
+    distinct_labs = db.session.query(SitInSession.lab).distinct().filter(SitInSession.lab != None).order_by(SitInSession.lab).all()
+    labs = [lab[0] for lab in distinct_labs]
+    # If no labs found in sessions, provide a default list
+    if not labs:
+        labs = ["Lab 1", "Lab 2", "Lab 3", "Lab 4"] # Default labs
+
+    return render_template("admin/computer_control.html", labs=labs)
+
+@app.route("/admin/reservation")
+def admin_reservation():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+
+    # Fetch pending reservations
+    pending_reservations = SitInSession.query.filter_by(status='pending')\
+                                             .join(User)\
+                                             .order_by(SitInSession.start_time.asc())\
+                                             .all()
+
+    # Fetch processed reservations (approved or disapproved)
+    processed_reservations = SitInSession.query.filter(or_(SitInSession.status == 'approved', SitInSession.status == 'disapproved'))\
+                                               .join(User)\
+                                               .order_by(SitInSession.end_time.desc())\
+                                               .limit(50)\
+                                               .all() # Limit logs for performance
+
+    return render_template("admin/admin_reservation.html",
+                           pending_reservations=pending_reservations,
+                           processed_reservations=processed_reservations)
+
+@app.route("/admin/reservation/approve/<int:session_id>", methods=["POST"])
+def admin_approve_reservation(session_id):
+    if 'admin' not in session:
+        flash("Unauthorized access.", "error")
+        return redirect(url_for('admin_login'))
+
+    reservation = SitInSession.query.get(session_id)
+    if reservation and reservation.status == 'pending':
+        user = User.query.get(reservation.user_id)
+        # Check if user has sessions left before approving
+        if user and user.student_session > 0:
+            # Check if user already has an active session (approved or active)
+            active_session = SitInSession.query.filter(
+                SitInSession.user_id == user.id,
+                or_(SitInSession.status == 'active', SitInSession.status == 'approved')
+            ).first()
+
+            if active_session and active_session.id != reservation.id:
+                 flash(f"Student {user.firstname.capitalize()} {user.lastname.capitalize()} already has an active or approved session.", "error")
+                 return redirect(url_for('admin_reservation'))
+
+            reservation.status = 'approved' # Mark as approved, admin needs to manually start it via Sit-in form
+            reservation.end_time = datetime.now() # Use end_time to mark processing time
+            # Do NOT deduct session here. Session is deducted when admin starts the sit-in via the form.
+            db.session.commit()
+            flash(f"Reservation for {user.firstname.capitalize()} {user.lastname.capitalize()} approved. Please start the session manually.", "success")
+        elif user and user.student_session <= 0:
+             flash(f"Cannot approve: Student {user.firstname.capitalize()} {user.lastname.capitalize()} has no remaining sessions.", "error")
+             # Optionally disapprove it automatically
+             reservation.status = 'disapproved'
+             reservation.end_time = datetime.now()
+             db.session.commit()
+        else:
+            flash("Reservation or User not found.", "error")
+    elif reservation:
+        flash("Reservation is not pending.", "error")
+    else:
+        flash("Reservation not found.", "error")
+
+    return redirect(url_for('admin_reservation'))
+
+
+@app.route("/admin/reservation/disapprove/<int:session_id>", methods=["POST"])
+def admin_disapprove_reservation(session_id):
+    if 'admin' not in session:
+        flash("Unauthorized access.", "error")
+        return redirect(url_for('admin_login'))
+
+    reservation = SitInSession.query.get(session_id)
+    if reservation and reservation.status == 'pending':
+        reservation.status = 'disapproved'
+        reservation.end_time = datetime.now() # Use end_time to mark processing time
+        db.session.commit()
+        user = User.query.get(reservation.user_id)
+        flash(f"Reservation for {user.firstname.capitalize()} {user.lastname.capitalize()} disapproved.", "success")
+    elif reservation:
+        flash("Reservation is not pending.", "error")
+    else:
+        flash("Reservation not found.", "error")
+
+    return redirect(url_for('admin_reservation'))
+
 
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)

@@ -1,0 +1,96 @@
+{% extends "admin/admin_layout.html" %} {% block content %}
+<h1 class="text-2xl font-khand text-violet-800 mb-4">Computer Control</h1>
+
+<!-- Lab Filter (Placeholder - Needs dynamic data) -->
+<div class="mb-4">
+  <label
+    for="lab-filter"
+    class="block text-sm font-medium text-gray-700 font-switzer"
+    >Filter by Lab:</label
+  >
+  <select
+    id="lab-filter"
+    name="lab-filter"
+    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md font-switzer"
+  >
+    <option value="all">All Labs</option>
+    {% for lab in labs %}
+    <option value="{{ lab }}">{{ lab }}</option>
+    {% endfor %}
+    <!-- Add more labs as needed -->
+  </select>
+</div>
+
+<!-- Lab Cards Container -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  {% for lab in labs %}
+  <div
+    class="bg-white shadow-lg rounded-lg overflow-hidden lab-card"
+    data-lab="{{ lab }}"
+  >
+    <div class="bg-violet-700 text-white px-4 py-2 font-khand text-lg">
+      {{ lab }}
+    </div>
+    <div class="p-4">
+      <form>
+        <!-- Add form tags if needed for button actions -->
+        <div class="grid grid-cols-5 gap-4">
+          <!-- 5 columns for 50 PCs -->
+          {% for i in range(1, 51) %}
+          <div class="flex items-center">
+            <input
+              id="{{ lab }}-pc-{{ i }}"
+              name="{{ lab }}-pc-{{ i }}"
+              type="checkbox"
+              class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <label
+              for="{{ lab }}-pc-{{ i }}"
+              class="ml-2 block text-sm text-gray-900 font-switzer"
+            >
+              PC {{ i }}
+            </label>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="mt-6 flex justify-end space-x-3">
+          <button
+            type="button"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-switzer"
+          >
+            Mark Available
+          </button>
+          <button
+            type="button"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 font-switzer"
+          >
+            Mark Used
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-gray-500 italic">No labs found.</p>
+  {% endfor %}
+</div>
+
+<script>
+  // Simple client-side filtering for labs
+  document.getElementById("lab-filter").addEventListener("change", function () {
+    const selectedLab = this.value;
+    const labCards = document.querySelectorAll(".lab-card");
+    labCards.forEach((card) => {
+      if (
+        selectedLab === "all" ||
+        card.getAttribute("data-lab") === selectedLab
+      ) {
+        card.style.display = "";
+      } else {
+        card.style.display = "none";
+      }
+    });
+  });
+</script>
+
+{% endblock %}
