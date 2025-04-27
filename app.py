@@ -1766,7 +1766,7 @@ def admin_approve_reservation(session_id):
 
     if reservation.status != 'pending':
         flash("Reservation is not pending.", "error")
-        return redirect(url_for('admin_reservation'))
+        return redirect(url_for('admin_reservation'))   
 
     user = User.query.get(reservation.user_id)
     if not user:
