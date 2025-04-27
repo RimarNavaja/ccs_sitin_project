@@ -139,3 +139,6 @@ VALUES
 ('544', 41), ('544', 42), ('544', 43), ('544', 44), ('544', 45), ('544', 46), ('544', 47), ('544', 48), ('544', 49), ('544', 50);
 
 SELECT * FROM computer_status
+
+
+ALTER TABLE sit_in_sessions ADD COLUMN notified BOOLEAN DEFAULT FALSE;

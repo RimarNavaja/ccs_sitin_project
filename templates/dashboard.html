@@ -67,30 +67,62 @@
             </div>
             <div class="hidden md:block">
               <div class="ml-4 flex items-center md:ml-6">
-                <!-- Notification -->
-                <!-- <button
-                type="button"
-                class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden"
-              >
-                <span class="absolute -inset-1.5"></span>
-                <span class="sr-only">View notifications</span>
-                <svg
-                  class="size-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-                  />
-                </svg>
-              </button> -->
-
+                <!-- Notification bell -->
+                <div class="relative">
+                  <button
+                    id="notif-bell-btn"
+                    class="relative focus:outline-none"
+                    onclick="toggleNotifDropdown()"
+                  >
+                    <svg
+                      class="w-7 h-7 text-gray-700"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                      />
+                    </svg>
+                    <span
+                      id="notif-badge"
+                      style="display: none"
+                      class="absolute -top-1 -right-1"
+                    >
+                      <span class="relative flex size-2.5">
+                        <span
+                          class="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-600 opacity-75"
+                        ></span>
+                        <span
+                          class="relative inline-flex size-2.5 rounded-full bg-violet-700"
+                        ></span>
+                      </span>
+                    </span>
+                  </button>
+                  <!-- Dropdown -->
+                  <div
+                    id="notif-dropdown"
+                    class="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+                  >
+                    <div class="p-3 shadow-sm font-switzer font-bold text-lg">
+                      Reservation Notifications
+                    </div>
+                    <div id="notif-list" class="max-h-64 overflow-y-auto">
+                      <div class="p-3 text-gray-500 text-sm">
+                        No new notifications.
+                      </div>
+                    </div>
+                    <button
+                      onclick="markNotifRead()"
+                      class="block cursor-pointer w-full text-center py-2 font-switzer text-xs text-blue-600 hover:bg-gray-100"
+                    >
+                      Mark all as read
+                    </button>
+                  </div>
+                </div>
                 <!-- Profile dropdown -->
                 <div class="relative ml-3">
                   <div>
@@ -141,22 +173,6 @@
                       </button>
                     </form>
 
-                    <!-- <a
-                    href="#"
-                    class="block px-4 py-2 text-sm font-switzer text-gray-700"
-                    role="menuitem"
-                    tabindex="-1"
-                    id="user-menu-item-1"
-                    >Settings</a
-                  > -->
-                    <!-- <a
-                    href="#"
-                    class="block px-4 py-2 text-sm font-switzer text-gray-700"
-                    role="menuitem"
-                    tabindex="-1"
-                    id="user-menu-item-2"
-                    >Sign out</a -->
-                    <!-- Logout/sign out -->
                     <form method="POST" action="{{ url_for('logout') }}">
                       <button
                         class="cursor-pointer block px-4 py-2 text-sm font-switzer hover:text-yellow-300 text-gray-700 duration-300 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
@@ -246,6 +262,64 @@
           </div>
           <div class="border-t border-gray-700 pt-4 pb-3">
             <div class="flex items-center px-5">
+              <!-- Notification bell for mobile -->
+              <div class="relative mr-4">
+                <button
+                  id="notif-bell-btn-mobile"
+                  class="relative focus:outline-none"
+                  onclick="toggleNotifDropdownMobile()"
+                >
+                  <svg
+                    class="w-7 h-7 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                    />
+                  </svg>
+                  <span
+                    id="notif-badge-mobile"
+                    style="display: none"
+                    class="absolute -top-1 -right-1"
+                  >
+                    <span class="relative flex size-2.5">
+                      <span
+                        class="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400 opacity-75"
+                      ></span>
+                      <span
+                        class="relative inline-flex size-2.5 rounded-full bg-violet-500"
+                      ></span>
+                    </span>
+                  </span>
+                </button>
+                <!-- Dropdown for mobile -->
+                <div
+                  id="notif-dropdown-mobile"
+                  class="hidden absolute left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+                  style="min-width: 260px"
+                >
+                  <div class="p-3 shadow-sm font-switzer font-bold text-lg">
+                    Reservation Notifications
+                  </div>
+                  <div id="notif-list-mobile" class="max-h-64 overflow-y-auto">
+                    <div class="p-3 text-gray-500 text-sm">
+                      No new notifications.
+                    </div>
+                  </div>
+                  <button
+                    onclick="markNotifReadMobile()"
+                    class="block cursor-pointer w-full text-center py-2 font-switzer text-xs text-blue-600 hover:bg-gray-100"
+                  >
+                    Mark all as read
+                  </button>
+                </div>
+              </div>
+              <!-- ...existing profile photo and info... -->
               <div class="shrink-0">
                 <img
                   class="size-10 rounded-full"
@@ -510,5 +584,120 @@
     </footer>
     <!-- Load script at the end of the body -->
     <script src="/static/js/script.js"></script>
+    <script>
+      function fetchReservationNotif() {
+        fetch("/api/reservation-notifications")
+          .then((res) => res.json())
+          .then((data) => {
+            // Desktop
+            const badge = document.getElementById("notif-badge");
+            const list = document.getElementById("notif-list");
+            // Mobile
+            const badgeMobile = document.getElementById("notif-badge-mobile");
+            const listMobile = document.getElementById("notif-list-mobile");
+            if (data.count > 0) {
+              if (badge) badge.style.display = "";
+              if (badgeMobile) badgeMobile.style.display = "";
+              let html = "";
+              data.notifications.forEach((n) => {
+                html += `<div class="p-3 font-switzer border-b last:border-b-0">
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold ${
+                      n.status === "approved"
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }">${
+                  n.status === "approved" ? "Approved" : "Disapproved"
+                }</span>
+                    <span class="text-xs text-gray-400">${n.date} ${
+                  n.time
+                }</span>
+                  </div>
+                  <div class="text-xs text-gray-700">Lab: <b>${
+                    n.lab
+                  }</b> | Purpose: <b>${n.purpose}</b></div>
+                </div>`;
+              });
+              if (list) list.innerHTML = html;
+              if (listMobile) listMobile.innerHTML = html;
+            } else {
+              if (badge) badge.style.display = "none";
+              if (badgeMobile) badgeMobile.style.display = "none";
+              if (list)
+                list.innerHTML =
+                  '<div class="p-3 text-gray-500 text-sm">No new notifications.</div>';
+              if (listMobile)
+                listMobile.innerHTML =
+                  '<div class="p-3 text-gray-500 text-sm">No new notifications.</div>';
+            }
+          });
+      }
+
+      function toggleNotifDropdown() {
+        const dd = document.getElementById("notif-dropdown");
+        dd.classList.toggle("hidden");
+        if (!dd.classList.contains("hidden")) {
+          fetchReservationNotif();
+        }
+      }
+      function toggleNotifDropdownMobile() {
+        const dd = document.getElementById("notif-dropdown-mobile");
+        dd.classList.toggle("hidden");
+        if (!dd.classList.contains("hidden")) {
+          fetchReservationNotif();
+        }
+      }
+
+      function markNotifRead() {
+        fetch("/api/mark-reservation-notif-read", { method: "POST" }).then(
+          () => {
+            fetchReservationNotif();
+            const badge = document.getElementById("notif-badge");
+            if (badge) badge.style.display = "none";
+          }
+        );
+      }
+      function markNotifReadMobile() {
+        fetch("/api/mark-reservation-notif-read", { method: "POST" }).then(
+          () => {
+            fetchReservationNotif();
+            const badgeMobile = document.getElementById("notif-badge-mobile");
+            if (badgeMobile) badgeMobile.style.display = "none";
+          }
+        );
+      }
+
+      // Improved click-away logic for notification dropdowns
+      document.addEventListener("click", function (e) {
+        // Desktop
+        const notifBtn = document.getElementById("notif-bell-btn");
+        const notifDropdown = document.getElementById("notif-dropdown");
+        if (notifBtn && notifDropdown) {
+          if (notifBtn.contains(e.target)) return;
+          if (
+            !notifDropdown.classList.contains("hidden") &&
+            !notifDropdown.contains(e.target)
+          ) {
+            notifDropdown.classList.add("hidden");
+          }
+        }
+        // Mobile
+        const notifBtnMobile = document.getElementById("notif-bell-btn-mobile");
+        const notifDropdownMobile = document.getElementById(
+          "notif-dropdown-mobile"
+        );
+        if (notifBtnMobile && notifDropdownMobile) {
+          if (notifBtnMobile.contains(e.target)) return;
+          if (
+            !notifDropdownMobile.classList.contains("hidden") &&
+            !notifDropdownMobile.contains(e.target)
+          ) {
+            notifDropdownMobile.classList.add("hidden");
+          }
+        }
+      });
+
+      window.addEventListener("DOMContentLoaded", fetchReservationNotif);
+    </script>
   </body>
 </html>

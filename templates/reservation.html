@@ -127,7 +127,7 @@
         </button>
       </div>
       <input type="hidden" name="lab" id="selectedLab" required />
-      <div id="available-pcs" class="mt-5"></div>
+      <div id="available-pcs" class="mt-5 p-4"></div>
       <input type="hidden" name="pc_id" id="selectedPcId" required />
       <script>
         document.querySelectorAll(".lab-btn").forEach((btn) => {
@@ -152,12 +152,12 @@
                   document.getElementById("selectedPcId").value = "";
                   return;
                 }
-                let html = "<div class='flex flex-wrap gap-2 justify-between'>";
+                let html = "<div class='flex flex-wrap gap-4 '>";
                 data.pcs.forEach((pc) => {
                   html += `<button type="button" class="pc-btn cursor-pointer w-15 h-9 bg-green-100 hover:bg-green-300 text-green-800 font-switzer font-semibold  px-2 py-1 rounded" data-pc-id="${pc.id}">PC ${pc.pc_number}</button>`;
                 });
                 html +=
-                  "</div><div class='mt-2 text-sm  font-switzer font-bold'>Click your desired PC number.</div>";
+                  "</div><div class='mt-2 text-sm text-violet-700 font-switzer font-bold'>Click your desired PC number.</div>";
                 pcsDiv.innerHTML = html;
                 // Add click event for PC buttons
                 document.querySelectorAll(".pc-btn").forEach((pcBtn) => {

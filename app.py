@@ -8,7 +8,8 @@ from flask import (
     session, # Handles user sessions  
     jsonify,# Converts data to JSON response
     Response, # Added for CSV export
-    send_file # Sends files to client
+    send_file, # Sends files to client
+    g
 )
 from werkzeug.utils import secure_filename # Secures uploaded filenames
 import os  # Operating system operations
@@ -201,7 +202,13 @@ def dashboard():
     announcements = Announcement.get_active_announcements()
     coloractive = "bg-green-200 text-green-700"
     colorinactive = "bg-gray-300"
-    return render_template("dashboard.html", user=user, announcements=announcements, sitinsession=sitinsession, coloractive=coloractive, colorinactive=colorinactive)
+    # Notification: count unseen approved/disapproved reservations
+    notif_count = SitInSession.query.filter(
+        SitInSession.user_id == user.id,
+        SitInSession.status.in_(["approved", "disapproved"]),
+        SitInSession.notified == False
+    ).count()
+    return render_template("dashboard.html", user=user, announcements=announcements, sitinsession=sitinsession, coloractive=coloractive, colorinactive=colorinactive, notif_count=notif_count)
 
 @app.route("/lab_rules")
 def lab_rules():
@@ -1800,6 +1807,7 @@ def admin_approve_reservation(session_id):
     # --- Approve the reservation ---
     reservation.status = 'approved' # Status indicates admin approved it
     reservation.end_time = datetime.now() # Use end_time to mark processing time
+    reservation.notified = False  # <--- Add this line
     # Session count is deducted ONLY when the admin manually starts the session via the Sit-in Form
     db.session.commit()
     flash(f"Reservation for {user.firstname.capitalize()} {user.lastname.capitalize()} approved. Admin must start the session manually via the Sit-in form.", "success")
@@ -1825,6 +1833,7 @@ def admin_disapprove_reservation(session_id):
     # --- Disapprove the reservation ---
     reservation.status = 'disapproved'
     reservation.end_time = datetime.now() # Use end_time to mark processing time
+    reservation.notified = False  # <--- Add this line
     db.session.commit()
 
     user = User.query.get(reservation.user_id)
@@ -1839,6 +1848,43 @@ def api_available_pcs(lab_name):
     pcs = ComputerStatus.query.filter_by(lab_name=lab_name, status='available').order_by(ComputerStatus.pc_number).all()
     pc_list = [{"id": pc.id, "pc_number": pc.pc_number} for pc in pcs]
     return jsonify({"pcs": pc_list})
+
+@app.route("/api/reservation-notifications")
+def api_reservation_notifications():
+    if 'user' not in session:
+        return jsonify({"count": 0, "notifications": []})
+    user = User.query.filter_by(username=session['user']).first()
+    notifs = SitInSession.query.filter(
+        SitInSession.user_id == user.id,
+        SitInSession.status.in_(["approved", "disapproved"]),
+        SitInSession.notified == False
+    ).order_by(SitInSession.end_time.desc()).all()
+    notif_list = [
+        {
+            "id": s.id,
+            "status": s.status,
+            "lab": s.lab,
+            "purpose": s.purpose,
+            "date": s.start_time.strftime("%b %d, %Y") if s.start_time else "",
+            "time": s.start_time.strftime("%I:%M %p") if s.start_time else ""
+        }
+        for s in notifs
+    ]
+    return jsonify({"count": len(notif_list), "notifications": notif_list})
+
+@app.route("/api/mark-reservation-notif-read", methods=["POST"])
+def api_mark_reservation_notif_read():
+    if 'user' not in session:
+        return jsonify({"success": False})
+    user = User.query.filter_by(username=session['user']).first()
+    # Mark all as notified
+    SitInSession.query.filter(
+        SitInSession.user_id == user.id,
+        SitInSession.status.in_(["approved", "disapproved"]),
+        SitInSession.notified == False
+    ).update({"notified": True})
+    db.session.commit()
+    return jsonify({"success": True})
 
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)

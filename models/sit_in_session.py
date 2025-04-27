@@ -12,12 +12,13 @@ class SitInSession(db.Model):
     start_time = db.Column(db.DateTime, default=datetime.now)
     end_time = db.Column(db.DateTime)
     status = db.Column(db.String(20), default='active')
+    notified = db.Column(db.Boolean, default=False)  # For notification badge
     
     # Define relationship with User model
     user = db.relationship('User', backref=db.backref('sit_in_sessions', lazy=True))
     
     # Update the __init__ method of SitInSession to accept start_time and status as keyword arguments
-    def __init__(self, user_id, purpose, lab=None, notes=None, start_time=None, status=None):
+    def __init__(self, user_id, purpose, lab=None, notes=None, start_time=None, status=None, notified=False):
         self.user_id = user_id
         self.purpose = purpose
         self.lab = lab
@@ -26,6 +27,7 @@ class SitInSession(db.Model):
             self.start_time = start_time
         if status is not None:
             self.status = status
+        self.notified = notified
     
     def end_session(self):
         """End the current sit-in session"""
