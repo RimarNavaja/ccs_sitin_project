@@ -138,3 +138,149 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+//Notification
+function fetchReservationNotif() {
+  fetch("/api/reservation-notifications")
+    .then((res) => res.json())
+    .then((data) => {
+      // Desktop
+      const badge = document.getElementById("notif-badge");
+      const list = document.getElementById("notif-list");
+      // Mobile
+      const badgeMobile = document.getElementById("notif-badge-mobile");
+      const listMobile = document.getElementById("notif-list-mobile");
+      if (data.count > 0) {
+        if (badge) badge.style.display = "";
+        if (badgeMobile) badgeMobile.style.display = "";
+        let html = "";
+        data.notifications.forEach((n) => {
+          html += `<div class="p-3 font-switzer border-b last:border-b-0">
+            <div class="flex items-center gap-2">
+              <span class="font-bold ${
+                n.status === "approved" ? "text-green-600" : "text-red-600"
+              }">${n.status === "approved" ? "Approved" : "Disapproved"}</span>
+              <span class="text-xs text-gray-400">${n.date} ${n.time}</span>
+            </div>
+            <div class="text-xs text-gray-700">Lab: <b>${
+              n.lab
+            }</b> | Purpose: <b>${n.purpose}</b></div>
+          </div>`;
+        });
+        if (list) list.innerHTML = html;
+        if (listMobile) listMobile.innerHTML = html;
+      } else {
+        if (badge) badge.style.display = "none";
+        if (badgeMobile) badgeMobile.style.display = "none";
+        if (list)
+          list.innerHTML =
+            '<div class="p-3 text-gray-500 text-sm">No new notifications.</div>';
+        if (listMobile)
+          listMobile.innerHTML =
+            '<div class="p-3 text-gray-500 text-sm">No new notifications.</div>';
+      }
+    });
+}
+
+function toggleNotifDropdown() {
+  const dd = document.getElementById("notif-dropdown");
+  dd.classList.toggle("hidden");
+  if (!dd.classList.contains("hidden")) {
+    fetchReservationNotif();
+  }
+}
+function toggleNotifDropdownMobile() {
+  const dd = document.getElementById("notif-dropdown-mobile");
+  dd.classList.toggle("hidden");
+  if (!dd.classList.contains("hidden")) {
+    fetchReservationNotif();
+  }
+}
+
+function markNotifRead() {
+  fetch("/api/mark-reservation-notif-read", { method: "POST" }).then(() => {
+    fetchReservationNotif();
+    const badge = document.getElementById("notif-badge");
+    if (badge) badge.style.display = "none";
+  });
+}
+function markNotifReadMobile() {
+  fetch("/api/mark-reservation-notif-read", { method: "POST" }).then(() => {
+    fetchReservationNotif();
+    const badgeMobile = document.getElementById("notif-badge-mobile");
+    if (badgeMobile) badgeMobile.style.display = "none";
+  });
+}
+
+// Improved click-away logic for notification dropdowns
+document.addEventListener("click", function (e) {
+  // Desktop
+  const notifBtn = document.getElementById("notif-bell-btn");
+  const notifDropdown = document.getElementById("notif-dropdown");
+  if (notifBtn && notifDropdown) {
+    if (notifBtn.contains(e.target)) return;
+    if (
+      !notifDropdown.classList.contains("hidden") &&
+      !notifDropdown.contains(e.target)
+    ) {
+      notifDropdown.classList.add("hidden");
+    }
+  }
+  // Mobile
+  const notifBtnMobile = document.getElementById("notif-bell-btn-mobile");
+  const notifDropdownMobile = document.getElementById("notif-dropdown-mobile");
+  if (notifBtnMobile && notifDropdownMobile) {
+    if (notifBtnMobile.contains(e.target)) return;
+    if (
+      !notifDropdownMobile.classList.contains("hidden") &&
+      !notifDropdownMobile.contains(e.target)
+    ) {
+      notifDropdownMobile.classList.add("hidden");
+    }
+  }
+});
+
+window.addEventListener("DOMContentLoaded", fetchReservationNotif);
+
+// --- All Notifications Modal Logic ---
+function openAllNotifModal() {
+  const modal = document.getElementById("allNotifModal");
+  const list = document.getElementById("all-notif-list");
+  modal.classList.remove("hidden");
+  list.innerHTML = '<div class="text-gray-500 text-center">Loading...</div>';
+  fetch("/api/all-reservation-notifications")
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.count > 0) {
+        let html = "";
+        data.notifications.forEach((n) => {
+          html += `<div class="p-3 border-b last:border-b-0 font-switzer">
+            <div class="flex items-center gap-2">
+              <span class="font-bold ${
+                n.status === "approved"
+                  ? "text-green-600"
+                  : n.status === "disapproved"
+                  ? "text-red-600"
+                  : "text-gray-600"
+              }">${n.status.charAt(0).toUpperCase() + n.status.slice(1)}</span>
+              <span class="text-xs text-gray-400">${n.date} ${n.time}</span>
+            </div>
+            <div class="text-xs text-gray-700">Lab: <b>${
+              n.lab
+            }</b> | Purpose: <b>${n.purpose}</b></div>
+          </div>`;
+        });
+        list.innerHTML = html;
+      } else {
+        list.innerHTML =
+          '<div class="text-gray-500 text-center">No notifications found.</div>';
+      }
+    })
+    .catch(() => {
+      list.innerHTML =
+        '<div class="text-red-500 text-center">Failed to load notifications.</div>';
+    });
+}
+function closeAllNotifModal() {
+  document.getElementById("allNotifModal").classList.add("hidden");
+}

@@ -1886,6 +1886,27 @@ def api_mark_reservation_notif_read():
     db.session.commit()
     return jsonify({"success": True})
 
+@app.route("/api/all-reservation-notifications")
+def api_all_reservation_notifications():
+    if 'user' not in session:
+        return jsonify({"count": 0, "notifications": []})
+    user = User.query.filter_by(username=session['user']).first()
+    notifs = SitInSession.query.filter(
+        SitInSession.user_id == user.id
+    ).order_by(SitInSession.end_time.desc(), SitInSession.start_time.desc()).all()
+    notif_list = [
+        {
+            "id": s.id,
+            "status": s.status,
+            "lab": s.lab,
+            "purpose": s.purpose,
+            "date": s.start_time.strftime("%b %d, %Y") if s.start_time else "",
+            "time": s.start_time.strftime("%I:%M %p") if s.start_time else ""
+        }
+        for s in notifs
+    ]
+    return jsonify({"count": len(notif_list), "notifications": notif_list})
+
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)
         app.run(debug=True)

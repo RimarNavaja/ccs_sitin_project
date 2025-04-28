@@ -71,7 +71,7 @@
                 <div class="relative">
                   <button
                     id="notif-bell-btn"
-                    class="relative focus:outline-none"
+                    class="relative cursor-pointer focus:outline-none"
                     onclick="toggleNotifDropdown()"
                   >
                     <svg
@@ -120,6 +120,12 @@
                       class="block cursor-pointer w-full text-center py-2 font-switzer text-xs text-blue-600 hover:bg-gray-100"
                     >
                       Mark all as read
+                    </button>
+                    <button
+                      onclick="openAllNotifModal()"
+                      class="block cursor-pointer w-full text-center py-2 font-switzer text-xs text-violet-700 hover:bg-gray-100"
+                    >
+                      All Notifications
                     </button>
                   </div>
                 </div>
@@ -303,7 +309,7 @@
                   class="hidden absolute left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
                   style="min-width: 260px"
                 >
-                  <div class="p-3 shadow-sm font-switzer font-bold text-lg">
+                  <div class="p-3 shadow-sm font-khand text-lg">
                     Reservation Notifications
                   </div>
                   <div id="notif-list-mobile" class="max-h-64 overflow-y-auto">
@@ -316,6 +322,12 @@
                     class="block cursor-pointer w-full text-center py-2 font-switzer text-xs text-blue-600 hover:bg-gray-100"
                   >
                     Mark all as read
+                  </button>
+                  <button
+                    onclick="openAllNotifModal()"
+                    class="block cursor-pointer w-full text-center py-2 font-khand text-xs text-violet-700 hover:bg-gray-100"
+                  >
+                    All Notifications
                   </button>
                 </div>
               </div>
@@ -582,122 +594,31 @@
         </div>
       </div>
     </footer>
+    <!-- All Notifications Modal -->
+    <div
+      id="allNotifModal"
+      class="fixed inset-0 z-50 hidden bg-linear-to-r from-purple-900 to-yellow-300 bg-opacity-100 flex items-center justify-center"
+    >
+      <div
+        class="bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[80vh] overflow-y-auto"
+      >
+        <div class="flex justify-between items-center px-6 py-4 border-b">
+          <h3 class="font-khand text-xl tracking-wider text-violet-800">
+            All Notifications
+          </h3>
+          <button
+            onclick="closeAllNotifModal()"
+            class="text-gray-500 cursor-pointer hover:text-red-600 text-2xl font-bold"
+          >
+            &times;
+          </button>
+        </div>
+        <div id="all-notif-list" class="p-4 space-y-2">
+          <div class="text-gray-500 text-center">Loading...</div>
+        </div>
+      </div>
+    </div>
     <!-- Load script at the end of the body -->
     <script src="/static/js/script.js"></script>
-    <script>
-      function fetchReservationNotif() {
-        fetch("/api/reservation-notifications")
-          .then((res) => res.json())
-          .then((data) => {
-            // Desktop
-            const badge = document.getElementById("notif-badge");
-            const list = document.getElementById("notif-list");
-            // Mobile
-            const badgeMobile = document.getElementById("notif-badge-mobile");
-            const listMobile = document.getElementById("notif-list-mobile");
-            if (data.count > 0) {
-              if (badge) badge.style.display = "";
-              if (badgeMobile) badgeMobile.style.display = "";
-              let html = "";
-              data.notifications.forEach((n) => {
-                html += `<div class="p-3 font-switzer border-b last:border-b-0">
-                  <div class="flex items-center gap-2">
-                    <span class="font-bold ${
-                      n.status === "approved"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }">${
-                  n.status === "approved" ? "Approved" : "Disapproved"
-                }</span>
-                    <span class="text-xs text-gray-400">${n.date} ${
-                  n.time
-                }</span>
-                  </div>
-                  <div class="text-xs text-gray-700">Lab: <b>${
-                    n.lab
-                  }</b> | Purpose: <b>${n.purpose}</b></div>
-                </div>`;
-              });
-              if (list) list.innerHTML = html;
-              if (listMobile) listMobile.innerHTML = html;
-            } else {
-              if (badge) badge.style.display = "none";
-              if (badgeMobile) badgeMobile.style.display = "none";
-              if (list)
-                list.innerHTML =
-                  '<div class="p-3 text-gray-500 text-sm">No new notifications.</div>';
-              if (listMobile)
-                listMobile.innerHTML =
-                  '<div class="p-3 text-gray-500 text-sm">No new notifications.</div>';
-            }
-          });
-      }
-
-      function toggleNotifDropdown() {
-        const dd = document.getElementById("notif-dropdown");
-        dd.classList.toggle("hidden");
-        if (!dd.classList.contains("hidden")) {
-          fetchReservationNotif();
-        }
-      }
-      function toggleNotifDropdownMobile() {
-        const dd = document.getElementById("notif-dropdown-mobile");
-        dd.classList.toggle("hidden");
-        if (!dd.classList.contains("hidden")) {
-          fetchReservationNotif();
-        }
-      }
-
-      function markNotifRead() {
-        fetch("/api/mark-reservation-notif-read", { method: "POST" }).then(
-          () => {
-            fetchReservationNotif();
-            const badge = document.getElementById("notif-badge");
-            if (badge) badge.style.display = "none";
-          }
-        );
-      }
-      function markNotifReadMobile() {
-        fetch("/api/mark-reservation-notif-read", { method: "POST" }).then(
-          () => {
-            fetchReservationNotif();
-            const badgeMobile = document.getElementById("notif-badge-mobile");
-            if (badgeMobile) badgeMobile.style.display = "none";
-          }
-        );
-      }
-
-      // Improved click-away logic for notification dropdowns
-      document.addEventListener("click", function (e) {
-        // Desktop
-        const notifBtn = document.getElementById("notif-bell-btn");
-        const notifDropdown = document.getElementById("notif-dropdown");
-        if (notifBtn && notifDropdown) {
-          if (notifBtn.contains(e.target)) return;
-          if (
-            !notifDropdown.classList.contains("hidden") &&
-            !notifDropdown.contains(e.target)
-          ) {
-            notifDropdown.classList.add("hidden");
-          }
-        }
-        // Mobile
-        const notifBtnMobile = document.getElementById("notif-bell-btn-mobile");
-        const notifDropdownMobile = document.getElementById(
-          "notif-dropdown-mobile"
-        );
-        if (notifBtnMobile && notifDropdownMobile) {
-          if (notifBtnMobile.contains(e.target)) return;
-          if (
-            !notifDropdownMobile.classList.contains("hidden") &&
-            !notifDropdownMobile.contains(e.target)
-          ) {
-            notifDropdownMobile.classList.add("hidden");
-          }
-        }
-      });
-
-      window.addEventListener("DOMContentLoaded", fetchReservationNotif);
-    </script>
   </body>
 </html>
