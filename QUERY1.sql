@@ -90,12 +90,15 @@ CREATE TABLE computer_status (
     id INT AUTO_INCREMENT PRIMARY KEY,
     lab_name VARCHAR(50) NOT NULL,
     pc_number INT NOT NULL,
-    status VARCHAR(20) DEFAULT 'available' NOT NULL, -- 'available', 'used', 'maintenance'
+    status VARCHAR(20) NOT NULL DEFAULT 'available', -- 'available', 'used', 'maintenance'
     current_session_id INT NULL, -- Link to the sit_in_sessions if 'used'
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY unique_lab_pc (lab_name, pc_number),
     FOREIGN KEY (current_session_id) REFERENCES sit_in_sessions(id) ON DELETE SET NULL
 );
+
+-- If the table already exists and you get the error, run this:
+ALTER TABLE computer_status ALTER COLUMN status SET DEFAULT 'available';
 
 DESCRIBE computer_status;
 

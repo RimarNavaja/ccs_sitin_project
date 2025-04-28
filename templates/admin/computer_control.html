@@ -17,7 +17,7 @@
     <select
       id="lab-filter"
       name="lab-filter"
-      class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md font-switzer"
+      class="mt-1 cursor-pointer block w-full pl-3 pr-10 py-2 text-base border-gray-300 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md font-switzer"
     >
       <option value="all">All Labs</option>
       {% for lab_name in lab_names %}
@@ -41,7 +41,7 @@
       <label class="flex items-center text-xs font-switzer cursor-pointer">
         <input
           type="checkbox"
-          class="h-4 w-4 text-indigo-300 border-gray-400 rounded focus:ring-indigo-400 mr-1 select-all-lab"
+          class="h-4 w-4 cursor-pointer text-indigo-300 border-gray-400 rounded focus:ring-indigo-400 mr-1 select-all-lab"
           data-lab="{{ lab_name }}"
         />
         Select All
@@ -79,21 +79,21 @@
           <button
             type="button"
             data-status="available"
-            class="update-status-btn inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-switzer"
+            class="update-status-btn cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-switzer"
           >
             Mark Available
           </button>
           <button
             type="button"
             data-status="used"
-            class="update-status-btn inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 font-switzer"
+            class="update-status-btn cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 font-switzer"
           >
             Mark Used
           </button>
           <button
             type="button"
             data-status="maintenance"
-            class="update-status-btn inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 font-switzer"
+            class="update-status-btn cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 font-switzer"
           >
             Mark Maintenance
           </button>
