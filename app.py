@@ -2024,6 +2024,38 @@ def admin_toggle_resource(id):
 
     return redirect(url_for('admin_resources'))
 
+@app.route("/admin/resources/toggle-bulk", methods=["POST"])
+def admin_toggle_resources_bulk():
+    if 'admin' not in session:
+        return jsonify({"success": False, "message": "Unauthorized access."})
+
+    try:
+        data = request.get_json()
+        resource_ids = data.get('resource_ids', [])
+
+        if not resource_ids:
+            return jsonify({"success": False, "message": "No resources selected."})
+
+        # Get all selected resources
+        resources = ResourceMaterial.query.filter(ResourceMaterial.id.in_(resource_ids)).all()
+        
+        # Toggle each resource's status
+        for resource in resources:
+            resource.is_active = not resource.is_active
+
+        db.session.commit()
+        return jsonify({
+            "success": True,
+            "message": f"Successfully toggled {len(resources)} resource(s)."
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "success": False,
+            "message": f"Error toggling resources: {str(e)}"
+        })
+
 
 # --- Student Resource Viewing Route ---
 

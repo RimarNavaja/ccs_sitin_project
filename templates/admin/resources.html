@@ -101,7 +101,7 @@ endblock %} {% block content %}
     <div>
       <button
         type="submit"
-        class="inline-flex justify-center py-2 px-4 text-sm font-switzer rounded-md shadow-sm text-white bg-violet-800 hover:bg-violet-700 hover:text-yellow-300 duration-200 ease-in-out delay-150"
+        class="inline-flex justify-center cursor-pointer py-2 px-4 text-sm font-switzer rounded-md shadow-sm text-white bg-violet-800 hover:bg-violet-700 hover:text-yellow-300 duration-100 ease-in-out delay-150"
       >
         Add Resource
       </button>
@@ -112,14 +112,32 @@ endblock %} {% block content %}
 <!-- Existing Resources Table -->
 <div class="bg-white rounded-lg shadow-lg shadow-violet-800/30 overflow-hidden">
   <div class="px-6 py-4 border-b border-gray-200">
-    <h2 class="text-xl font-khand tracking-wider text-gray-800">
-      Existing Resources
-    </h2>
+    <div class="flex justify-between items-center">
+      <h2 class="text-xl font-khand tracking-wider text-gray-800">
+        Existing Resources
+      </h2>
+      <button
+        id="toggleAllResourcesBtn"
+        class="inline-flex cursor-pointer py-2 px-4 text-sm font-switzer rounded-md text-white bg-violet-800 hover:bg-violet-700 hover:text-yellow-300 duration-100 ease-in-out delay-150"
+      >
+        Toggle Selected Resources
+      </button>
+    </div>
   </div>
   <div class="overflow-x-auto">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            <input
+              type="checkbox"
+              id="selectAllResources"
+              class="h-4 w-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500"
+            />
+          </th>
           <th
             scope="col"
             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -161,6 +179,14 @@ endblock %} {% block content %}
       <tbody class="bg-white divide-y divide-gray-200">
         {% if resources %} {% for resource in resources %}
         <tr>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <input
+              type="checkbox"
+              name="resourceCheckbox"
+              value="{{ resource.id }}"
+              class="resource-checkbox h-4 w-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500"
+            />
+          </td>
           <td
             class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
           >
@@ -284,6 +310,59 @@ endblock %} {% block content %}
     if (document.querySelector('input[name="resource_type"]:checked')) {
       toggleInputFields();
     }
+
+    // Add select all functionality
+    const selectAllCheckbox = document.getElementById("selectAllResources");
+    const resourceCheckboxes =
+      document.getElementsByClassName("resource-checkbox");
+
+    selectAllCheckbox.addEventListener("change", function () {
+      Array.from(resourceCheckboxes).forEach((checkbox) => {
+        checkbox.checked = this.checked;
+      });
+    });
+
+    // Toggle all selected resources
+    document
+      .getElementById("toggleAllResourcesBtn")
+      .addEventListener("click", function () {
+        const selectedResources = Array.from(resourceCheckboxes)
+          .filter((cb) => cb.checked)
+          .map((cb) => cb.value);
+
+        if (selectedResources.length === 0) {
+          alert("Please select at least one resource to toggle.");
+          return;
+        }
+
+        if (
+          confirm(
+            `Are you sure you want to toggle the status of ${selectedResources.length} resource(s)?`
+          )
+        ) {
+          fetch("/admin/resources/toggle-bulk", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              resource_ids: selectedResources,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                location.reload();
+              } else {
+                alert(data.message || "Error toggling resources");
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("An error occurred while toggling resources");
+            });
+        }
+      });
   });
 </script>
 {% endblock %}
