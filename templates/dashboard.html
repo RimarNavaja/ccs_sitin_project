@@ -9,6 +9,10 @@
       href="https://api.fontshare.com/v2/css?f[]=khand@700&f[]=switzer@400&display=swap"
       rel="stylesheet"
     />
+    <script
+      src="https://kit.fontawesome.com/1356bb865d.js"
+      crossorigin="anonymous"
+    ></script>
     <!-- js script -->
     <script src="/static/js/script.js"></script>
     <title>CCS Sit-in</title>
@@ -54,12 +58,9 @@
                   >
                   <a
                     href="{{ url_for('resources') }}"
-                    class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-violet-700 hover:text-white"
                   >
-                    <i
-                      class="fas fa-book-open w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                    ></i>
-                    <span class="ml-3">Resources</span>
+                    Resources
                   </a>
                   <a
                     href="{{ url_for('sitin_history') }}"

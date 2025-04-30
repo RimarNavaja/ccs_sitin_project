@@ -165,6 +165,11 @@
             >Dashboard</a
           >
           <a
+            href="{{ url_for('admin_announcements') }}"
+            class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+            >Announcements</a
+          >
+          <a
             href="{{ url_for('admin_student_list') }}"
             class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
             >Students</a
@@ -185,10 +190,11 @@
             >Computer Control</a
           >
           <a
-            href="{{ url_for('admin_announcements') }}"
+            href="{{ url_for('admin_resources') }}"
             class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-            >Announcements</a
+            >Manage Resources </a
           >
+
           <a
             href="{{ url_for('admin_sit_in_records') }}"
             class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -470,12 +476,10 @@
               <li class="mb-2">
                 <a
                   href="{{ url_for('admin_resources') }}"
-                  class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
+                  class="flex items-center py-2 px-4 rounded-md hover:text-yellow-300 text-white duration-200 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
                 >
-                  <i
-                    class="fas fa-folder-open w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  ></i>
-                  <span class="ml-3">Manage Resources</span>
+                  <i class="fa-regular fa-folder"></i>
+                  <span class="font-switzer ml-3">Manage Resources</span>
                 </a>
               </li>
             </ul>

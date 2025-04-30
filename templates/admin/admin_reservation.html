@@ -1,12 +1,15 @@
 {% extends "admin/admin_layout.html" %} {% block content %}
-<h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900 mb-4">
+<h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900 mb-1">
   Reservation Management
 </h1>
+<p class="text-lg font-switzer text-gray-600">
+  Manage reservation requests and logs
+</p>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-5">
   <!-- Pending Reservations Column -->
   <div>
-    <h2 class="text-xl font-khand text-yellow-300 mb-4 border-b pb-2">
+    <h2 class="text-xl font-khand text-yellow-300 mb-4 border-b-4 pb-2">
       Pending Reservations
     </h2>
     <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
@@ -63,7 +66,7 @@
 
   <!-- Reservation Logs Column -->
   <div>
-    <h2 class="text-xl font-khand text-violet-700 mb-4 border-b pb-2">
+    <h2 class="text-xl font-khand text-violet-700 mb-4 border-b-4 pb-2">
       Reservation Logs
     </h2>
     <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
