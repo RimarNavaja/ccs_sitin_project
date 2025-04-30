@@ -10,10 +10,10 @@ from flask import (
     Response, # Added for CSV export
     send_file, # Sends files to client
     g
-)
+) 
 from werkzeug.utils import secure_filename # Secures uploaded filenames
 import os  # Operating system operations
-from dbhelper import db, User, Announcement, ComputerStatus # Custom database models
+from dbhelper import db, User, Announcement, ComputerStatus
 from datetime import timedelta, datetime  # Date and time operations
 from models.sit_in_session import SitInSession  # Sit-in session model
 from models.feedback import Feedback  # Feedback model
@@ -30,6 +30,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image, Spac
 from reportlab.lib.styles import getSampleStyleSheet,  ParagraphStyle
 from reportlab.platypus import Paragraph
 import xlsxwriter # Excel file creation
+from models.resource_material import ResourceMaterial
 
 # --- Define Colors based on HTML ---
 COLOR_PURPLE_900 = '#4C1D95' # Tailwind purple-900
@@ -45,7 +46,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1010@localhost/ccs_sitin_p
 # username - root password - 1010/@Rimar097851 database - ccs_sitin_project
 app.secret_key = 'supersecretkey'
 app.config['UPLOAD_FOLDER'] = './static/src/images/userphotos'
+app.config['RESOURCE_UPLOAD_FOLDER'] = './static/resources' 
 db.init_app(app)
+
+# Ensure resource upload directory exists
+if not os.path.exists(app.config['RESOURCE_UPLOAD_FOLDER']):
+    os.makedirs(app.config['RESOURCE_UPLOAD_FOLDER'])
 
 def check_database_schema():
     """Check and update database schema if needed"""
@@ -1487,7 +1493,6 @@ def admin_export_report(format):
         # --- Write Data ---
         if data:
             for row_idx, row_data in enumerate(data):
-                # Calculate the actual worksheet row index
                 worksheet_row = data_start_row + row_idx
                 for col_idx, value in enumerate(row_data):
                     chosen_format = data_format_center if col_idx in center_aligned_cols else data_format
@@ -1906,6 +1911,135 @@ def api_all_reservation_notifications():
         for s in notifs
     ]
     return jsonify({"count": len(notif_list), "notifications": notif_list})
+
+# --- Admin Resource Management Routes ---
+
+@app.route("/admin/resources", methods=["GET", "POST"])
+def admin_resources():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+
+    if request.method == "POST":
+        title = request.form.get('title')
+        description = request.form.get('description')
+        resource_type = request.form.get('resource_type')
+        link_url = request.form.get('link_url')
+        uploaded_file = request.files.get('resource_file')
+
+        if not title or not resource_type:
+            flash("Title and Resource Type are required.", "error")
+            return redirect(url_for('admin_resources'))
+
+        file_path = None # Initialize file_path
+
+        if resource_type == 'file':
+            if not uploaded_file or uploaded_file.filename == '':
+                flash("File is required for 'File Upload' type.", "error")
+                return redirect(url_for('admin_resources'))
+
+            if uploaded_file:
+                filename = secure_filename(uploaded_file.filename)
+                # Save file relative to the static folder
+                save_path = os.path.join(app.config['RESOURCE_UPLOAD_FOLDER'], filename)
+                try:
+                    uploaded_file.save(save_path)
+                    # Store path relative to static folder for url_for
+                    file_path = os.path.join('resources', filename).replace("\\", "/")
+                    link_url = None # Ensure link_url is None for file type
+                except Exception as e:
+                    flash(f"Error saving file: {e}", "error")
+                    return redirect(url_for('admin_resources'))
+
+        elif resource_type == 'link':
+            if not link_url:
+                flash("Link URL is required for 'Online Link' type.", "error")
+                return redirect(url_for('admin_resources'))
+            file_path = None # Ensure file_path is None for link type
+        else:
+            flash("Invalid resource type selected.", "error")
+            return redirect(url_for('admin_resources'))
+
+        # Create and save the new resource
+        new_resource = ResourceMaterial(
+            title=title,
+            description=description,
+            resource_type=resource_type,
+            file_path=file_path,
+            link_url=link_url
+        )
+        db.session.add(new_resource)
+        db.session.commit()
+        flash("Resource added successfully.", "success")
+        return redirect(url_for('admin_resources'))
+
+    # GET request: Fetch and display existing resources
+    resources = ResourceMaterial.get_all_resources()
+    return render_template("admin/resources.html", resources=resources)
+
+@app.route("/admin/resources/delete/<int:id>", methods=["POST"])
+def admin_delete_resource(id):
+    if 'admin' not in session:
+        flash("Unauthorized access.", "error")
+        return redirect(url_for('admin_login'))
+
+    resource = ResourceMaterial.get_resource_by_id(id)
+    if resource:
+        try:
+            # If it's a file, attempt to delete it from the filesystem
+            if resource.resource_type == 'file' and resource.file_path:
+                # Construct full path based on config
+                full_file_path = os.path.join(app.root_path, 'static', resource.file_path)
+                if os.path.exists(full_file_path):
+                    os.remove(full_file_path)
+
+            db.session.delete(resource)
+            db.session.commit()
+            flash("Resource deleted successfully.", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error deleting resource: {e}", "error")
+    else:
+        flash("Resource not found.", "error")
+
+    return redirect(url_for('admin_resources'))
+
+@app.route("/admin/resources/toggle/<int:id>", methods=["POST"])
+def admin_toggle_resource(id):
+    if 'admin' not in session:
+        flash("Unauthorized access.", "error")
+        return redirect(url_for('admin_login'))
+
+    resource = ResourceMaterial.get_resource_by_id(id)
+    if resource:
+        try:
+            resource.is_active = not resource.is_active
+            db.session.commit()
+            status = "activated" if resource.is_active else "deactivated"
+            flash(f"Resource {status} successfully.", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error toggling resource status: {e}", "error")
+    else:
+        flash("Resource not found.", "error")
+
+    return redirect(url_for('admin_resources'))
+
+
+# --- Student Resource Viewing Route ---
+
+@app.route("/resources")
+def resources():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    user = User.query.filter_by(username=session['user']).first()
+    active_resources = ResourceMaterial.get_active_resources()
+    # Notification count needed for the base template
+    notif_count = SitInSession.query.filter(
+        SitInSession.user_id == user.id,
+        SitInSession.status.in_(["approved", "disapproved"]),
+        SitInSession.notified == False
+    ).count()
+    return render_template("resources.html", user=user, resources=active_resources, notif_count=notif_count)
 
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)

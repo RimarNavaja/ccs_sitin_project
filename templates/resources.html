@@ -1,0 +1,68 @@
+{% extends "dashboard.html" %} {% block title %}Resources{% endblock %} {% block
+content %}
+<div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+  <h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900 mb-4">
+    Available Resources
+  </h1>
+  <p class="text-lg font-switzer text-gray-600 mb-8">
+    Access course-related materials and useful links
+  </p>
+
+  {% if resources %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for resource in resources %}
+    <div
+      class="bg-white rounded-lg shadow-lg shadow-violet-800/30 overflow-hidden"
+    >
+      <div class="p-6">
+        <h2 class="text-xl font-khand tracking-wider text-gray-800 mb-2">
+          {{ resource.title }}
+        </h2>
+        {% if resource.description %}
+        <p class="text-sm font-switzer text-gray-600 mb-4">
+          {{ resource.description }}
+        </p>
+        {% endif %}
+
+        <div class="mt-4">
+          {% if resource.resource_type == 'file' and resource.file_path %}
+          <a
+            href="{{ url_for('static', filename=resource.file_path) }}"
+            download
+            class="inline-flex items-center px-4 py-2 text-sm font-switzer rounded-md shadow-sm text-white bg-violet-800 hover:bg-violet-700 hover:text-yellow-300 duration-200 ease-in-out delay-150"
+          >
+            <i class="fas fa-download mr-2"></i> Download File
+          </a>
+          {% elif resource.resource_type == 'link' and resource.link_url %}
+          <a
+            href="{{ resource.link_url }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center px-4 py-2 text-sm font-switzer rounded-md shadow-sm text-white bg-violet-800 hover:bg-violet-700 hover:text-yellow-300 duration-200 ease-in-out delay-150"
+          >
+            <i class="fas fa-external-link-alt mr-2"></i> Open Link
+          </a>
+          {% else %}
+          <span class="text-sm font-switzer text-gray-400"
+            >No source available</span
+          >
+          {% endif %}
+        </div>
+        <p class="text-xs font-switzer text-gray-400 mt-4">
+          Uploaded: {{ resource.uploaded_at.strftime('%b %d, %Y') }}
+        </p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div
+    class="text-center bg-white rounded-lg shadow-lg shadow-violet-800/30 p-10"
+  >
+    <p class="text-gray-500 font-switzer">
+      No resources are currently available.
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
