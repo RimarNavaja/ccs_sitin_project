@@ -54,7 +54,12 @@
                   <a
                     href="{{ url_for('lab_rules') }}"
                     class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-violet-700 hover:text-white"
-                    >Sit-in Rules | Lab Rules</a
+                    >Rules</a
+                  >
+                  <a
+                    href="{{ url_for('lab_schedules') }}"
+                    class="rounded-md px-3 py-2 text-sm font-medium font-switzer tracking-wider text-gray-300 hover:bg-violet-700 hover:text-white"
+                    >Schedules</a
                   >
                   <a
                     href="{{ url_for('resources') }}"
@@ -263,9 +268,14 @@
             <a
               href="{{ url_for('lab_rules') }}"
               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-              >Sit-in Rules | Lab Rules</a
+              >Rules</a
             >
-
+            <a
+              href="{{ url_for('lab_schedules') }}"
+              class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+            >
+              Schedules
+            </a>
             <a
               href="{{ url_for('resources') }}"
               class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -362,7 +372,7 @@
                   {{ user.firstname.capitalize() }} {{
                   user.lastname.capitalize() }}
                 </div>
-                <div class="text-sm font-medium text-gray-400">
+                <div class="text-sm font-light text-white">
                   {{ user.email }}
                 </div>
               </div>

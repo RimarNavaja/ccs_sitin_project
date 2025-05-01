@@ -52,12 +52,12 @@
                 >
                 <a
                   href="{{ url_for('admin_reservation') }}"
-                  class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  class="block uppercase rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                   >Reservations</a
                 >
                 <a
                   href="{{ url_for('admin_computer_control') }}"
-                  class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  class="block uppercase rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                   >Computer Control</a
                 >
               </div>
@@ -180,6 +180,11 @@
             >Sit-in</a
           >
           <a
+            href="{{ url_for('admin_lab_schedules') }}"
+            class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+            >Schedules</a
+          >
+          <a
             href="{{ url_for('admin_reservation') }}"
             class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
             >Reservations</a
@@ -200,11 +205,6 @@
             class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
             >Sit-in Records</a
           >
-          <!-- <a
-            href="{{ url_for('admin_sit_in_reports') }}"
-            class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
-            >Sit-in Reports</a
-          > -->
           <a
             href="{{ url_for('admin_generate_reports') }}"
             class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -415,12 +415,12 @@
               <li>
                 <a
                   href="{{ url_for('admin_leaderboard') }}"
-                  class="cursor-pointer flex items-center w-full px-4 py-2 rounded-md font-switzer hover:text-yellow-300 text-white duration-300 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
+                  class="cursor-pointer flex items-center w-full pl-2.5 py-2 rounded-md font-switzer hover:text-yellow-300 text-white duration-300 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
-                    class="w-7 h-7 mr-3"
+                    class="w-7 h-7 mr-2.5"
                   >
                     <path
                       fill="none"
@@ -447,7 +447,7 @@
                       d="M5 18.25h14"
                     ></path>
                   </svg>
-                  Leaderboard
+                  <span class="font-switzer">Leaderboard</span>
                 </a>
               </li>
               <li>
@@ -456,7 +456,7 @@
                   class="flex items-center py-2 px-4 rounded-md hover:text-yellow-300 text-white duration-200 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
                 >
                   <svg
-                    class="w-5 h-5 mr-3"
+                    class="w-5 h-5 mr-2.5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -472,7 +472,7 @@
                   <span class="font-switzer">Computer Control</span>
                 </a>
               </li>
-              <!-- Add Resource Management Link -->
+              <!-- Added Resource Management Link -->
               <li class="mb-2">
                 <a
                   href="{{ url_for('admin_resources') }}"
@@ -480,6 +480,16 @@
                 >
                   <i class="fa-regular fa-folder"></i>
                   <span class="font-switzer ml-3">Manage Resources</span>
+                </a>
+              </li>
+              <li>
+                <!-- Added Lab Schedule Link -->
+                <a
+                  href="{{ url_for('admin_lab_schedules') }}"
+                  class="flex items-center py-2 px-4 rounded-md hover:text-yellow-300 text-white duration-200 ease-in-out delay-150 hover:tracking-wider hover:translate-x-2"
+                >
+                  <i class="fa-regular fa-calendar-days"></i>
+                  <span class="font-switzer ml-3">Lab Schedules</span>
                 </a>
               </li>
             </ul>

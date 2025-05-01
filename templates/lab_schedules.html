@@ -1,0 +1,78 @@
+{% extends "dashboard.html" %} {% block title %}Lab Schedules{% endblock %} {%
+block content %}
+<div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+  <h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900 mb-4">
+    Lab Schedules
+  </h1>
+  <p class="text-lg font-switzer text-gray-600 mb-8">
+    View the current schedules for the computer laboratories.
+  </p>
+
+  {% if schedules_by_lab %} {% for lab_name, schedules in
+  schedules_by_lab.items()|sort %}
+  <div class="mb-8">
+    <h2
+      class="text-2xl font-khand tracking-wider text-violet-800 mb-4 pb-2 border-b border-violet-200"
+    >
+      {{ lab_name }}
+    </h2>
+    <div class="space-y-4">
+      {% for schedule in schedules %}
+      <div
+        class="bg-white rounded-lg shadow-md shadow-violet-800/20 overflow-hidden p-4"
+      >
+        {% if schedule.is_file_upload %}
+        <div class="flex items-center justify-between">
+          <span class="font-medium text-gray-700"
+            >Schedule File (Uploaded: {{ schedule.uploaded_at.strftime('%b %d,
+            %Y') }})</span
+          >
+          <a
+            href="{{ url_for('static', filename=schedule.file_path) }}"
+            target="_blank"
+            class="inline-flex items-center px-3 py-1 text-sm font-switzer rounded-md shadow-sm text-white bg-violet-700 hover:bg-violet-600 hover:text-yellow-300 duration-200 ease-in-out delay-150"
+          >
+            <i class="fas fa-eye mr-2"></i> View/Download
+          </a>
+        </div>
+        {% else %}
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
+          <div>
+            <span class="font-bold text-black">{{ schedule.day_of_week }}</span>
+            <span class="text-violet-700 font-medium">
+              {{ schedule.start_time.strftime('%I:%M %p') if schedule.start_time
+              else '' }} - {{ schedule.end_time.strftime('%I:%M %p') if
+              schedule.end_time else '' }}</span
+            >
+          </div>
+          <div>
+            <span class="font-semibold text-gray-800">Subject:</span>
+            <span class="uppercase text-gray-600"
+              >{{ schedule.subject or 'N/A' }}</span
+            >
+          </div>
+          <div>
+            <span class="font-semibold text-gray-800">Instructor:</span>
+            <span class="capitalize text-gray-600"
+              >{{ schedule.instructor or 'N/A' }}</span
+            >
+            <span class="font-semibold text-gray-800 ml-2">Section:</span>
+            <span class="text-gray-600">{{ schedule.section or 'N/A' }}</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %} {% else %}
+  <div
+    class="text-center bg-white rounded-lg shadow-lg shadow-violet-800/30 p-10"
+  >
+    <p class="text-gray-500 font-switzer">
+      No active lab schedules are currently available.
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

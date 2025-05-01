@@ -1,0 +1,388 @@
+{% extends "admin/admin_layout.html" %} {% block title %}Manage Lab Schedules{%
+endblock %} {% block content %}
+
+<h1 class="text-4xl font-bold font-khand tracking-wide text-gray-900 mb-4">
+  Manage Lab Schedules
+</h1>
+<p class="text-lg font-switzer text-gray-600 mb-8">
+  Add, view, and manage laboratory schedules.
+</p>
+
+<!-- Add Schedule Form -->
+<div class="bg-white rounded-lg shadow-lg shadow-violet-800/30 p-6 mb-8">
+  <h2 class="text-xl font-khand tracking-wider text-gray-800 mb-4">
+    Add New Schedule
+  </h2>
+  <form
+    method="POST"
+    action="{{ url_for('admin_lab_schedules') }}"
+    enctype="multipart/form-data"
+    id="schedule-form"
+  >
+    <div class="mb-4">
+      <label for="lab_name" class="block text-sm font-medium text-gray-700 mb-1"
+        >Lab Name <span class="text-red-500">*</span></label
+      >
+      <select
+        id="lab_name"
+        name="lab_name"
+        required
+        class="block w-full rounded-md py-2 pl-2 border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 sm:text-sm"
+      >
+        <option value="" disabled selected>Select a lab</option>
+        <option value="524">524</option>
+        <option value="526">526</option>
+        <option value="528">528</option>
+        <option value="530">530</option>
+        <option value="542">542</option>
+        <option value="544">544</option>
+        <option value="517">517</option>
+      </select>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-1"
+        >Entry Type <span class="text-red-500">*</span></label
+      >
+      <div class="flex items-center space-x-4">
+        <label class="inline-flex items-center">
+          <input
+            type="radio"
+            name="entry_type"
+            value="file"
+            required
+            class="form-radio h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+            onchange="toggleScheduleInputFields()"
+          />
+          <span class="ml-2 text-sm text-gray-700">Upload File</span>
+        </label>
+        <label class="inline-flex items-center">
+          <input
+            type="radio"
+            name="entry_type"
+            value="manual"
+            required
+            class="form-radio h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+            onchange="toggleScheduleInputFields()"
+          />
+          <span class="ml-2 text-sm text-gray-700">Manual Entry</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- File Upload Fields -->
+    <div id="file-input-container" class="mb-4 hidden">
+      <label
+        for="schedule_file"
+        class="block text-sm font-medium text-gray-700 mb-1"
+        >Upload Schedule File (PDF, Image)</label
+      >
+      <input
+        type="file"
+        id="schedule_file"
+        name="schedule_file"
+        accept=".pdf,.png,.jpg,.jpeg"
+        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+      />
+    </div>
+
+    <!-- Manual Entry Fields -->
+    <div id="manual-input-container" class="hidden">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label
+            for="day_of_week"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Day of Week <span class="text-red-500">*</span></label
+          >
+          <select
+            id="day_of_week"
+            name="day_of_week"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="">Select Day</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+          </select>
+        </div>
+        <div>
+          <label
+            for="start_time"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Start Time <span class="text-red-500">*</span></label
+          >
+          <input
+            type="time"
+            id="start_time"
+            name="start_time"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div>
+          <label
+            for="end_time"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >End Time <span class="text-red-500">*</span></label
+          >
+          <input
+            type="time"
+            id="end_time"
+            name="end_time"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label
+            for="subject"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Subject</label
+          >
+          <input
+            type="text"
+            id="subject"
+            name="subject"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div>
+          <label
+            for="instructor"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Instructor</label
+          >
+          <input
+            type="text"
+            id="instructor"
+            name="instructor"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div>
+          <label
+            for="section"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Section</label
+          >
+          <input
+            type="text"
+            id="section"
+            name="section"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <button
+        type="submit"
+        class="inline-flex justify-center cursor-pointer py-2 px-4 text-sm font-switzer rounded-md shadow-sm text-white bg-violet-800 hover:bg-violet-700 hover:text-yellow-300 duration-100 ease-in-out delay-150"
+      >
+        Add Schedule
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Existing Schedules Table -->
+<div class="bg-white rounded-lg shadow-lg shadow-violet-800/30 overflow-hidden">
+  <div class="px-6 py-4 border-b border-gray-200">
+    <h2 class="text-xl font-khand tracking-wider text-gray-800">
+      Existing Schedules
+    </h2>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Lab
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Type
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Details
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Uploaded
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Status
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% if schedules %} {% for schedule in schedules %}
+        <tr>
+          <td
+            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+          >
+            {{ schedule.lab_name }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ 'File' if schedule.is_file_upload else 'Manual' }}
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-500">
+            {% if schedule.is_file_upload %}
+            <a
+              href="{{ url_for('static', filename=schedule.file_path) }}"
+              target="_blank"
+              class="text-indigo-600 hover:text-indigo-900"
+              >{{ schedule.file_path.split('/')[-1] }}</a
+            >
+            {% else %}
+            <div class="max-w-md">
+              {{ schedule.day_of_week }} {{ schedule.start_time.strftime('%I:%M
+              %p') if schedule.start_time else '' }} - {{
+              schedule.end_time.strftime('%I:%M %p') if schedule.end_time else
+              '' }}<br />
+              <span class="font-medium">{{ schedule.subject or 'N/A' }}</span>
+              ({{ schedule.instructor or 'N/A' }}) - Section: {{
+              schedule.section or 'N/A' }}
+            </div>
+            {% endif %}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ schedule.uploaded_at.strftime('%Y-%m-%d %H:%M') }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <span
+              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ 'bg-green-100 text-green-800' if schedule.is_active else 'bg-red-100 text-red-800' }}"
+            >
+              {{ 'Active' if schedule.is_active else 'Inactive' }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+            <!-- Toggle Action -->
+            <form
+              method="POST"
+              action="{{ url_for('admin_toggle_lab_schedule', id=schedule.id) }}"
+              class="inline-block"
+            >
+              <button
+                type="submit"
+                class="text-violet-700 cursor-pointer"
+                title="{{ 'Deactivate' if schedule.is_active else 'Activate' }}"
+              >
+                <i
+                  class="fas {% if schedule.is_active %}fa-toggle-on{% else %}fa-toggle-off{% endif %} text-xl"
+                ></i>
+              </button>
+            </form>
+            <!-- Delete Action -->
+            <form
+              method="POST"
+              action="{{ url_for('admin_delete_lab_schedule', id=schedule.id) }}"
+              class="inline-block"
+              onsubmit="return confirm('Are you sure you want to delete this schedule? This action cannot be undone.');"
+            >
+              <button
+                type="submit"
+                class="cursor-pointer bg-red-600 text-white rounded-md px-1 py-1"
+                title="Delete"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6 inline"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %} {% else %}
+        <tr>
+          <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+            No lab schedules found.
+          </td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  function toggleScheduleInputFields() {
+    const entryType = document.querySelector(
+      'input[name="entry_type"]:checked'
+    ).value;
+    const fileInputContainer = document.getElementById("file-input-container");
+    const manualInputContainer = document.getElementById(
+      "manual-input-container"
+    );
+    const fileInput = document.getElementById("schedule_file");
+    const dayInput = document.getElementById("day_of_week");
+    const startTimeInput = document.getElementById("start_time");
+    const endTimeInput = document.getElementById("end_time");
+
+    if (entryType === "file") {
+      fileInputContainer.classList.remove("hidden");
+      manualInputContainer.classList.add("hidden");
+      fileInput.required = true;
+      dayInput.required = false;
+      startTimeInput.required = false;
+      endTimeInput.required = false;
+    } else if (entryType === "manual") {
+      fileInputContainer.classList.add("hidden");
+      manualInputContainer.classList.remove("hidden");
+      fileInput.required = false;
+      dayInput.required = true;
+      startTimeInput.required = true;
+      endTimeInput.required = true;
+    } else {
+      fileInputContainer.classList.add("hidden");
+      manualInputContainer.classList.add("hidden");
+      fileInput.required = false;
+      dayInput.required = false;
+      startTimeInput.required = false;
+      endTimeInput.required = false;
+    }
+  }
+
+  // Initial call in case a radio button is pre-selected
+  document.addEventListener("DOMContentLoaded", () => {
+    if (document.querySelector('input[name="entry_type"]:checked')) {
+      toggleScheduleInputFields();
+    }
+  });
+</script>
+{% endblock %}

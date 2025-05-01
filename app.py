@@ -31,6 +31,7 @@ from reportlab.lib.styles import getSampleStyleSheet,  ParagraphStyle
 from reportlab.platypus import Paragraph
 import xlsxwriter # Excel file creation
 from models.resource_material import ResourceMaterial
+from models.lab_schedule import LabSchedule # Import the new model
 
 # --- Define Colors based on HTML ---
 COLOR_PURPLE_900 = '#4C1D95' # Tailwind purple-900
@@ -47,11 +48,16 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1010@localhost/ccs_sitin_p
 app.secret_key = 'supersecretkey'
 app.config['UPLOAD_FOLDER'] = './static/src/images/userphotos'
 app.config['RESOURCE_UPLOAD_FOLDER'] = './static/resources' 
+app.config['SCHEDULE_UPLOAD_FOLDER'] = './static/schedules' # Add schedule upload folder config
 db.init_app(app)
 
 # Ensure resource upload directory exists
 if not os.path.exists(app.config['RESOURCE_UPLOAD_FOLDER']):
     os.makedirs(app.config['RESOURCE_UPLOAD_FOLDER'])
+
+# Ensure schedule upload directory exists
+if not os.path.exists(app.config['SCHEDULE_UPLOAD_FOLDER']):
+    os.makedirs(app.config['SCHEDULE_UPLOAD_FOLDER'])
 
 def check_database_schema():
     """Check and update database schema if needed"""
@@ -79,7 +85,7 @@ def check_database_schema():
         print(f"Error checking/updating database schema: {e}")
 
 with app.app_context():
-    db.create_all()  # Ensure the tables are created
+    db.create_all()  # Ensure the tables are created (including lab_schedules)
     check_database_schema()  # Check and update schema if needed
 
 @app.route("/login",  methods=["GET", "POST"])
@@ -2072,6 +2078,161 @@ def resources():
         SitInSession.notified == False
     ).count()
     return render_template("resources.html", user=user, resources=active_resources, notif_count=notif_count)
+
+# --- Admin Lab Schedule Management Routes ---
+
+@app.route("/admin/lab-schedules", methods=["GET", "POST"])
+def admin_lab_schedules():
+    if 'admin' not in session:
+        return redirect(url_for('admin_login'))
+
+    if request.method == "POST":
+        entry_type = request.form.get('entry_type') # 'file' or 'manual'
+        lab_name = request.form.get('lab_name')
+
+        if not lab_name:
+            flash("Lab Name is required.", "error")
+            return redirect(url_for('admin_lab_schedules'))
+
+        if entry_type == 'file':
+            uploaded_file = request.files.get('schedule_file')
+            if not uploaded_file or uploaded_file.filename == '':
+                flash("Schedule file is required for file upload.", "error")
+                return redirect(url_for('admin_lab_schedules'))
+
+            filename = secure_filename(f"{lab_name}_{uploaded_file.filename}")
+            save_path = os.path.join(app.config['SCHEDULE_UPLOAD_FOLDER'], filename)
+            try:
+                uploaded_file.save(save_path)
+                file_path = os.path.join('schedules', filename).replace("\\", "/")
+                new_schedule = LabSchedule(
+                    lab_name=lab_name,
+                    file_path=file_path,
+                    is_file_upload=True
+                )
+                db.session.add(new_schedule)
+                db.session.commit()
+                flash("Schedule file uploaded successfully.", "success")
+            except Exception as e:
+                flash(f"Error saving schedule file: {e}", "error")
+
+        elif entry_type == 'manual':
+            day_of_week = request.form.get('day_of_week')
+            start_time_str = request.form.get('start_time')
+            end_time_str = request.form.get('end_time')
+            subject = request.form.get('subject')
+            instructor = request.form.get('instructor')
+            section = request.form.get('section')
+
+            if not day_of_week or not start_time_str or not end_time_str:
+                flash("Day, Start Time, and End Time are required for manual entry.", "error")
+                return redirect(url_for('admin_lab_schedules'))
+
+            try:
+                start_time = datetime.strptime(start_time_str, '%H:%M').time()
+                end_time = datetime.strptime(end_time_str, '%H:%M').time()
+
+                new_schedule = LabSchedule(
+                    lab_name=lab_name,
+                    day_of_week=day_of_week,
+                    start_time=start_time,
+                    end_time=end_time,
+                    subject=subject,
+                    instructor=instructor,
+                    section=section,
+                    is_file_upload=False
+                )
+                db.session.add(new_schedule)
+                db.session.commit()
+                flash("Manual schedule entry added successfully.", "success")
+            except ValueError:
+                flash("Invalid time format. Please use HH:MM.", "error")
+            except Exception as e:
+                 flash(f"Error adding manual schedule: {e}", "error")
+
+        else:
+            flash("Invalid entry type selected.", "error")
+
+        return redirect(url_for('admin_lab_schedules'))
+
+    # GET request: Fetch and display existing schedules
+    schedules = LabSchedule.get_all_schedules()
+    return render_template("admin/lab_schedules.html", schedules=schedules)
+
+
+@app.route("/admin/lab-schedules/delete/<int:id>", methods=["POST"])
+def admin_delete_lab_schedule(id):
+    if 'admin' not in session:
+        flash("Unauthorized access.", "error")
+        return redirect(url_for('admin_login'))
+
+    schedule = LabSchedule.get_schedule_by_id(id)
+    if schedule:
+        try:
+            # If it's a file upload, attempt to delete the file
+            if schedule.is_file_upload and schedule.file_path:
+                full_file_path = os.path.join(app.root_path, 'static', schedule.file_path)
+                if os.path.exists(full_file_path):
+                    os.remove(full_file_path)
+
+            db.session.delete(schedule)
+            db.session.commit()
+            flash("Lab schedule deleted successfully.", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error deleting lab schedule: {e}", "error")
+    else:
+        flash("Lab schedule not found.", "error")
+
+    return redirect(url_for('admin_lab_schedules'))
+
+
+@app.route("/admin/lab-schedules/toggle/<int:id>", methods=["POST"])
+def admin_toggle_lab_schedule(id):
+    if 'admin' not in session:
+        flash("Unauthorized access.", "error")
+        return redirect(url_for('admin_login'))
+
+    schedule = LabSchedule.get_schedule_by_id(id)
+    if schedule:
+        try:
+            schedule.is_active = not schedule.is_active
+            db.session.commit()
+            status = "activated" if schedule.is_active else "deactivated"
+            flash(f"Lab schedule {status} successfully.", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error toggling lab schedule status: {e}", "error")
+    else:
+        flash("Lab schedule not found.", "error")
+
+    return redirect(url_for('admin_lab_schedules'))
+
+
+# --- Student Lab Schedule Viewing Route ---
+
+@app.route("/lab-schedules")
+def lab_schedules():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    user = User.query.filter_by(username=session['user']).first()
+    active_schedules = LabSchedule.get_active_schedules()
+
+    # Group schedules by lab for easier display
+    schedules_by_lab = {}
+    for schedule in active_schedules:
+        if schedule.lab_name not in schedules_by_lab:
+            schedules_by_lab[schedule.lab_name] = []
+        schedules_by_lab[schedule.lab_name].append(schedule)
+
+    # Notification count needed for the base template
+    notif_count = SitInSession.query.filter(
+        SitInSession.user_id == user.id,
+        SitInSession.status.in_(["approved", "disapproved"]),
+        SitInSession.notified == False
+    ).count()
+    return render_template("lab_schedules.html", user=user, schedules_by_lab=schedules_by_lab, notif_count=notif_count)
+
 
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)
