@@ -123,6 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize admin dashboard if we're on that page
   if (window.location.href.includes("/admin/")) {
     initAdminDashboard();
+    fetchAdminPendingCount(); // Add this line to fetch count on load
   }
 
   // Add active class to current page link in navigation
@@ -238,6 +239,41 @@ document.addEventListener("click", function (e) {
       notifDropdownMobile.classList.add("hidden");
     }
   }
+
+  // Admin Notification Dropdowns
+  const adminNotifBtn = document.getElementById("admin-notif-bell-btn");
+  const adminNotifDropdown = document.getElementById("admin-notif-dropdown");
+  if (
+    adminNotifBtn &&
+    adminNotifDropdown &&
+    !adminNotifDropdown.classList.contains("hidden")
+  ) {
+    if (
+      !adminNotifBtn.contains(e.target) &&
+      !adminNotifDropdown.contains(e.target)
+    ) {
+      adminNotifDropdown.classList.add("hidden");
+    }
+  }
+
+  const adminNotifBtnMobile = document.getElementById(
+    "admin-notif-bell-btn-mobile"
+  );
+  const adminNotifDropdownMobile = document.getElementById(
+    "admin-notif-dropdown-mobile"
+  );
+  if (
+    adminNotifBtnMobile &&
+    adminNotifDropdownMobile &&
+    !adminNotifDropdownMobile.classList.contains("hidden")
+  ) {
+    if (
+      !adminNotifBtnMobile.contains(e.target) &&
+      !adminNotifDropdownMobile.contains(e.target)
+    ) {
+      adminNotifDropdownMobile.classList.add("hidden");
+    }
+  }
 });
 
 window.addEventListener("DOMContentLoaded", fetchReservationNotif);
@@ -283,4 +319,80 @@ function openAllNotifModal() {
 }
 function closeAllNotifModal() {
   document.getElementById("allNotifModal").classList.add("hidden");
+}
+
+// --- Admin Notification Functions ---
+
+function fetchAdminPendingCount() {
+  fetch("/api/admin/pending-reservations-count")
+    .then((res) => res.json())
+    .then((data) => {
+      const badge = document.getElementById("admin-notif-badge");
+      const badgeMobile = document.getElementById("admin-notif-badge-mobile");
+      if (data.count > 0) {
+        if (badge) badge.style.display = "";
+        if (badgeMobile) badgeMobile.style.display = "";
+      } else {
+        if (badge) badge.style.display = "none";
+        if (badgeMobile) badgeMobile.style.display = "none";
+      }
+    })
+    .catch((error) =>
+      console.error("Error fetching admin pending count:", error)
+    );
+}
+
+function fetchAdminPendingList() {
+  fetch("/api/admin/pending-reservations-list")
+    .then((res) => res.json())
+    .then((data) => {
+      const list = document.getElementById("admin-notif-list");
+      const listMobile = document.getElementById("admin-notif-list-mobile");
+      let html = "";
+
+      if (data.reservations && data.reservations.length > 0) {
+        data.reservations.forEach((r) => {
+          html += `<div class="p-3 font-switzer border-b last:border-b-0">
+            <div class="flex items-center justify-between">
+              <span class="font-semibold text-sm text-gray-800">${r.student_name}</span>
+              <span class="text-xs text-gray-400">${r.date} ${r.time}</span>
+            </div>
+            <div class="text-xs text-gray-600">Lab: <b>${r.lab}</b> | PC: <b>${r.pc_number}</b></div>
+          </div>`;
+        });
+      } else {
+        html =
+          '<div class="p-3 text-gray-500 text-sm">No pending reservations.</div>';
+      }
+
+      if (list) list.innerHTML = html;
+      if (listMobile) listMobile.innerHTML = html;
+    })
+    .catch((error) => {
+      console.error("Error fetching admin pending list:", error);
+      const errorHtml =
+        '<div class="p-3 text-red-500 text-sm">Failed to load reservations.</div>';
+      if (list) list.innerHTML = errorHtml;
+      if (listMobile) list.innerHTML = errorHtml;
+    });
+}
+
+function toggleAdminNotifDropdown() {
+  const dd = document.getElementById("admin-notif-dropdown");
+  if (dd) {
+    dd.classList.toggle("hidden");
+    if (!dd.classList.contains("hidden")) {
+      fetchAdminPendingList();
+    }
+  }
+}
+
+function toggleAdminNotifDropdownMobile() {
+  const dd = document.getElementById("admin-notif-dropdown-mobile");
+  if (dd) {
+    dd.classList.toggle("hidden");
+    if (!dd.classList.contains("hidden")) {
+      fetchAdminPendingList();
+    }
+  }
 }

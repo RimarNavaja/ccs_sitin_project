@@ -65,6 +65,64 @@
           </div>
           <div class="hidden md:block">
             <div class="ml-4 flex items-center md:ml-6">
+              <!-- Admin Notification Bell - Desktop -->
+              <div class="relative mr-0.5 mt-2">
+                <button
+                  id="admin-notif-bell-btn"
+                  class="relative cursor-pointer focus:outline-none"
+                  onclick="toggleAdminNotifDropdown()"
+                >
+                  <svg
+                    class="w-7 h-7 text-violet-700 hover:text-gray-300"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                    ></path>
+                  </svg>
+                  <span
+                    id="admin-notif-badge"
+                    style="display: none"
+                    class="absolute -top-1 -right-1"
+                  >
+                    <span class="relative flex size-2.5">
+                      <span
+                        class="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-500 opacity-75"
+                      ></span>
+                      <span
+                        class="relative inline-flex size-2.5 rounded-full bg-violet-700"
+                      ></span>
+                    </span>
+                  </span>
+                </button>
+                <!-- Admin Notification Dropdown -->
+                <div
+                  id="admin-notif-dropdown"
+                  class="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+                >
+                  <div
+                    class="p-3 shadow-sm font-switzer font-bold text-lg text-gray-800"
+                  >
+                    Pending Reservations
+                  </div>
+                  <div id="admin-notif-list" class="max-h-64 overflow-y-auto">
+                    <div class="p-3 text-gray-500 text-sm">Loading...</div>
+                  </div>
+                  <a
+                    href="{{ url_for('admin_reservation') }}"
+                    class="block cursor-pointer w-full text-center py-2 font-switzer text-xs hover:bg-gray-300 hover:text-violet-700"
+                  >
+                    View All Reservations
+                  </a>
+                </div>
+              </div>
+
+              <!-- Profile dropdown -->
               <div class="relative ml-3">
                 <div class="">
                   <button
@@ -223,6 +281,66 @@
         </div>
         <div class="border-t border-gray-700 pt-4 pb-3">
           <div class="flex items-center px-5">
+            <!-- Admin Notification Bell - Mobile -->
+            <div class="relative mr-4">
+              <button
+                id="admin-notif-bell-btn-mobile"
+                class="relative focus:outline-none"
+                onclick="toggleAdminNotifDropdownMobile()"
+              >
+                <svg
+                  class="w-7 h-7 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  ></path>
+                </svg>
+                <span
+                  id="admin-notif-badge-mobile"
+                  style="display: none"
+                  class="absolute -top-1 -right-1"
+                >
+                  <span class="relative flex size-2.5">
+                    <span
+                      class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"
+                    ></span>
+                    <span
+                      class="relative inline-flex size-2.5 rounded-full bg-red-500"
+                    ></span>
+                  </span>
+                </span>
+              </button>
+              <!-- Admin Notification Dropdown - Mobile -->
+              <div
+                id="admin-notif-dropdown-mobile"
+                class="hidden absolute left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+                style="min-width: 260px"
+              >
+                <div
+                  class="p-3 shadow-sm font-switzer font-bold text-lg text-gray-800"
+                >
+                  Pending Reservations
+                </div>
+                <div
+                  id="admin-notif-list-mobile"
+                  class="max-h-64 overflow-y-auto"
+                >
+                  <div class="p-3 text-gray-500 text-sm">Loading...</div>
+                </div>
+                <a
+                  href="{{ url_for('admin_reservation') }}"
+                  class="block cursor-pointer w-full text-center py-2 font-switzer text-xs text-violet-700 hover:bg-gray-100"
+                >
+                  View All Reservations
+                </a>
+              </div>
+            </div>
             <div class="shrink-0">
               <img
                 class="size-10 rounded-full"

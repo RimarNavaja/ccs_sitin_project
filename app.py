@@ -2290,6 +2290,38 @@ def lab_schedules():
     ).count()
     return render_template("lab_schedules.html", user=user, schedules_by_lab=schedules_by_lab, notif_count=notif_count)
 
+@app.route("/api/admin/pending-reservations-count")
+def api_admin_pending_reservations_count():
+    if 'admin' not in session:
+        return jsonify({"count": 0})
+    count = SitInSession.query.filter_by(status='pending').count()
+    return jsonify({"count": count})
+
+@app.route("/api/admin/pending-reservations-list")
+def api_admin_pending_reservations_list():
+    if 'admin' not in session:
+        return jsonify({"reservations": []})
+
+    # Get pending reservations with user info, ordered by creation time
+    pending = SitInSession.query.options(db.joinedload(SitInSession.user))\
+                                .filter(SitInSession.status == 'pending')\
+                                .order_by(SitInSession.start_time.asc())\
+                                .limit(10)\
+                                .all()
+
+    reservation_list = []
+    for r in pending:
+        user = r.user
+        pc = ComputerStatus.query.get(r.pc_id) if r.pc_id else None
+        reservation_list.append({
+            "id": r.id,
+            "student_name": f"{user.firstname.capitalize()} {user.lastname.capitalize()}" if user else "Unknown",
+            "lab": r.lab,
+            "pc_number": pc.pc_number if pc else "N/A",
+            "date": r.start_time.strftime("%b %d") if r.start_time else "N/A",
+            "time": r.start_time.strftime("%I:%M %p") if r.start_time else "N/A",
+        })
+    return jsonify({"reservations": reservation_list})
 
 if __name__ == "__main__":
     # app.run(debug=True, host='172.19.131.163', port=5000)
