@@ -1762,8 +1762,8 @@ def admin_reservation():
 
     # Fetch processed reservations (approved or disapproved) with user data
     processed_reservations = SitInSession.query.options(db.joinedload(SitInSession.user))\
-                                               .filter(or_(SitInSession.status == 'approved', SitInSession.status == 'disapproved'))\
-                                               .order_by(SitInSession.end_time.desc())\
+                                               .filter(SitInSession.status.in_(['approved', 'disapproved', 'active']))\
+                                               .order_by(SitInSession.end_time.desc(), SitInSession.start_time.desc())\
                                                .limit(50)\
                                                .all() # Limit logs for performance
 
@@ -1784,7 +1784,7 @@ def admin_approve_reservation(session_id):
 
     if reservation.status != 'pending':
         flash("Reservation is not pending.", "error")
-        return redirect(url_for('admin_reservation'))   
+        return redirect(url_for('admin_reservation'))
 
     user = User.query.get(reservation.user_id)
     if not user:
@@ -1800,31 +1800,46 @@ def admin_approve_reservation(session_id):
         flash(f"Cannot approve: Student {user.firstname.capitalize()} {user.lastname.capitalize()} has no remaining sessions.", "error")
         reservation.status = 'disapproved'
         reservation.end_time = datetime.now()
+        reservation.notified = False # Mark for notification
         db.session.commit()
         return redirect(url_for('admin_reservation'))
 
-    # Check if user already has another active/approved session
+    # Check if user already has another active session
     # Exclude the current reservation being approved
     existing_active_session = SitInSession.query.filter(
         SitInSession.user_id == user.id,
         SitInSession.id != reservation.id, # Exclude self
-        or_(SitInSession.status == 'active', SitInSession.status == 'approved')
+        SitInSession.status == 'active' # Only check for 'active' sessions now
     ).first()
 
     if existing_active_session:
-        flash(f"Student {user.firstname.capitalize()} {user.lastname.capitalize()} already has another active or approved session.", "error")
+        flash(f"Student {user.firstname.capitalize()} {user.lastname.capitalize()} already has another active session.", "error")
         return redirect(url_for('admin_reservation'))
+    
+    # First mark as approved to track the approval
+    reservation.status = 'approved'
+    reservation.end_time = datetime.now()  # Track when it was approved
+    reservation.notified = False  # Ensure notification is sent
+    db.session.commit()  # Commit the approval status
 
-    # --- Approve the reservation ---
-    reservation.status = 'approved' # Status indicates admin approved it
-    reservation.end_time = datetime.now() # Use end_time to mark processing time
-    reservation.notified = False  # <--- Add this line
-    # Session count is deducted ONLY when the admin manually starts the session via the Sit-in Form
+    # Then create a new active session
+    active_session = SitInSession(
+        user_id=user.id,
+        purpose=reservation.purpose,
+        lab=reservation.lab,
+        start_time=datetime.now(),
+        status='active',
+        notified=True
+    )
+    db.session.add(active_session)
+
+    # Deduct one session from the user's available sessions
+    user.deduct_session()
+
     db.session.commit()
-    flash(f"Reservation for {user.firstname.capitalize()} {user.lastname.capitalize()} approved. Admin must start the session manually via the Sit-in form.", "success")
+    flash(f"Reservation for {user.firstname.capitalize()} {user.lastname.capitalize()} approved and started successfully.", "success")
 
     return redirect(url_for('admin_reservation'))
-
 
 @app.route("/admin/reservation/disapprove/<int:session_id>", methods=["POST"])
 def admin_disapprove_reservation(session_id):

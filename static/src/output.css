@@ -2199,6 +2199,13 @@
       }
     }
   }
+  .hover\:text-yellow-500 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-yellow-500);
+      }
+    }
+  }
   .hover\:underline-offset-8 {
     &:hover {
       @media (hover: hover) {
