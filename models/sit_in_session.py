@@ -6,6 +6,7 @@ class SitInSession(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    pc_id = db.Column(db.Integer, nullable=True) #to store which PC was selected during reservation
     purpose = db.Column(db.String(100), nullable=False)
     lab = db.Column(db.String(10))
     notes = db.Column(db.Text)
@@ -18,11 +19,12 @@ class SitInSession(db.Model):
     user = db.relationship('User', backref=db.backref('sit_in_sessions', lazy=True))
     
     # Update the __init__ method of SitInSession to accept start_time and status as keyword arguments
-    def __init__(self, user_id, purpose, lab=None, notes=None, start_time=None, status=None, notified=False):
+    def __init__(self, user_id, purpose, lab=None, notes=None, start_time=None, status=None, notified=False, pc_id=None):
         self.user_id = user_id
         self.purpose = purpose
         self.lab = lab
         self.notes = notes
+        self.pc_id = pc_id  # Added self.pc_id = pc_id to initialize the pc_id field
         if start_time is not None:
             self.start_time = start_time
         if status is not None:

@@ -145,3 +145,5 @@ SELECT * FROM computer_status
 
 
 ALTER TABLE sit_in_sessions ADD COLUMN notified BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE sit_in_sessions ADD COLUMN pc_id INT NULL;

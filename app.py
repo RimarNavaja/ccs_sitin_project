@@ -963,6 +963,13 @@ def admin_end_sit_in(session_id):
         flash("Sit-in session not found")
         return redirect(url_for('admin_sit_in_form'))
 
+    # Mark the PC as available if there was one assigned
+    if sit_in_session.pc_id:
+        pc = ComputerStatus.query.get(sit_in_session.pc_id)
+        if pc:
+            pc.status = 'available'
+            pc.current_session_id = None
+
     # End the sit-in session
     sit_in_session.end_session()
     db.session.commit()
@@ -1648,7 +1655,9 @@ def admin_leaderboard():
 def reservation():
     if 'user' not in session:
         return redirect(url_for('login'))
+    
     user = User.query.filter_by(username=session['user']).first()
+    
     if request.method == "POST":
         purpose = request.form.get("purpose")
         lab = request.form.get("lab")
@@ -1673,6 +1682,11 @@ def reservation():
              flash("Invalid date or time format.", "error")
              return render_template("reservation.html", user=user, form_data=request.form)
 
+        # Check if selected PC exists and is available
+        pc = ComputerStatus.query.get(pc_id)
+        if not pc or pc.status != 'available':
+            flash("Selected PC is not available. Please choose another PC.", "error")
+            return render_template("reservation.html", user=user, form_data=request.form)
 
         if user.student_session <= 0:
             flash("No remaining sit-in sessions.", "error")
@@ -1692,16 +1706,27 @@ def reservation():
             user_id=user.id,
             purpose=purpose,
             lab=lab,
+            pc_id=pc_id,  # Add the PC ID to the reservation
             start_time=requested_datetime, # Store the requested start time
             status="pending" # Initial status is pending approval
         )
         db.session.add(new_session)
+        
+        # Mark PC as pending (optional, depending on your requirements)
+        # pc.status = 'pending'
+        
         db.session.commit()
         flash("Reservation submitted successfully! Please wait for admin approval.", "success")
         return redirect(url_for('dashboard'))
 
-    # GET request
-    return render_template("reservation.html", user=user)
+    # GET request - get available PCs for the template
+    computers = ComputerStatus.query.filter_by(status='available').order_by(ComputerStatus.lab_name, ComputerStatus.pc_number).all()
+    labs = sorted(list(set(pc.lab_name for pc in computers)))  # Get unique lab names
+    
+    return render_template("reservation.html", 
+                         user=user, 
+                         computers=computers,
+                         labs=labs)
 
 @app.route("/admin/computer-control")
 def admin_computer_control():
@@ -1765,11 +1790,15 @@ def admin_reservation():
                                                .filter(SitInSession.status.in_(['approved', 'disapproved', 'active']))\
                                                .order_by(SitInSession.end_time.desc(), SitInSession.start_time.desc())\
                                                .limit(50)\
-                                               .all() # Limit logs for performance
+                                               .all()
+
+    # Get all computer statuses as a dictionary for easy lookup
+    pc_statuses = {pc.id: pc for pc in ComputerStatus.query.all()}
 
     return render_template("admin/admin_reservation.html",
-                           pending_reservations=pending_reservations,
-                           processed_reservations=processed_reservations)
+                         pending_reservations=pending_reservations,
+                         processed_reservations=processed_reservations,
+                         pc_statuses=pc_statuses)
 
 @app.route("/admin/reservation/approve/<int:session_id>", methods=["POST"])
 def admin_approve_reservation(session_id):
@@ -1789,8 +1818,7 @@ def admin_approve_reservation(session_id):
     user = User.query.get(reservation.user_id)
     if not user:
         flash("Associated user not found.", "error")
-        # Clean up orphan reservation?
-        reservation.status = 'disapproved' # Mark as disapproved if user is gone
+        reservation.status = 'disapproved'
         reservation.end_time = datetime.now()
         db.session.commit()
         return redirect(url_for('admin_reservation'))
@@ -1800,39 +1828,53 @@ def admin_approve_reservation(session_id):
         flash(f"Cannot approve: Student {user.firstname.capitalize()} {user.lastname.capitalize()} has no remaining sessions.", "error")
         reservation.status = 'disapproved'
         reservation.end_time = datetime.now()
-        reservation.notified = False # Mark for notification
+        reservation.notified = False
         db.session.commit()
         return redirect(url_for('admin_reservation'))
 
     # Check if user already has another active session
-    # Exclude the current reservation being approved
     existing_active_session = SitInSession.query.filter(
         SitInSession.user_id == user.id,
-        SitInSession.id != reservation.id, # Exclude self
-        SitInSession.status == 'active' # Only check for 'active' sessions now
+        SitInSession.id != reservation.id,
+        SitInSession.status == 'active'
     ).first()
 
     if existing_active_session:
         flash(f"Student {user.firstname.capitalize()} {user.lastname.capitalize()} already has another active session.", "error")
         return redirect(url_for('admin_reservation'))
+
+    # Check if the PC is still available
+    pc = ComputerStatus.query.get(reservation.pc_id)
+    if not pc or pc.status != 'available':
+        flash(f"Selected PC is no longer available. Please ask student to make a new reservation.", "error")
+        reservation.status = 'disapproved'
+        reservation.end_time = datetime.now()
+        reservation.notified = False
+        db.session.commit()
+        return redirect(url_for('admin_reservation'))
     
     # First mark as approved to track the approval
     reservation.status = 'approved'
-    reservation.end_time = datetime.now()  # Track when it was approved
-    reservation.notified = False  # Ensure notification is sent
-    db.session.commit()  # Commit the approval status
+    reservation.end_time = datetime.now()
+    reservation.notified = False
+    db.session.commit()
 
-    # Then create a new active session
+    # Create a new active session
     active_session = SitInSession(
         user_id=user.id,
         purpose=reservation.purpose,
         lab=reservation.lab,
+        pc_id=reservation.pc_id,  # Copy the PC ID to the new session
         start_time=datetime.now(),
         status='active',
         notified=True
     )
     db.session.add(active_session)
 
+    # Mark the PC as used and link it to the new session
+    pc.status = 'used'
+    pc.current_session_id = active_session.id
+    
     # Deduct one session from the user's available sessions
     user.deduct_session()
 

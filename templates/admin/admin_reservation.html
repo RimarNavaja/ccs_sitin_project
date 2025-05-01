@@ -27,6 +27,12 @@
           <span class="font-semibold">Lab:</span> {{ res.lab }}
         </p>
         <p class="font-switzer text-sm">
+          <span class="font-semibold">PC Number:</span>
+          {% if res.pc_id %} {% set pc = pc_statuses.get(res.pc_id) %} {{
+          pc.pc_number if pc else 'Unknown' }} {% else %} Not selected {% endif
+          %}
+        </p>
+        <p class="font-switzer text-sm">
           <span class="font-semibold">Requested Time:</span> {{
           res.start_time.strftime('%b %d, %Y at %I:%M %p') if res.start_time
           else 'N/A' }}
