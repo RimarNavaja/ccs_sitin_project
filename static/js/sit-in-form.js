@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   </div>
                   ${activeSessionBadge}
                 </div>
-                <button class="select-student-btn cursor-pointer px-5 py-1 bg-violet-200 tracking-wide text-violet-800 rounded-md text-sm font-switzer hover:bg-violet-300">
+                <button class="select-student-btn cursor-pointer px-5 py-1 bg-violet-700 text-white tracking-wide rounded-md text-sm font-switzer hover:bg-violet-300">
                   Select
                 </button>
               `;
@@ -266,17 +266,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div class="flex space-x-2">
-                    <form action="/admin/reward-sit-in/${
+                    <form id="reward-form-${
                       session.id
-                    }" method="POST">
-                      <button title="Reward student 1 point and end sit-in session." type="submit" class="bg-green-500 text-white rounded-md p-1 px-2 cursor-pointer hover:bg-green-600">
+                    }" action="/admin/reward-sit-in/${
+              session.id
+            }" method="POST" style="display: inline;">
+                      <button title="Reward student 1 point and end sit-in session." type="button" onclick="confirmReward(${
+                        session.id
+                      })" class="bg-green-500 text-white rounded-md p-1 px-2 cursor-pointer hover:bg-green-600">
                         Reward
                       </button>
                     </form>
-                    <form action="/admin/end-sit-in/${
+                    <form id="end-form-${
                       session.id
-                    }" method="POST">
-                      <button title="End sit-in session with no reward." type="submit" class="bg-red-500 text-white rounded-md p-1 px-2 cursor-pointer hover:bg-red-600">
+                    }" action="/admin/end-sit-in/${
+              session.id
+            }" method="POST" style="display: inline;">
+                      <button title="End sit-in session with no reward." type="button" onclick="confirmEndSession(${
+                        session.id
+                      })" class="bg-red-500 text-white rounded-md p-1 px-2 cursor-pointer hover:bg-red-600">
                         End Session
                       </button>
                     </form>
@@ -307,6 +315,25 @@ document.addEventListener("DOMContentLoaded", function () {
     const url = new URL(window.location.href);
     return url.searchParams.get(name);
   }
+
+  // --- NEW: Confirmation functions ---
+  window.confirmReward = function (sessionId) {
+    if (
+      confirm(
+        "Are you sure you want to reward this student and end the session?"
+      )
+    ) {
+      document.getElementById(`reward-form-${sessionId}`).submit();
+    }
+  };
+
+  window.confirmEndSession = function (sessionId) {
+    if (
+      confirm("Are you sure you want to end this session without an reward?")
+    ) {
+      document.getElementById(`end-form-${sessionId}`).submit();
+    }
+  };
 
   // Event listeners
   searchButton.addEventListener("click", searchStudent);

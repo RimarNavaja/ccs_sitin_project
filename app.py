@@ -210,7 +210,8 @@ def dashboard():
     if 'user' not in session:
         return redirect(url_for('login'))
     user = User.query.filter_by(username=session['user']).first()
-    sitinsession = SitInSession.query.filter_by( status='active').first()
+    # Fetch the active session specifically for the logged-in user
+    sitinsession = SitInSession.query.filter_by(user_id=user.id, status='active').first()
     announcements = Announcement.get_active_announcements()
     coloractive = "bg-green-200 text-green-700"
     colorinactive = "bg-gray-300"

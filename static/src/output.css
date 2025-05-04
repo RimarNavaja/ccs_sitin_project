@@ -2009,14 +2009,6 @@
       }
     }
   }
-  .hover\:font-medium {
-    &:hover {
-      @media (hover: hover) {
-        --tw-font-weight: var(--font-weight-medium);
-        font-weight: var(--font-weight-medium);
-      }
-    }
-  }
   .hover\:tracking-wider {
     &:hover {
       @media (hover: hover) {
