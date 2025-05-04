@@ -32,6 +32,7 @@ from reportlab.platypus import Paragraph
 import xlsxwriter # Excel file creation
 from models.resource_material import ResourceMaterial
 from models.lab_schedule import LabSchedule # Import the new model
+import pytz # Philippines timezone (Asia/Manila)
 
 # --- Define Colors based on HTML ---
 COLOR_PURPLE_900 = '#4C1D95' # Tailwind purple-900
@@ -1996,6 +1997,10 @@ def admin_resources():
 
         file_path = None # Initialize file_path
 
+        # Get current time in Philippines timezone
+        pht = pytz.timezone('Asia/Manila')
+        now_pht = datetime.now(pht)
+
         if resource_type == 'file':
             if not uploaded_file or uploaded_file.filename == '':
                 flash("File is required for 'File Upload' type.", "error")
@@ -2029,7 +2034,8 @@ def admin_resources():
             description=description,
             resource_type=resource_type,
             file_path=file_path,
-            link_url=link_url
+            link_url=link_url,
+            uploaded_at=now_pht # Set upload time in PHT
         )
         db.session.add(new_resource)
         db.session.commit()
@@ -2144,9 +2150,13 @@ def admin_lab_schedules():
     if 'admin' not in session:
         return redirect(url_for('admin_login'))
 
+    # Define Philippines Timezone
+    pht = pytz.timezone('Asia/Manila')
+
     if request.method == "POST":
         entry_type = request.form.get('entry_type') # 'file' or 'manual'
         lab_name = request.form.get('lab_name')
+        now_pht = datetime.now(pht) # Get current time in PHT
 
         if not lab_name:
             flash("Lab Name is required.", "error")
@@ -2166,12 +2176,14 @@ def admin_lab_schedules():
                 new_schedule = LabSchedule(
                     lab_name=lab_name,
                     file_path=file_path,
-                    is_file_upload=True
+                    is_file_upload=True,
+                    uploaded_at=now_pht 
                 )
                 db.session.add(new_schedule)
                 db.session.commit()
                 flash("Schedule file uploaded successfully.", "success")
             except Exception as e:
+                db.session.rollback() # Rollback on error
                 flash(f"Error saving schedule file: {e}", "error")
 
         elif entry_type == 'manual':
@@ -2187,6 +2199,7 @@ def admin_lab_schedules():
                 return redirect(url_for('admin_lab_schedules'))
 
             try:
+                # Keep start/end times naive as they represent time of day, not a specific point in time
                 start_time = datetime.strptime(start_time_str, '%H:%M').time()
                 end_time = datetime.strptime(end_time_str, '%H:%M').time()
 
@@ -2198,7 +2211,8 @@ def admin_lab_schedules():
                     subject=subject,
                     instructor=instructor,
                     section=section,
-                    is_file_upload=False
+                    is_file_upload=False,
+                    uploaded_at=now_pht 
                 )
                 db.session.add(new_schedule)
                 db.session.commit()
@@ -2206,6 +2220,7 @@ def admin_lab_schedules():
             except ValueError:
                 flash("Invalid time format. Please use HH:MM.", "error")
             except Exception as e:
+                 db.session.rollback() # Rollback on error
                  flash(f"Error adding manual schedule: {e}", "error")
 
         else:
@@ -2214,8 +2229,9 @@ def admin_lab_schedules():
         return redirect(url_for('admin_lab_schedules'))
 
     # GET request: Fetch and display existing schedules
-    schedules = LabSchedule.get_all_schedules()
+    schedules = LabSchedule.get_all_schedules() # Consider ordering if needed
     return render_template("admin/lab_schedules.html", schedules=schedules)
+
 
 
 @app.route("/admin/lab-schedules/delete/<int:id>", methods=["POST"])
